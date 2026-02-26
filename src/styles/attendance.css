@@ -1,0 +1,373 @@
+/* ===============================
+   ATTENDANCE PAGE WRAPPER
+================================ */
+
+.attendance-page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ===============================
+   PAGE HEADER
+================================ */
+
+.page-header {
+  background: linear-gradient(135deg, #020617, #2563eb);
+  color: white;
+  padding: 24px 28px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  animation: fadeSlideIn 0.4s ease-out;
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: #cbd5e1;
+  margin-top: 4px;
+}
+
+.date-badge {
+  background: #e0e7ff;
+  color: #1e40af;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ===============================
+   BULK ACTION BAR
+================================ */
+
+.bulk-action-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: #f8fafc;
+  padding: 14px 18px;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+}
+
+.bulk-action-bar select {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+}
+
+.bulk-btn {
+  background: #2563eb;
+  color: white;
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bulk-btn:hover {
+  background: #1d4ed8;
+}
+
+.bulk-btn:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+/* ===============================
+   TABLE WRAPPER
+================================ */
+
+.table-wrapper {
+  background: white;
+  border-radius: 16px;
+  overflow-x: auto;      /* ✅ Scroll inside wrapper only */
+  overflow-y: hidden;
+  max-width: 100%;       /* ✅ Prevent overflow outside */
+  box-shadow: 0 12px 35px rgba(15, 23, 42, 0.08);
+}
+
+.premium-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;   /* ✅ More responsive */
+}
+
+/* ===============================
+   ATTENDANCE TABLE
+================================ */
+
+.attendance-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.attendance-table th {
+  background: #f1f5f9;
+  text-align: left;
+  padding: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.attendance-table td {
+  padding: 14px;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: middle;
+}
+
+.attendance-table tr:hover {
+  background: #f8fafc;
+}
+
+.employee-name {
+  font-weight: 500;
+  color: #0f172a;
+}
+
+/* ===============================
+   ATTENDANCE ACTION BUTTONS
+================================ */
+
+.attendance-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* Base button */
+
+.att-btn {
+  padding: 6px 16px;
+  border-radius: 8px;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  opacity: 0.65;
+  transition: all 0.2s ease;
+  color: white;
+}
+
+/* Hover */
+
+.att-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* Active */
+
+.att-btn.active {
+  opacity: 1;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* Disabled */
+
+.att-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Status colors */
+
+.att-btn.present {
+  background: #16a34a;
+}
+
+.att-btn.absent {
+  background: #ef4444;
+}
+
+.att-btn.leave {
+  background: #f59e0b;
+}
+
+/* ===============================
+   LOCK LABEL
+================================ */
+
+.lock-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #ef4444;
+  background: #fee2e2;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+/* ===============================
+   MONTH GRID (IF USED)
+================================ */
+
+.month-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
+
+.month-day {
+  border: 1px solid #e5e7eb;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  background: #ffffff;
+  transition: all 0.2s ease;
+}
+
+.month-day:hover {
+  background: #f8fafc;
+}
+
+.month-day.present {
+  background: #16a34a;
+  color: white;
+}
+
+.month-day.absent {
+  background: #ef4444;
+  color: white;
+}
+
+.month-day.leave {
+  background: #f59e0b;
+  color: white;
+}
+
+.month-day.empty {
+  background: #f1f5f9;
+  color: #94a3b8;
+}
+
+/* ===============================
+   STATUS BADGES
+================================ */
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.status-badge.present {
+  background: #16a34a;
+  color: white;
+}
+
+.status-badge.absent {
+  background: #ef4444;
+  color: white;
+}
+
+.status-badge.leave {
+  background: #f59e0b;
+  color: white;
+}
+
+/* ===============================
+   MODAL (IF USED)
+================================ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-card {
+  background: white;
+  width: 420px;
+  padding: 24px;
+  border-radius: 14px;
+}
+
+.modal-card h3 {
+  font-size: 18px;
+  margin-bottom: 16px;
+}
+
+.modal-info p {
+  margin-bottom: 10px;
+  font-size: 14px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.countdown-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #f59e0b;
+  background: #fffbeb;
+  padding: 4px 8px;
+  border-radius: 999px;
+}
+
+.unlock-btn {
+  background: #0ea5e9;
+  color: white;
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: none;
+  font-size: 12px;
+  cursor: pointer;
+  margin-left: 8px;
+}
+
+.unlock-btn:hover {
+  background: #0284c7;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 768px) {
+  .attendance-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .att-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .bulk-action-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .bulk-btn {
+    width: 100%;
+  }
+}

@@ -1,0 +1,524 @@
+/* ================= ADD EMPLOYEE PAGE ================= */
+
+.add-employee-page {
+  width: 100%;
+  padding-bottom: 60px;
+  background: linear-gradient(135deg, #f8fafc, #eef2ff);
+  min-height: 100vh;
+}
+
+/* ================= HEADER ================= */
+
+.add-employee-header {
+  background: linear-gradient(135deg, #0f172a, #2563eb, #4f46e5);
+  background-size: 200% 200%;
+  animation: gradientShift 6s ease infinite;
+  color: white;
+  padding: 20px 24px;
+  border-radius: 16px;
+  margin-bottom: 32px;
+  box-shadow: 0 15px 40px rgba(37, 99, 235, 0.25);
+}
+
+.add-employee-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.add-employee-header p {
+  font-size: 14px;
+  margin-top: 6px;
+  opacity: 0.9;
+}
+
+/* ================= NAME + STATUS ROW ================= */
+
+.name-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+/* ================= STATUS BADGE ================= */
+
+.status-badge {
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: capitalize;
+  transition: 0.3s ease;
+}
+
+/* Active */
+.status-badge.active {
+  background: #dcfce7;
+  color: #166534;
+  box-shadow: 0 4px 12px rgba(22, 101, 52, 0.15);
+}
+
+/* Inactive */
+.status-badge.inactive {
+  background: #fee2e2;
+  color: #991b1b;
+  box-shadow: 0 4px 12px rgba(153, 27, 27, 0.15);
+}
+
+
+/* ================= FORM CARD ================= */
+
+.step-form-card {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.08);
+  transition: all 0.3s ease;
+}
+
+/* ================= STEPPER ================= */
+
+.stepper {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 28px;
+  position: relative;
+}
+
+.step {
+  flex: 1;
+  text-align: center;
+  position: relative;
+  opacity: 0.6;
+  transition: all 0.3s ease;
+}
+
+.step::after {
+  content: "";
+  position: absolute;
+  top: 18px;
+  right: -50%;
+  width: 100%;
+  height: 3px;
+  background: #e2e8f0;
+  z-index: 0;
+  transition: all 0.4s ease;
+}
+
+.step:last-child::after {
+  display: none;
+}
+
+.step span {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #e2e8f0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: #475569;
+  position: relative;
+  z-index: 1;
+  transition: all 0.3s ease;
+  font-size: 13px;
+}
+
+.step.active {
+  opacity: 1;
+}
+
+.step.active span {
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  color: white;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+}
+
+.step.active::after {
+  background: linear-gradient(to right, #2563eb, #4f46e5);
+}
+
+.step p {
+  font-size: 12px;
+  margin-top: 6px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.step.active p {
+  color: #0f172a;
+}
+
+/* ================= FORM GRID ================= */
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+/* ================= FORM FIELD ================= */
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-field label {
+  font-size: 12px;
+  color: #334155;
+  margin-bottom: 5px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+/* ================= INPUT / SELECT ================= */
+
+.form-field input,
+.form-field select {
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  font-size: 13px;
+  transition: all 0.25s ease;
+  background: #ffffff;
+}
+
+.form-field input:hover,
+.form-field select:hover {
+  border-color: #cbd5e1;
+}
+
+.form-field input:focus,
+.form-field select:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+  transform: translateY(-1px);
+}
+
+/* ================= ERROR ================= */
+
+.input-error {
+  border: 1px solid #ef4444 !important;
+  background: #fff5f5;
+}
+
+.error-text {
+  color: #ef4444;
+  font-size: 12px;
+  margin-top: 5px;
+  font-weight: 500;
+}
+
+/* ================= FILE INPUT ================= */
+
+.form-field input[type="file"] {
+  padding: 14px;
+  background: #f8fafc;
+  border: 2px dashed #cbd5e1;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.form-field input[type="file"]:hover {
+  background: #eef2ff;
+  border-color: #4f46e5;
+}
+
+/* ================= FILE ACTIONS ================= */
+
+.file-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.file-name {
+  font-size: 13px;
+  color: #334155;
+}
+
+/* Preview Button */
+.preview-btn {
+  padding: 6px 14px;
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.preview-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+}
+
+/* Remove Button */
+.remove-btn {
+  padding: 6px 14px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.remove-btn:hover {
+  background: #dc2626;
+  transform: translateY(-2px);
+}
+
+/* ================= ACTION BUTTONS ================= */
+
+.step-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+  margin-top: 36px;
+}
+
+.btn {
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.25s ease;
+}
+
+/* Primary */
+.btn.primary {
+  background: linear-gradient(135deg, #2563eb, #4f46e5);
+  color: white;
+  box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
+}
+
+.btn.primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(37, 99, 235, 0.4);
+}
+
+/* Ghost */
+.btn.ghost {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.btn.ghost:hover {
+  background: #e2e8f0;
+}
+
+/* ================= PREVIEW MODAL ================= */
+
+.preview-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.preview-content {
+  position: relative;
+  background: white;
+  padding: 24px;
+  border-radius: 18px;
+  max-width: 85vw;
+  max-height: 85vh;
+  overflow: auto;
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
+  animation: modalPop 0.3s ease;
+}
+
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 14px;
+  background: #ef4444;
+  border: none;
+  color: white;
+  font-size: 14px;
+  padding: 5px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  background: #dc2626;
+}
+
+.modal-image {
+  max-width: 70vw;
+  max-height: 70vh;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.modal-pdf {
+  width: 70vw;
+  height: 70vh;
+  border: none;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ================= ANIMATIONS ================= */
+
+@keyframes modalPop {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 1024px) {
+  .form-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stepper {
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .step::after {
+    display: none;
+  }
+
+  .step-actions {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+}
+
+
+/* ================= STEP TRANSITION ================= */
+
+.step-animate {
+  animation: fadeSlide 0.35s ease forwards;
+}
+
+@keyframes fadeSlide {
+  from {
+    opacity: 0;
+    transform: translateX(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+
+
+
+/* ================= ADVANCED STEP TRANSITION ================= */
+
+.step-animate {
+  animation-duration: 0.35s;
+  animation-fill-mode: both;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.step-animate.forward {
+  animation-name: slideForward;
+}
+
+.step-animate.backward {
+  animation-name: slideBackward;
+}
+
+@keyframes slideForward {
+  from {
+    opacity: 0;
+    transform: translateX(40px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes slideBackward {
+  from {
+    opacity: 0;
+    transform: translateX(-40px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+
+/* ================= FORCE STYLE FOR STEP 5 ================= */
+
+.form-grid > select,
+.form-grid > textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+  font-size: 13px;
+  background: #ffffff;
+  transition: all 0.25s ease;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+/* Hover */
+.form-grid > select:hover,
+.form-grid > textarea:hover {
+  border-color: #cbd5e1;
+}
+
+/* Focus */
+.form-grid > select:focus,
+.form-grid > textarea:focus {
+  outline: none;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
+  transform: translateY(-1px);
+}
+
+/* Textarea specific */
+.form-grid > textarea {
+  min-height: 100px;
+  resize: vertical;
+}

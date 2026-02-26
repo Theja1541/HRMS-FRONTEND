@@ -1,0 +1,34 @@
+/* =============================
+   RESET VITE DEFAULT STYLES
+============================= */
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* =============================
+   CSS VARIABLES
+============================= */
+
+:root {
+  --primary: #2563eb;
+  --primary-dark: #1e40af;
+  --sidebar-bg: #020617;
+  --card-bg: #ffffff;
+  --success: #22c55e;
+  --danger: #ef4444;
+}
+
+/* =============================
+   GLOBAL FONT CONSISTENCY
+============================= */
+
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f6f8fc;
+}

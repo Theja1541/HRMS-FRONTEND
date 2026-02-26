@@ -1,0 +1,31 @@
+/* .layout-root {
+  display: flex;
+  min-height: 100vh;
+}
+
+.layout-main {
+  flex: 1;
+  background: #f6f8fc;
+}
+
+.layout-content {
+  padding: 28px;
+} */
+
+.layout-root {
+  display: flex;
+  height: 100vh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.layout-main {
+  flex: 1;
+  background: #f6f8fc;
+  overflow-x: hidden;   /* ✅ Important */
+}
+
+.layout-content {
+  padding: 28px;
+  max-width: 100%;
+}

@@ -1,0 +1,95 @@
+/* ===============================
+   MODAL OVERLAY
+================================ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* ===============================
+   MODAL CARD
+================================ */
+
+.modal-card {
+  background: #ffffff;
+  width: 420px;
+  max-width: 90%;
+  border-radius: 14px;
+  padding: 24px;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
+  animation: fadeInScale 0.2s ease;
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ===============================
+   CONTENT
+================================ */
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #0f172a;
+}
+
+.modal-message {
+  font-size: 14px;
+  color: #475569;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+/* ===============================
+   ACTION BUTTONS
+================================ */
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-cancel {
+  background: #e5e7eb;
+  color: #111827;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn-cancel:hover {
+  background: #d1d5db;
+}
+
+.btn-delete {
+  background: #ef4444;
+  color: #ffffff;
+  padding: 8px 18px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.btn-delete:hover {
+  background: #dc2626;
+}

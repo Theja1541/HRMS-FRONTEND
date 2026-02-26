@@ -1,0 +1,93 @@
+/* ===============================
+   EMPLOYEE SIDEBAR
+================================ */
+
+.employee-sidebar {
+  width: 260px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #020617, #020617);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 16px;
+  position: relative;
+}
+
+/* ===============================
+   TITLE
+================================ */
+
+.sidebar-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+/* ===============================
+   MENU
+================================ */
+
+.employee-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.employee-menu a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #cbd5f5;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.employee-menu a:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.employee-menu a.active {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+/* ===============================
+   FOOTER (LOGOUT)
+================================ */
+
+.employee-sidebar-footer {
+  margin-top: auto;
+  padding-top: 16px;
+  padding-bottom: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logout-btn {
+  width: 100%;
+  background: #ef4444;
+  color: white;
+  border: none;
+  padding: 12px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  opacity: 0.9;
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 1024px) {
+  .employee-sidebar {
+    width: 220px;
+  }
+}

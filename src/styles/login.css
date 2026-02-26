@@ -1,0 +1,77 @@
+/* ======================
+   LOGIN PAGE
+====================== */
+
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #0f172a, #2563eb);
+}
+
+.login-card {
+  background: #ffffff;
+  padding: 32px;
+  width: 360px;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.login-card h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #0f172a;
+}
+
+.login-card input {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  outline: none;
+}
+
+.login-card input:focus {
+  border-color: #2563eb;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 10px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.login-btn:hover {
+  background: #1e40af;
+}
+
+.login-error {
+  color: #dc2626;
+  font-size: 14px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+
+.login-subtitle {
+  font-size: 14px;
+  color: #64748b;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.login-btn.secondary {
+  background: #16a34a;
+  margin-top: 12px;
+}
+
+.login-btn.secondary:hover {
+  background: #15803d;
+}

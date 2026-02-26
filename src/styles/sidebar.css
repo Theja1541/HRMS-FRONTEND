@@ -1,0 +1,234 @@
+/* ===============================
+   SIDEBAR ROOT
+================================ */
+
+.sidebar {
+  width: 260px;
+  min-width: 260px;
+  background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  position: relative;
+  box-shadow: 4px 0 40px rgba(0, 0, 0, 0.35);
+}
+
+/* COLLAPSED */
+.sidebar.collapsed {
+  width: 80px;
+  min-width: 80px;
+}
+
+/* ===============================
+   HEADER
+================================ */
+
+.sidebar-header {
+  height: 70px;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sidebar-logo {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.sidebar.collapsed .sidebar-logo {
+  opacity: 0;
+  transform: translateX(-12px);
+  pointer-events: none;
+}
+
+.sidebar-toggle {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+/* ===============================
+   MENU
+================================ */
+
+.sidebar-menu {
+  flex: 1;
+  padding: 14px;
+  overflow-y: auto;
+}
+
+/* MAIN ITEM */
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  margin-bottom: 8px;
+  border-radius: 12px;
+  font-size: 14px;
+  color: #cbd5e1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+  position: relative;
+}
+
+/* ICON */
+.sidebar-item i,
+.sidebar-item svg {
+  min-width: 22px;
+  font-size: 18px;
+}
+
+/* TEXT */
+.sidebar-item span {
+  transition: all 0.25s ease;
+}
+
+/* HOVER */
+.sidebar-item:hover {
+  background: rgba(59, 130, 246, 0.15);
+  color: #ffffff;
+  transform: translateX(3px);
+}
+
+/* ACTIVE */
+.sidebar-item.active {
+  background: linear-gradient(90deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+}
+
+/* COLLAPSED MODE */
+
+.sidebar.collapsed .sidebar-item {
+  justify-content: center;
+}
+
+.sidebar.collapsed .sidebar-item span {
+  opacity: 0;
+  transform: translateX(-10px);
+  pointer-events: none;
+}
+
+/* ===============================
+   DROPDOWN
+================================ */
+
+.dropdown {
+  justify-content: space-between;
+}
+
+.dropdown-arrow {
+  font-size: 12px;
+  opacity: 0.6;
+  transition: transform 0.3s ease;
+}
+
+/* Rotate when open (optional if you toggle class .open) */
+.dropdown.open .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.sidebar.collapsed .dropdown-arrow {
+  display: none;
+}
+
+/* SUB MENU */
+
+.dropdown-menu {
+  margin: 8px 0 10px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  animation: dropdownFade 0.25s ease;
+}
+
+.sidebar.collapsed .dropdown-menu {
+  display: none;
+}
+
+/* SUB ITEM */
+
+.sidebar-subitem {
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #94a3b8;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.sidebar-subitem:hover {
+  background: rgba(59, 130, 246, 0.12);
+  color: #ffffff;
+  transform: translateX(4px);
+}
+
+.sidebar-subitem.active {
+  background: rgba(37, 99, 235, 0.25);
+  color: #ffffff;
+}
+
+/* ===============================
+   FOOTER
+================================ */
+
+.sidebar-footer {
+  padding: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.sidebar-item.logout {
+  color: #fca5a5;
+}
+
+.sidebar-item.logout:hover {
+  background: rgba(239, 68, 68, 0.18);
+  color: #ffffff;
+}
+
+/* ===============================
+   SCROLLBAR
+================================ */
+
+.sidebar-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-menu::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 6px;
+}
+
+/* ===============================
+   ANIMATIONS
+================================ */
+
+@keyframes dropdownFade {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.sidebar-dropdown-menu{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}

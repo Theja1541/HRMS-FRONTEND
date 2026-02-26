@@ -1,0 +1,122 @@
+/* =========================
+   GLOBAL RESET
+========================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* =========================
+   ROOT FONT SETTINGS
+========================= */
+html {
+  font-size: 16px; /* 🔥 BASE SIZE FIX */
+}
+
+body {
+  font-family: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 15px;           /* 🔥 PROFESSIONAL BASE */
+  line-height: 1.6;
+  background-color: #f6f8fc;
+  color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* =========================
+   HEADINGS
+========================= */
+h1 {
+  font-size: 26px;
+  font-weight: 600;
+}
+
+h2 {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+h3 {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+h4 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* =========================
+   TEXT
+========================= */
+p {
+  font-size: 14.5px;
+  color: #475569;
+}
+
+small {
+  font-size: 13px;
+}
+
+/* =========================
+   LINKS
+========================= */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+button {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+/* =========================
+   INPUTS / FORMS
+========================= */
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: 8px;
+}
+
+/* =========================
+   TABLES
+========================= */
+table {
+  font-size: 14px;
+}
+
+th {
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+}
+
+td {
+  font-size: 14px;
+  color: #0f172a;
+}
+
+/* =========================
+   UTILITIES
+========================= */
+.muted-text {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.text-center {
+  text-align: center;
+}

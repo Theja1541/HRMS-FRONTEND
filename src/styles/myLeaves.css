@@ -1,0 +1,96 @@
+.my-leaves-page {
+  width: 100%;
+}
+
+/* ================= HEADER ================= */
+
+.page-header {
+  background: linear-gradient(135deg, #020617, #2563eb);
+  color: white;
+  padding: 24px 28px;
+  border-radius: 18px;
+  margin-bottom: 28px;
+}
+
+.page-header h2 {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.page-header p {
+  font-size: 14px;
+  opacity: 0.85;
+}
+
+/* ================= EMPTY ================= */
+
+.empty-state {
+  background: white;
+  padding: 40px;
+  border-radius: 14px;
+  text-align: center;
+  color: #64748b;
+}
+
+/* ================= TABLE ================= */
+
+.leaves-table-wrapper {
+  background: white;
+  border-radius: 16px;
+  overflow-x: auto;
+}
+
+.leaves-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.leaves-table th {
+  background: #f1f5f9;
+  padding: 14px;
+  text-align: left;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.leaves-table td {
+  padding: 14px;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: middle;
+}
+
+.leaves-table tr:hover {
+  background: #f8fafc;
+}
+
+.reason {
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ================= STATUS BADGES ================= */
+
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-badge.pending {
+  background: #fff4e5;
+  color: #d97706;
+}
+
+.status-badge.approved {
+  background: #ecfdf5;
+  color: #16a34a;
+}
+
+.status-badge.rejected {
+  background: #fef2f2;
+  color: #dc2626;
+}
