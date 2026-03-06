@@ -13,67 +13,61 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setError("");
+  e.preventDefault();
 
-    if (!username.trim() || !password.trim()) {
-      setError("Please enter username and password");
+  if (loading) return;   // 🔥 prevent double submit
+
+  setError("");
+
+  if (!username.trim() || !password.trim()) {
+    setError("Please enter username and password");
+    return;
+  }
+
+  try {
+    setLoading(true);
+
+    const result = await login(username.trim(), password.trim());
+    console.log("LOGIN RESULT:", result);
+
+    if (result.forcePasswordChange) {
+      // console.log("Redirecting to change-password page...");
+      navigate("/change-password", {
+        state: { username, password }
+      });
+      return;
+    }
+    console.log("Navigating to change password...");
+
+    if (!result.success) {
+      setError(result.message || "Invalid credentials");
       return;
     }
 
-    try {
-      setLoading(true);
+    const role = result.role?.toUpperCase();
 
-      const result = await login(username.trim(), password.trim());
-
-      if (!result.success) {
-        setError(result.message || "Invalid credentials");
-        return;
-      }
-
-      /* =========================================
-         🔐 FORCE PASSWORD CHANGE FLOW
-      ========================================= */
-
-      if (result.forcePasswordChange) {
-        navigate("/change-password", {
-          state: { username, password }
-        });
-        return;
-      }
-
-
-      /* =========================================
-         🎯 ROLE BASED REDIRECT
-      ========================================= */
-
-      const role = result.role?.toUpperCase();
-
-      switch (role) {
-        case "SUPER_ADMIN":
-          navigate("/super-admin/dashboard", { replace: true });
-          break;
-
-        case "ADMIN":
-        case "HR":
-          navigate("/dashboard", { replace: true });
-          break;
-
-        case "EMPLOYEE":
-          navigate("/employee/dashboard", { replace: true });
-          break;
-
-        default:
-          navigate("/unauthorized", { replace: true });
-      }
-
-    } catch (err) {
-      console.error("Login error:", err);
-      setError("Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
+    switch (role) {
+      case "SUPER_ADMIN":
+        navigate("/super-admin/dashboard", { replace: true });
+        break;
+      case "ADMIN":
+      case "HR":
+        navigate("/dashboard", { replace: true });
+        break;
+      case "EMPLOYEE":
+        navigate("/employee/dashboard", { replace: true });
+        break;
+      default:
+        navigate("/unauthorized", { replace: true });
     }
-  };
+
+  } catch (err) {
+    console.error("Login error:", err);
+    setError("Something went wrong. Please try again.");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="login-container">

@@ -68,32 +68,33 @@ export default function Sidebar() {
         )}
 
         {/* PAYROLL DROPDOWN */}
-        <div
-          className="sidebar-item dropdown"
-          onClick={() => setOpenPayroll(!openPayroll)}
-        >
-          💰 {!collapsed && "Payroll"}
-          {!collapsed && (
-            <span className="dropdown-arrow">
-              {openPayroll ? "▲" : "▼"}
-            </span>
-          )}
+      <div
+        className="sidebar-item dropdown"
+        onClick={() => setOpenPayroll(!openPayroll)}
+      >
+        💰 {!collapsed && "Payroll"}
+        {!collapsed && (
+          <span className="dropdown-arrow">
+            {openPayroll ? "▲" : "▼"}
+          </span>
+        )}
+      </div>
+
+      {openPayroll && !collapsed && (
+        <div className="sidebar-dropdown-menu">
+          <NavLink to="/payroll" className="sidebar-subitem">
+            📄 Generate Payslip
+          </NavLink>
+
+          <NavLink to="/payroll-summary" className="sidebar-subitem">
+            📊 Payroll Summary
+          </NavLink>
+
+          <NavLink to="/email-dashboard" className="sidebar-subitem">
+            📧 Email Dashboard
+          </NavLink>
         </div>
-
-        {openPayroll && !collapsed && (
-  <div className="sidebar-dropdown-menu">
-    <NavLink to="/payroll" className="sidebar-subitem">
-      📄 Generate Payslip
-    </NavLink>
-    <NavLink to="/salary" className="sidebar-subitem">
-      💼 Salary Management
-    </NavLink>
-    <NavLink to="/email-dashboard" className="sidebar-subitem">
-      📧 Email Dashboard
-    </NavLink>
-  </div>
-)}
-
+      )}
       </nav>
 
       {/* FOOTER */}

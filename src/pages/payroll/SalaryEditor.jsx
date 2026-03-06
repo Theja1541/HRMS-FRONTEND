@@ -97,11 +97,29 @@ export default function SalaryEditor() {
             ) : (
               salaries.map((salary) => {
 
-                const total =
+                const gross =
                   Number(salary.basic) +
+                  Number(salary.da) +
                   Number(salary.hra) +
-                  Number(salary.allowances) -
-                  Number(salary.deductions);
+                  Number(salary.conveyance) +
+                  Number(salary.medical) +
+                  Number(salary.special_allowance);
+
+                const deductions =
+                  Number(salary.employee_pf) +
+                  Number(salary.professional_tax) +
+                  Number(salary.employee_esi) +
+                  Number(salary.tds) +
+                  Number(salary.medical_insurance);
+
+                const net = gross - deductions;
+
+                const employer =
+                  Number(salary.employer_pf) +
+                  Number(salary.employer_esi) +
+                  Number(salary.gratuity);
+
+                const ctc = gross + employer;
 
                 return (
                   <tr key={salary.id}>
@@ -177,7 +195,10 @@ export default function SalaryEditor() {
                         <td>
                           <button
                             className="btn-payslip"
-                            onClick={() => handleEdit(salary)}
+                            onClick={() => {
+                              setEditingId(salary.id);
+                              setForm(salary);
+                            }}
                           >
                             Edit
                           </button>

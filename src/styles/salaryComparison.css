@@ -1,0 +1,39 @@
+.salary-comparison {
+  margin-top: 30px;
+}
+
+.comparison-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.comparison-table th,
+.comparison-table td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
+}
+
+.comparison-table th {
+  background: #f6f6f6;
+}
+
+.summary-row {
+  font-weight: 600;
+  background: #fafafa;
+}
+
+.change.increase {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.change.decrease {
+  color: #dc2626;
+  font-weight: 600;
+}
+
+.change.neutral {
+  color: #999;
+}

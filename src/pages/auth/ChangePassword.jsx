@@ -16,12 +16,6 @@ export default function ChangePassword() {
   /* =========================================
      OPTIONAL: Prevent direct access
   ========================================= */
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (!token) {
-      navigate("/login", { replace: true });
-    }
-  }, [navigate]);
 
   const handleSubmit = async (e) => {
   e.preventDefault();
@@ -40,20 +34,15 @@ export default function ChangePassword() {
   try {
     setLoading(true);
 
-    await api.post("/accounts/change-password/", {
+    const res = await api.post("/accounts/change-password/", {
       new_password: newPassword,
     });
 
     alert("Password changed successfully ✅");
 
-    // 🔥 VERY IMPORTANT
+    // After password change → go back to login
     localStorage.clear();
-
-    // After successful change
-    localStorage.setItem("accessToken", access);
-    localStorage.setItem("refreshToken", refresh);
-
-    navigate("/dashboard", { replace: true });
+    navigate("/login", { replace: true });
 
   } catch (err) {
     setError(

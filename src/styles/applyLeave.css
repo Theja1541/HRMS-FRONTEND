@@ -1,112 +1,219 @@
-.apply-leave-page {
-  max-width: 760px;
+/* ============================================================
+   APPLY LEAVE PAGE (PREMIUM VERSION)
+============================================================ */
+
+.employee-page {
+  padding: 5px 0 10px 0;
 }
 
-/* Header */
+/* ============================================================
+   HERO HEADER
+============================================================ */
+
 .page-header {
-  background: linear-gradient(135deg, #020617, #2563eb);
-  color: white;
+  background: linear-gradient(135deg, #0f172a, #2563eb);
   padding: 26px 32px;
-  border-radius: 18px;
-  margin-bottom: 28px;
+  border-radius: 22px;
+  color: white;
+  margin-bottom: 30px;
+
+  box-shadow: 0 20px 50px rgba(37, 99, 235, 0.25);
 }
 
 .page-header h2 {
-  font-size: 20px;
-  font-weight: 600;
-  margin-bottom: 4px;
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 6px;
 }
 
 .page-header p {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.85); /* 🔥 FIXED */
+  opacity: 0.9;
 }
 
+/* ============================================================
+   FORM CARD
+============================================================ */
 
-/* Card */
-.leave-card {
-  background: white;
-  padding: 28px;
-  border-radius: 18px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+.form-card {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+
+  padding: 30px;
+  border-radius: 22px;
+
+  box-shadow:
+    0 20px 60px rgba(15, 23, 42, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+
+  max-width: 720px;
+
+  animation: fadeUp 0.6s ease forwards;
 }
 
-/* Form */
+/* ============================================================
+   FORM GROUP
+============================================================ */
+
 .form-group {
   display: flex;
   flex-direction: column;
-  margin-bottom: 18px;
+  margin-bottom: 22px;
 }
 
 .form-group label {
   font-size: 14px;
-  font-weight: 500;
-  margin-bottom: 6px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #0f172a;
 }
+
+/* ============================================================
+   INPUTS
+============================================================ */
 
 .form-group input,
 .form-group select,
 .form-group textarea {
   padding: 12px 14px;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
   font-size: 14px;
+  background: #ffffff;
+
+  transition: all 0.25s ease;
 }
 
-.form-group textarea {
-  min-height: 100px;
-  resize: vertical;
+.form-group input:hover,
+.form-group select:hover,
+.form-group textarea:hover {
+  border-color: #3b82f6;
 }
 
-/* Row */
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.15);
+}
+
+/* ============================================================
+   DATE ROW
+============================================================ */
+
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 22px;
 }
 
-/* Errors */
-.error {
-  color: #ef4444;
-  font-size: 12px;
-  margin-top: 4px;
-}
+/* ============================================================
+   TOTAL DAYS BADGE
+============================================================ */
 
-/* Success */
-.success-msg {
-  background: #ecfdf5;
-  color: #065f46;
-  padding: 10px 14px;
-  border-radius: 10px;
+.leave-days-info {
+  margin: 8px 0 18px 0;
+  padding: 12px 16px;
+  border-radius: 14px;
+
   font-size: 14px;
-  margin-bottom: 18px;
+  font-weight: 600;
+
+  background: linear-gradient(135deg, #dbeafe, #eff6ff);
+  color: #1d4ed8;
+
+  box-shadow: 0 8px 20px rgba(59, 130, 246, 0.15);
+
+  animation: slideFade 0.4s ease;
 }
 
-/* Button */
-.btn-primary {
-  background: #2563eb;
+/* ============================================================
+   TEXTAREA
+============================================================ */
+
+.form-group textarea {
+  resize: none;
+  min-height: 100px;
+}
+
+/* ============================================================
+   BUTTON
+============================================================ */
+
+.form-actions {
+  margin-top: 16px;
+}
+
+.btn.primary {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
   color: white;
+
+  padding: 12px 26px;
+  border-radius: 16px;
   border: none;
-  padding: 12px 18px;
-  border-radius: 12px;
+
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
+
   cursor: pointer;
+
+  transition: all 0.3s ease;
 }
 
-.btn-primary:hover {
-  opacity: 0.9;
+.btn.primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 18px 35px rgba(37, 99, 235, 0.35);
 }
 
-/* Responsive */
-@media (max-width: 640px) {
-  .form-row {
-    grid-template-columns: 1fr;
+.btn.primary:active {
+  transform: scale(0.97);
+}
+
+.btn.primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* ============================================================
+   ANIMATIONS
+============================================================ */
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
+@keyframes slideFade {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-.apply-leave-page {
-  max-width: 760px;
-  margin-left: 0;
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 900px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-card {
+    padding: 24px;
+  }
 }

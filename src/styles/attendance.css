@@ -347,6 +347,10 @@
   background: #0284c7;
 }
 
+.att-btn.halfday { background: #0ea5e9; }
+.att-btn.paidleave { background: #10b981; }
+.att-btn.unpaidleave { background: #f59e0b; }
+
 /* ===============================
    RESPONSIVE
 ================================ */

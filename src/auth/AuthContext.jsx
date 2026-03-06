@@ -15,62 +15,57 @@ export function AuthProvider({ children }) {
   ========================================= */
 
   const login = async (email, password) => {
-    try {
-      const res = await api.post("/accounts/login/", {
-        email: email.trim(),
-        password,
-      });
+  try {
+    const res = await api.post("/accounts/login/", {
+      email: email.trim(),
+      password,
+    });
 
-      // 🔁 FORCE PASSWORD CHANGE
-      if (res.data.force_password_change) {
-        return {
-          success: true,
-          forcePasswordChange: true,
-          message: res.data.message
-        };
-      }
+    const data = res.data;
 
-      // ✅ NORMAL LOGIN
-      const authUser = {
-        id: res.data.user.id,
-        username: res.data.user.username,   // still available from backend
-        email: res.data.user.email,
-        role: res.data.user.role.toUpperCase(),
-        employeeProfileId: res.data.user.employee_profile_id,
-        isAuthenticated: true,
-      };
+    const authUser = {
+      id: data.user.id,
+      username: data.user.username,
+      email: data.user.email,
+      role: data.user.role.toUpperCase(),
+      employeeProfileId: data.user.employee_profile_id,
+      isAuthenticated: true,
+    };
 
-      localStorage.setItem("authUser", JSON.stringify(authUser));
-      localStorage.setItem("accessToken", res.data.access);
-      localStorage.setItem("refreshToken", res.data.refresh);
+    localStorage.setItem("authUser", JSON.stringify(authUser));
+    localStorage.setItem("accessToken", data.access);
+    localStorage.setItem("refreshToken", data.refresh);
 
-      setUser(authUser);
+    setUser(authUser);
 
-      return {
-        success: true,
-        role: authUser.role,
-      };
+    return {
+      success: true,
+      role: authUser.role,
+      forcePasswordChange: data.force_password_change, // convert naming here
+    };
 
-    } catch (err) {
+  } catch (err) {
 
-      console.log("LOGIN ERROR DATA:", err.response?.data);
+    console.log("LOGIN ERROR DATA:", err.response?.data);
 
-      let message = "Invalid email or password";
+    const errorData = err.response?.data;
 
-      if (err.response?.data?.non_field_errors) {
-        message = err.response.data.non_field_errors[0];
-      }
+    let message = "Invalid email or password";
 
-      if (err.response?.data?.detail) {
-        message = err.response.data.detail;
-      }
-
-      return {
-        success: false,
-        message,
-      };
+    if (errorData?.email) {
+      message = errorData.email[0];
+    } else if (errorData?.password) {
+      message = errorData.password[0];
+    } else if (errorData?.detail) {
+      message = errorData.detail;
     }
-  };
+
+    return {
+      success: false,
+      message,
+    };
+  }
+};
 
   /* =========================================
      LOGOUT

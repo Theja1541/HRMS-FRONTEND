@@ -1,9 +1,19 @@
 import { useState, useEffect } from "react";
 import { useEmployees } from "../../context/EmployeesContext";
 import toast from "react-hot-toast";
+import { usePayroll } from "../../context/PayrollContext";
+import PayrollLockBanner from "../../components/common/PayrollLockBanner";
 import "../../styles/attendance.css";
 
 export default function Attendance() {
+  
+  // const { isLocked } = usePayroll();
+  const { payrollStatus } = usePayroll();
+  const isLocked = payrollStatus === "CLOSED";
+//   useEffect(() => {
+//   console.log("Payroll status:", payrollStatus);
+//   console.log("isLocked:", isLocked);
+// }, [payrollStatus, isLocked]);
   const {
     employees = [],
     attendance = {},
@@ -26,8 +36,8 @@ export default function Attendance() {
   }, []);
 
   const getRecord = (empId) => {
-    return attendance?.[today]?.[empId] || null;
-  };
+  return attendance?.[today]?.[String(empId)] || null;
+};
 
   /* ===============================
      BULK ATTENDANCE
@@ -47,6 +57,7 @@ export default function Attendance() {
 
   return (
     <div className="attendance-page">
+      <PayrollLockBanner />
 
       {/* ================= HEADER ================= */}
       <div className="page-header">
@@ -66,14 +77,16 @@ export default function Attendance() {
           onChange={(e) => setBulkStatus(e.target.value)}
         >
           <option value="PRESENT">Present</option>
-          <option value="LEAVE">Leave</option>
+          <option value="HALF_DAY">Half Day</option>
+          <option value="PAID_LEAVE">Paid Leave</option>
+          <option value="UNPAID_LEAVE">Unpaid Leave</option>
           <option value="ABSENT">Absent</option>
         </select>
 
         <button
           className="bulk-btn"
           onClick={handleBulkApply}
-          disabled={loadingBulk}
+          disabled={loadingBulk || isLocked}
         >
           {loadingBulk ? "Applying..." : "Apply to All"}
         </button>
@@ -110,19 +123,42 @@ export default function Attendance() {
                         onClick={() =>
                           markAttendance(today, emp.id, "PRESENT")
                         }
+                        disabled={isLocked}
                       >
                         Present
                       </button>
 
                       <button
                         className={`att-btn leave ${
-                          status === "LEAVE" ? "active" : ""
+                          status === "HALF_DAY" ? "active" : ""
                         }`}
                         onClick={() =>
-                          markAttendance(today, emp.id, "LEAVE")
+                          markAttendance(today, emp.id, "HALF_DAY")
                         }
                       >
-                        Leave
+                        Half Day
+                      </button>
+
+                      <button
+                        className={`att-btn leave ${
+                          status === "PAID_LEAVE" ? "active" : ""
+                        }`}
+                        onClick={() =>
+                          markAttendance(today, emp.id, "PAID_LEAVE")
+                        }
+                      >
+                        Paid Leave
+                      </button>
+
+                      <button
+                        className={`att-btn leave ${
+                          status === "UNPAID_LEAVE" ? "active" : ""
+                        }`}
+                        onClick={() =>
+                          markAttendance(today, emp.id, "UNPAID_LEAVE")
+                        }
+                      >
+                        Unpaid Leave
                       </button>
 
                       <button

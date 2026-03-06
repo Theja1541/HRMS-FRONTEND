@@ -5,6 +5,9 @@ import "../../styles/applyLeave.css";
 
 export default function ApplyLeave() {
   const [leaveTypes, setLeaveTypes] = useState([]);
+  const [leaveBalance, setLeaveBalance] = useState([]);
+  const [totalDays, setTotalDays] = useState(0);
+
   const [form, setForm] = useState({
     leaveTypeId: "",
     fromDate: "",
@@ -15,10 +18,12 @@ export default function ApplyLeave() {
   const [loading, setLoading] = useState(false);
 
   /* ================================
-     FETCH LEAVE TYPES
+     FETCH DATA
   ================================= */
+
   useEffect(() => {
     fetchLeaveTypes();
+    fetchLeaveBalance();
   }, []);
 
   const fetchLeaveTypes = async () => {
@@ -30,9 +35,40 @@ export default function ApplyLeave() {
     }
   };
 
+  const fetchLeaveBalance = async () => {
+    try {
+      const res = await api.get("/leaves/my-balance/");
+      setLeaveBalance(res.data);
+    } catch {
+      toast.error("Failed to load leave balance");
+    }
+  };
+
+  /* ================================
+     AUTO CALCULATE DAYS
+  ================================= */
+
+  useEffect(() => {
+    if (form.fromDate && form.toDate) {
+      const start = new Date(form.fromDate);
+      const end = new Date(form.toDate);
+
+      if (start <= end) {
+        const diff =
+          (end - start) / (1000 * 60 * 60 * 24) + 1;
+        setTotalDays(diff);
+      } else {
+        setTotalDays(0);
+      }
+    } else {
+      setTotalDays(0);
+    }
+  }, [form.fromDate, form.toDate]);
+
   /* ================================
      HANDLE CHANGE
   ================================= */
+
   const handleChange = (e) => {
     setForm({
       ...form,
@@ -43,6 +79,7 @@ export default function ApplyLeave() {
   /* ================================
      HANDLE SUBMIT
   ================================= */
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -53,8 +90,8 @@ export default function ApplyLeave() {
       return;
     }
 
-    if (new Date(fromDate) > new Date(toDate)) {
-      toast.error("From Date cannot be after To Date");
+    if (totalDays <= 0) {
+      toast.error("Invalid date selection");
       return;
     }
 
@@ -62,7 +99,7 @@ export default function ApplyLeave() {
       setLoading(true);
 
       await api.post("/leaves/apply/", {
-        leave_type_id: leaveTypeId,
+        leave_type: leaveTypeId,
         start_date: fromDate,
         end_date: toDate,
         reason,
@@ -77,6 +114,8 @@ export default function ApplyLeave() {
         reason: "",
       });
 
+      setTotalDays(0);
+
     } catch (err) {
       toast.error(
         err.response?.data?.error || "Failed to apply leave"
@@ -86,9 +125,12 @@ export default function ApplyLeave() {
     }
   };
 
+  const today = new Date().toISOString().split("T")[0];
+
   /* ================================
      UI
   ================================= */
+
   return (
     <div className="employee-page">
       <div className="page-header">
@@ -110,7 +152,6 @@ export default function ApplyLeave() {
               onChange={handleChange}
             >
               <option value="">Select leave type</option>
-
               {leaveTypes.map((type) => (
                 <option key={type.id} value={type.id}>
                   {type.name}
@@ -126,6 +167,7 @@ export default function ApplyLeave() {
               <input
                 type="date"
                 name="fromDate"
+                min={today}
                 value={form.fromDate}
                 onChange={handleChange}
               />
@@ -136,11 +178,18 @@ export default function ApplyLeave() {
               <input
                 type="date"
                 name="toDate"
+                min={form.fromDate || today}
                 value={form.toDate}
                 onChange={handleChange}
               />
             </div>
           </div>
+
+          {totalDays > 0 && (
+            <div className="leave-days-info">
+              <strong>Total Leave Days:</strong> {totalDays}
+            </div>
+          )}
 
           {/* Reason */}
           <div className="form-group">

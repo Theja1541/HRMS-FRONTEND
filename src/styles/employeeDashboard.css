@@ -1,299 +1,339 @@
-/* ======================================================
-   DASHBOARD CONTAINER
-====================================================== */
+/* ============================================================
+   EMPLOYEE DASHBOARD
+============================================================ */
 
-.dashboard-container {
-  display: flex;
-  flex-direction: column;
-  gap: 28px;
-  width: 100%;
-  padding: 15px 10px;
+.employee-dashboard {
+  padding: 10px 0 40px 0;
 }
 
-/* ======================================================
-   PROFILE / WELCOME CARD
-====================================================== */
-
-.dashboard-header {
-  display: flex;
-  align-items: center;
-  background: linear-gradient(135deg, #0f172a 0%, #2563eb 100%);
-  color: white;
-  padding: 30px;
-  border-radius: 20px;
-  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.25);
-}
-
-.profile-left {
-  display: flex;
-  align-items: center;
-  gap: 22px;
-}
-
-.profile-photo {
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
-}
-
-.profile-left h2 {
-  margin: 0;
-  font-size: 22px;
-  font-weight: 600;
-}
-
-.profile-left p {
-  margin: 4px 0;
-  font-size: 14px;
-  opacity: 0.9;
-}
-
-/* ======================================================
-   ROW LAYOUT
-====================================================== */
-
-.dashboard-row {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-/* ======================================================
-   CARD BASE STYLE
-====================================================== */
-
-.card {
-  flex: 1;
-  min-width: 260px;
-  background: #ffffff;
-  padding: 24px;
-  border-radius: 18px;
-  box-shadow: 0 12px 35px rgba(15, 23, 42, 0.06);
-  transition: all 0.25s ease;
-}
-
-.card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.12);
-}
-
-.card h4 {
-  font-size: 14px;
-  margin-bottom: 14px;
-  color: #64748b;
-  font-weight: 500;
-}
-
-.card p {
-  font-size: 14px;
-  margin: 6px 0;
-  color: #334155;
-}
-
-/* ======================================================
-   ATTENDANCE STATUS COLORS
-====================================================== */
-
-.status-card.present {
-  border-left: 5px solid #16a34a;
-}
-
-.status-card.absent {
-  border-left: 5px solid #ef4444;
-}
-
-.status-card.leave {
-  border-left: 5px solid #f59e0b;
-}
-
-.status-card.not {
-  border-left: 5px solid #64748b;
-}
-
-/* ======================================================
-   SUMMARY STAT STYLING
-====================================================== */
-
-.stats-row .stat {
-  text-align: center;
-}
-
-.stat h4 {
-  font-size: 13px;
-  color: #64748b;
-  margin-bottom: 8px;
-}
-
-.stat h2 {
-  font-size: 28px;
-  font-weight: 600;
-}
-
-.stat.present h2 {
-  color: #16a34a;
-}
-
-.stat.leave h2 {
-  color: #f59e0b;
-}
-
-.stat.absent h2 {
-  color: #ef4444;
-}
-
-/* ======================================================
-   NOTIFICATIONS SECTION
-====================================================== */
-
-.notification-item {
-  padding: 12px 0;
-  border-bottom: 1px solid #f1f5f9;
-}
-
-.notification-item:last-child {
-  border-bottom: none;
-}
-
-.notification-item strong {
-  font-size: 14px;
+.employee-dashboard h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 24px;
   color: #0f172a;
 }
 
-.notification-item p {
-  font-size: 13px;
-  margin: 4px 0;
-  color: #475569;
+/* ============================================================
+   KPI GRID
+============================================================ */
+
+.dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+  margin-bottom: 36px;
 }
 
-.notification-item small {
-  font-size: 11px;
-  color: #94a3b8;
-}
-
-/* ======================================================
-   LOADING STATE
-====================================================== */
-
-.loading-text {
-  padding: 25px;
-  font-size: 15px;
-  color: #64748b;
-}
-
-
-/* ======================================================
-   KPI BADGES
-====================================================== */
-
-.kpi-card {
-  display: flex;
-  flex-direction: column;
+.dashboard-cards.small {
+  grid-template-columns: repeat(4, 1fr);
   gap: 16px;
 }
 
-.kpi-row {
-  display: flex;
-  gap: 14px;
-  flex-wrap: wrap;
-}
+/* ============================================================
+   BASE CARD
+============================================================ */
 
-.kpi-badge {
-  flex: 1;
-  min-width: 120px;
-  padding: 14px 16px;
-  border-radius: 14px;
+.dashboard-card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 22px 24px;
+
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+  transition: all 0.35s ease;
+
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  font-size: 13px;
-  font-weight: 500;
-  background: #f8fafc;
-  transition: 0.25s ease;
+  justify-content: center;
+
+  opacity: 0;
+  transform: translateY(25px);
+  animation: fadeSlideUp 0.6s ease forwards;
+
+  position: relative;
+  overflow: hidden;
 }
 
-.kpi-badge strong {
+/* Stagger animation */
+.dashboard-card:nth-child(1) { animation-delay: 0.05s; }
+.dashboard-card:nth-child(2) { animation-delay: 0.15s; }
+.dashboard-card:nth-child(3) { animation-delay: 0.25s; }
+.dashboard-card:nth-child(4) { animation-delay: 0.35s; }
+
+/* Hover lift */
+.dashboard-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+}
+
+/* ============================================================
+   GRADIENT KPI CARDS (TOP SECTION ONLY)
+   Add class: .gradient + color class
+============================================================ */
+
+.dashboard-card.gradient {
+  color: white;
+  border: none;
+  background-size: 200% 200%;
+  animation: fadeSlideUp 0.6s ease forwards, gradientShift 8s ease infinite;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.2);
+}
+
+.dashboard-card.gradient h4 {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.dashboard-card.gradient p {
+  color: #ffffff;
+}
+
+/* Animated background movement */
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Color Themes */
+
+.dashboard-card.gradient.blue {
+  background: linear-gradient(
+    135deg,
+    #1e40af,
+    #2563eb,
+    #3b82f6
+  );
+}
+
+.dashboard-card.gradient.green {
+  background: linear-gradient(
+    135deg,
+    #15803d,
+    #16a34a,
+    #22c55e
+  );
+}
+
+.dashboard-card.gradient.orange {
+  background: linear-gradient(
+    135deg,
+    #ea580c,
+    #f97316,
+    #fb923c
+  );
+}
+
+.dashboard-card.gradient.purple {
+  background: linear-gradient(
+    135deg,
+    #6d28d9,
+    #7c3aed,
+    #8b5cf6
+  );
+}
+
+/* Soft glow overlay */
+.dashboard-card.gradient::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle at 30% 30%,
+    rgba(255, 255, 255, 0.15),
+    transparent 40%
+  );
+  animation: glowRotate 12s linear infinite;
+}
+
+@keyframes glowRotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.dashboard-card.gradient:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+}
+
+/* ============================================================
+   CARD CONTENT
+============================================================ */
+
+.dashboard-card h4 {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.dashboard-card p {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.dashboard-card span {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.dashboard-card strong {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Leave summary color indicators */
+.dashboard-card.pending {
+  border-left: 4px solid #facc15;
+}
+
+.dashboard-card.approved {
+  border-left: 4px solid #16a34a;
+}
+
+.dashboard-card.rejected {
+  border-left: 4px solid #ef4444;
+}
+
+/* ============================================================
+   LEAVE SUMMARY
+============================================================ */
+
+.leave-summary-section {
+  margin-top: 10px;
+}
+
+.leave-summary-section h3 {
   font-size: 18px;
   font-weight: 600;
-}
-
-.kpi-badge:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.08);
-}
-
-/* COLORS */
-
-.kpi-badge.success {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.kpi-badge.danger {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-.kpi-badge.warning {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.kpi-badge.primary {
-  background: #dbeafe;
-  color: #1e3a8a;
-}
-
-/* STATUS PILL */
-
-.status-pill {
-  display: inline-block;
-  padding: 6px 14px;
-  font-size: 12px;
-  border-radius: 20px;
-  background: #e2e8f0;
+  margin-bottom: 16px;
   color: #0f172a;
-  font-weight: 500;
 }
 
-/* ======================================================
-   RESPONSIVE DESIGN
-====================================================== */
+/* ============================================================
+   ENTRY ANIMATION
+============================================================ */
 
-@media (max-width: 1024px) {
-  .dashboard-row {
-    flex-direction: column;
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(25px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 1100px) {
+  .dashboard-cards {
+    grid-template-columns: repeat(2, 1fr);
   }
 
-  .dashboard-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 18px;
-  }
-
-  .profile-left {
-    flex-direction: column;
-    align-items: flex-start;
+  .dashboard-cards.small {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 600px) {
-  .profile-photo {
-    width: 70px;
-    height: 70px;
+  .dashboard-cards,
+  .dashboard-cards.small {
+    grid-template-columns: 1fr;
   }
+}
 
-  .profile-left h2 {
-    font-size: 18px;
-  }
 
-  .stat h2 {
-    font-size: 22px;
-  }
+/* =========================================
+   CARD ICON CIRCLE
+========================================= */
 
-  .card {
-    padding: 18px;
-  }
+.dashboard-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Icon Circle */
+.card-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: white;
+
+  position: relative;
+
+  animation: floatIcon 4s ease-in-out infinite;
+}
+
+.card-icon svg {
+  stroke-width: 2.2;
+}
+
+/* Gradient Variants */
+.card-icon.blue {
+  background: linear-gradient(135deg, #2563eb, #3b82f6);
+}
+
+.card-icon.green {
+  background: linear-gradient(135deg, #15803d, #16a34a);
+}
+
+.card-icon.orange {
+  background: linear-gradient(135deg, #ea580c, #f97316);
+}
+
+.card-icon.purple {
+  background: linear-gradient(135deg, #6d28d9, #7c3aed);
+}
+
+/* Glow Effect */
+.card-icon::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  background: inherit;
+  opacity: 0.25;
+  filter: blur(10px);
+  z-index: -1;
+}
+
+/* Floating Animation */
+@keyframes floatIcon {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+  100% { transform: translateY(0px); }
+}
+
+/* Card Content */
+.card-content h4 {
+  margin: 0;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.card-content p {
+  margin: 2px 0 0 0;
+  font-size: 26px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* Hover Enhancement */
+.dashboard-card:hover .card-icon {
+  transform: scale(1.08);
+  transition: 0.3s ease;
 }

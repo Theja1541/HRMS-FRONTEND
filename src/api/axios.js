@@ -94,7 +94,12 @@ api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
 
-    if (token) {
+    // ❌ Do NOT attach token for login or refresh endpoints
+    if (
+      token &&
+      !config.url.includes("/accounts/login/") &&
+      !config.url.includes("/accounts/token/refresh/")
+    ) {
       config.headers.Authorization = `Bearer ${token}`;
     }
 

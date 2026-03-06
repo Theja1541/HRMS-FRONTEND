@@ -10,10 +10,13 @@ import {
   rejectLeave,
 } from "../../api/leaves";
 import toast from "react-hot-toast";
+import { usePayroll } from "../../context/PayrollContext";
+
 
 export default function LeaveApprovals() {
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { isLocked } = usePayroll();
 
   useEffect(() => {
     fetchLeaves();

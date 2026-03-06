@@ -96,9 +96,6 @@ export const getPayslipEmailLogs = (payslipId) =>
 export const getEmailDashboard = () =>
   api.get("/payroll/email/dashboard/");
 
-export const getBulkProgress = (batchId) =>
-  api.get(`/payroll/bulk-progress/${batchId}/`);
-
 
 /* ============================================================
    PAYROLL CONTROL
@@ -107,8 +104,10 @@ export const getBulkProgress = (batchId) =>
 export const reopenPayrollMonth = (month) =>
   api.post("/payroll/reopen/", { month });
 
-export const getPayrollDashboardSummary = () =>
-  api.get("/payroll/dashboard-summary/");
+export const getPayrollDashboardSummary = (month) =>
+  api.get("/payroll/dashboard-summary/", {
+    params: { month },
+  });
 
 
 /* ============================================================
@@ -119,8 +118,14 @@ export const generateFullFinal = (data) =>
   api.post("/payroll/full-final/generate/", data);
 
 
-export const checkEmployeeId = async (employeeId) => {
-  return await api.get("/employees/check-id/", {
+/* ============================================================
+   EMPLOYEE VALIDATION
+============================================================ */
+
+export const checkEmployeeId = (employeeId) =>
+  api.get("/employees/check-id/", {
     params: { employee_id: employeeId },
   });
-};
+
+export const getSalaryTimeline = (employeeId) =>
+  api.get(`/payroll/salary-revisions/employee/${employeeId}/`);

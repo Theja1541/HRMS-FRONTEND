@@ -69,6 +69,7 @@ export function EmployeesProvider({ children }) {
         status,
       });
 
+      await refreshAttendance(); 
       await fetchAttendance();
     } catch (error) {
       console.error("Mark attendance failed:", error.response?.data);
@@ -82,7 +83,8 @@ export function EmployeesProvider({ children }) {
         date,
         status,
       });
-
+      
+      await refreshAttendance(); 
       await fetchAttendance();
     } catch (error) {
       console.error("Bulk attendance failed:", error.response?.data);

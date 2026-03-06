@@ -481,11 +481,10 @@
 // }
 
 
-
 import { useState, useEffect } from "react";
 import toast from "react-hot-toast";
 import confetti from "canvas-confetti";
-import { generateFullFinal } from "../../api/payroll";
+import api from "../../api/axios";
 
 import {
   generatePayslip,
@@ -496,6 +495,7 @@ import {
   downloadAllPayslipsZip,
   bulkEmailPayslips,
   sendSinglePayslipEmail,
+  generateFullFinal,
 } from "../../api/payroll";
 
 import "../../styles/payroll.css";
@@ -509,7 +509,7 @@ export default function Payroll() {
   const [payrollData, setPayrollData] = useState([]);
   const [loadingId, setLoadingId] = useState(null);
   const [loadingBulkEmail, setLoadingBulkEmail] = useState(false);
-
+  const [summary, setSummary] = useState(null);
   const [showFNFModal, setShowFNFModal] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [fnfData, setFnfData] = useState({
@@ -519,10 +519,15 @@ export default function Payroll() {
     bonus: 0,
   });
   const [fnfResult, setFnfResult] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState(null);
+  const [showPreview, setShowPreview] = useState(false);
 
-  /* =====================================================
-     🎉 CONFETTI
-  ===================================================== */
+  /* ============================================
+     Utility
+  ============================================ */
+
+  const formatCurrency = (amount) =>
+    `₹ ${Number(amount || 0).toLocaleString("en-IN")}`;
 
   const fireConfetti = () => {
     confetti({
@@ -532,26 +537,40 @@ export default function Payroll() {
     });
   };
 
-  /* =====================================================
-     FETCH PAYROLL STATUS
-  ===================================================== */
+  /* ============================================
+     Fetch Payroll Status
+  ============================================ */
 
   useEffect(() => {
     fetchStatus();
   }, [month, filterStatus]);
 
+  const [payrollStatus, setPayrollStatus] = useState("OPEN");
+
   const fetchStatus = async () => {
     try {
       const res = await getPayrollStatus(month, filterStatus);
-      setPayrollData(res.data);
+
+      setPayrollStatus(res.data.payroll_status);   // NEW
+      setPayrollData(res.data.employees);          // UPDATED
+
     } catch {
       toast.error("Failed to load payroll data");
     }
   };
 
-  /* =====================================================
-     GENERATE SINGLE PAYSLIP
-  ===================================================== */
+  useEffect(() => {
+  const fetchSummary = async () => {
+    const res = await api.get(`/payroll/summary/?month=${month}`);
+    setSummary(res.data);
+  };
+
+  fetchSummary();
+}, [month]);
+
+  /* ============================================
+     Generate Single Payslip
+  ============================================ */
 
   const handleGeneratePayslip = async (employeeId) => {
     try {
@@ -573,25 +592,9 @@ export default function Payroll() {
     }
   };
 
-  const handleGenerateFNF = async () => {
-  try {
-    const res = await generateFullFinal({
-      employee_id: selectedEmployee,
-      ...fnfData,
-    });
-
-    setFnfResult(res.data);
-    toast.success("Full & Final generated successfully 💼");
-  } catch (err) {
-    toast.error(
-      err.response?.data?.error || "FNF generation failed"
-    );
-  }
-};
-
-  /* =====================================================
-     DOWNLOAD PDF
-  ===================================================== */
+  /* ============================================
+     Download PDF
+  ============================================ */
 
   const handleDownload = async (payslipId) => {
     try {
@@ -602,7 +605,6 @@ export default function Payroll() {
       });
 
       const url = window.URL.createObjectURL(blob);
-
       const link = document.createElement("a");
       link.href = url;
       link.download = "Payslip.pdf";
@@ -612,9 +614,27 @@ export default function Payroll() {
     }
   };
 
-  /* =====================================================
-     SEND SINGLE EMAIL
-  ===================================================== */
+  const handlePreview = async (payslipId) => {
+    try {
+      const res = await downloadPayslipPDF(payslipId);
+
+      const blob = new Blob([res.data], {
+        type: "application/pdf",
+      });
+
+      const url = window.URL.createObjectURL(blob);
+
+      setPreviewUrl(url);
+      setShowPreview(true);
+
+    } catch {
+      toast.error("Preview failed");
+    }
+  };
+
+  /* ============================================
+     Send Single Email
+  ============================================ */
 
   const handleSendSingleEmail = async (employeeId) => {
     try {
@@ -627,18 +647,16 @@ export default function Payroll() {
     }
   };
 
-  /* =====================================================
-     BULK GENERATE
-  ===================================================== */
+  /* ============================================
+     Bulk Generate
+  ============================================ */
 
   const handleBulkGenerate = async () => {
     try {
       const res = await bulkGeneratePayslips(month);
 
       toast.success(
-        `Generated: ${res.data.generated} | 
-         No Salary: ${res.data.skipped_no_salary} | 
-         Existing: ${res.data.skipped_existing}`
+        `Generated ${res.data.generated} payslips successfully`
       );
 
       fetchStatus();
@@ -647,9 +665,9 @@ export default function Payroll() {
     }
   };
 
-  /* =====================================================
-     BULK APPROVE
-  ===================================================== */
+  /* ============================================
+     Bulk Approve
+  ============================================ */
 
   const handleBulkApprove = async () => {
     try {
@@ -665,9 +683,9 @@ export default function Payroll() {
     }
   };
 
-  /* =====================================================
-     DOWNLOAD ALL ZIP
-  ===================================================== */
+  /* ============================================
+     Download All ZIP
+  ============================================ */
 
   const handleDownloadAll = async () => {
     try {
@@ -678,7 +696,6 @@ export default function Payroll() {
       });
 
       const url = window.URL.createObjectURL(blob);
-
       const link = document.createElement("a");
       link.href = url;
       link.download = `Payslips_${month}.zip`;
@@ -688,16 +705,15 @@ export default function Payroll() {
     }
   };
 
-  /* =====================================================
-     BULK EMAIL (Synchronous)
-  ===================================================== */
+  /* ============================================
+     Bulk Email
+  ============================================ */
 
   const handleBulkEmail = async () => {
     try {
       setLoadingBulkEmail(true);
 
       const res = await bulkEmailPayslips(month);
-
       const { total, completed, failed } = res.data;
 
       if (failed === 0) {
@@ -720,33 +736,75 @@ export default function Payroll() {
     }
   };
 
-  /* =====================================================
-     RENDER
-  ===================================================== */
+  /* ============================================
+     Approve
+  ============================================ */
+
+  const handleApprove = async (payslipId) => {
+  try {
+    await api.post(`/payroll/payslip/${payslipId}/approve/`);
+    toast.success("Payslip approved");
+    fetchStatus();
+  } catch {
+    toast.error("Approval failed");
+  }
+};
+
+
+  /* ============================================
+     Mark Paid
+  ============================================ */
+
+  const handleMarkPaid = async (payslipId) => {
+    try {
+      await api.post(`/payroll/payslip/${payslipId}/mark-paid/`);
+      toast.success("Salary marked as PAID");
+      fetchStatus();
+    } catch {
+      toast.error("Payment update failed");
+    }
+  };
+
+  /* ============================================
+     Full & Final
+  ============================================ */
+
+  const handleGenerateFNF = async () => {
+    try {
+      const res = await generateFullFinal({
+        employee_id: selectedEmployee,
+        ...fnfData,
+      });
+
+      setFnfResult(res.data);
+      toast.success("Full & Final generated successfully 💼");
+    } catch (err) {
+      toast.error(
+        err.response?.data?.error || "FNF generation failed"
+      );
+    }
+  };
+
+  /* ============================================
+     Render
+  ============================================ */
 
   return (
     <div className="payroll-page">
+
       {/* ================= HEADER ================= */}
       <div className="page-header">
+
         <div className="bulk-actions">
-          <button
-            className="btn-bulk"
-            onClick={handleBulkGenerate}
-          >
+          <button className="btn-bulk" onClick={handleBulkGenerate}>
             Generate All
           </button>
 
-          <button
-            className="btn-approve"
-            onClick={handleBulkApprove}
-          >
+          <button className="btn-approve" onClick={handleBulkApprove}>
             Bulk Approve
           </button>
 
-          <button
-            className="btn-zip"
-            onClick={handleDownloadAll}
-          >
+          <button className="btn-zip" onClick={handleDownloadAll}>
             Download All (ZIP)
           </button>
 
@@ -755,9 +813,7 @@ export default function Payroll() {
             onClick={handleBulkEmail}
             disabled={loadingBulkEmail}
           >
-            {loadingBulkEmail
-              ? "Sending..."
-              : "Send Payslips"}
+            {loadingBulkEmail ? "Sending..." : "Send Payslips"}
           </button>
         </div>
 
@@ -770,27 +826,19 @@ export default function Payroll() {
           <input
             type="month"
             value={month}
-            onChange={(e) =>
-              setMonth(e.target.value)
-            }
+            onChange={(e) => setMonth(e.target.value)}
           />
 
           <select
             value={filterStatus}
-            onChange={(e) =>
-              setFilterStatus(e.target.value)
-            }
+            onChange={(e) => setFilterStatus(e.target.value)}
             className="filter-select"
           >
             <option value="ALL">All</option>
             <option value="DRAFT">Draft</option>
-            <option value="APPROVED">
-              Approved
-            </option>
+            <option value="APPROVED">Approved</option>
             <option value="PAID">Paid</option>
-            <option value="CANCELLED">
-              Cancelled
-            </option>
+            <option value="CANCELLED">Cancelled</option>
           </select>
         </div>
       </div>
@@ -801,20 +849,21 @@ export default function Payroll() {
           <thead>
             <tr>
               <th>Employee</th>
-              <th>Salary</th>
-              <th>Payslip</th>
-              <th>LOP</th>
-              <th>Action</th>
+              <th>Salary Status</th>
+              <th>Payslip Status</th>
+              <th>Gross (A)</th>
+              <th>LOP Days</th>
+              <th>Deductions (B)</th>
+              <th>Net (A - B)</th>
+              <th>CTC (A + C)</th>
+              <th>Actions</th>
             </tr>
           </thead>
 
           <tbody>
             {payrollData.length === 0 ? (
               <tr>
-                <td
-                  colSpan="4"
-                  className="loading-text"
-                >
+                <td colSpan="8" className="loading-text">
                   No payroll records found
                 </td>
               </tr>
@@ -836,18 +885,6 @@ export default function Payroll() {
                   </td>
 
                   <td>
-                    {emp.lop_days > 0 ? (
-                      <span className="status error">
-                        {emp.lop_days} days
-                      </span>
-                    ) : (
-                      <span className="status success">
-                        0
-                      </span>
-                    )}
-                  </td>
-
-                  <td>
                     {emp.payslip_generated ? (
                       <span
                         className={`status ${emp.payslip_status?.toLowerCase()}`}
@@ -861,164 +898,266 @@ export default function Payroll() {
                     )}
                   </td>
 
+                  <td>{formatCurrency(emp.gross_salary)}</td>
+
+                  <td>
+                    {emp.lop_days > 0 ? (
+                      <span className="lop-badge">
+                        {emp.lop_days}
+                      </span>
+                    ) : (
+                      "-"
+                    )}
+                  </td>
+
+                  <td>
+                    <div className="deduction-cell">
+                      {formatCurrency(emp.total_deductions)}
+
+                      {emp.lop_deduction > 0 && (
+                        <div className="lop-info">
+                          LOP: {formatCurrency(emp.lop_deduction)}
+                        </div>
+                      )}
+                    </div>
+                  </td>
+
+                  <td>
+                    <strong>
+                      {formatCurrency(emp.net_pay)}
+                    </strong>
+                  </td>
+
+                  <td>{formatCurrency(emp.ctc)}</td>
+
                   <td>
                     {emp.salary_set ? (
                       <>
                         {!emp.payslip_generated && (
                           <button
                             className="btn-payslip"
-                            disabled={
-                              loadingId ===
-                              emp.employee_id
-                            }
+                            disabled={loadingId === emp.employee_id}
                             onClick={() =>
-                              handleGeneratePayslip(
-                                emp.employee_id
-                              )
+                              handleGeneratePayslip(emp.employee_id)
                             }
                           >
-                            {loadingId ===
-                            emp.employee_id
+                            {loadingId === emp.employee_id
                               ? "Generating..."
                               : "Generate"}
                           </button>
                         )}
 
-                        {emp.payslip_generated &&
-                          emp.payslip_id && (
-                            <>
+                        {emp.payslip_generated && emp.payslip_id && (
+                          <>
+                            {/* DRAFT STATUS */}
+                            {emp.payslip_status === "DRAFT" && (
+                              <>
+                                <button
+                                  className="btn-preview"
+                                  onClick={() => handlePreview(emp.payslip_id)}
+                                >
+                                  Preview
+                                </button>
+
+                                <button
+                                  className="btn-approve"
+                                  onClick={() => handleApprove(emp.payslip_id)}
+                                >
+                                  Approve
+                                </button>
+                              </>
+                            )}
+
+                            {/* APPROVED STATUS */}
+                            {emp.payslip_status === "APPROVED" && (
+                              <>
+                                <button
+                                  className="btn-payslip"
+                                  onClick={() => handleDownload(emp.payslip_id)}
+                                >
+                                  PDF
+                                </button>
+
+                                <button
+                                  className="btn-email-single"
+                                  onClick={() =>
+                                    handleSendSingleEmail(emp.employee_id)
+                                  }
+                                >
+                                  Email
+                                </button>
+
+                                <button
+                                  className="btn-paid"
+                                  onClick={() => handleMarkPaid(emp.payslip_id)}
+                                >
+                                  Mark Paid
+                                </button>
+                              </>
+                            )}
+
+                            {/* PAID STATUS */}
+                            {emp.payslip_status === "PAID" && (
                               <button
                                 className="btn-payslip"
-                                onClick={() =>
-                                  handleDownload(
-                                    emp.payslip_id
-                                  )
-                                }
+                                onClick={() => handleDownload(emp.payslip_id)}
                               >
-                                Download PDF
+                                Download
                               </button>
+                            )}
+                          </>
+                        )}
 
-                              <button
-                                className="btn-email-single"
-                                onClick={() =>
-                                  handleSendSingleEmail(
-                                    emp.employee_id
-                                  )
-                                }
-                              >
-                                Send Email
-                              </button>
-                            </>
-                          )}
+                        <button
+                          className="btn-fnf"
+                          onClick={() => {
+                            setSelectedEmployee(emp.employee_id);
+                            setShowFNFModal(true);
+                            setFnfResult(null);
+                          }}
+                        >
+                          FNF
+                        </button>
                       </>
                     ) : (
-                      <button
-                        disabled
-                        className="btn-disabled"
-                      >
+                      <button disabled className="btn-disabled">
                         Set Salary First
                       </button>
                     )}
-                    <button
-                      className="btn-fnf"
-                      onClick={() => {
-                        setSelectedEmployee(emp.employee_id);
-                        setShowFNFModal(true);
-                        setFnfResult(null);
-                      }}
-                    >
-                      Full & Final
-                    </button>
                   </td>
                 </tr>
               ))
             )}
+            {showPreview && (
+            <div className="preview-modal">
+              <div className="preview-content">
+
+                <div className="preview-header">
+                  <h3>Payslip Preview</h3>
+
+                  <button
+                    className="btn-close"
+                    onClick={() => setShowPreview(false)}
+                  >
+                    Close
+                  </button>
+                </div>
+
+                <div className="preview-body">
+                  <iframe
+                    src={previewUrl + "#toolbar=0&view=FitH"}
+                    title="Payslip Preview"
+                  />
+                </div>
+
+              </div>
+            </div>
+          )}
           </tbody>
         </table>
       </div>
+
+      {/* ================= FNF MODAL ================= */}
       {showFNFModal && (
-  <div className="modal-overlay">
-    <div className="modal-card">
-      <h3>Full & Final Settlement</h3>
+        <div className="modal-overlay">
+          <div className="modal-card">
+            <h3>Full & Final Settlement</h3>
 
-      <input
-        type="date"
-        placeholder="Last Working Date"
-        value={fnfData.last_working_date}
-        onChange={(e) =>
-          setFnfData({
-            ...fnfData,
-            last_working_date: e.target.value,
-          })
-        }
-      />
+            <input
+              type="date"
+              value={fnfData.last_working_date}
+              onChange={(e) =>
+                setFnfData({
+                  ...fnfData,
+                  last_working_date: e.target.value,
+                })
+              }
+            />
 
-      <input
-        type="number"
-        placeholder="Notice Recovery"
-        value={fnfData.notice_recovery}
-        onChange={(e) =>
-          setFnfData({
-            ...fnfData,
-            notice_recovery: e.target.value,
-          })
-        }
-      />
+            <input
+              type="number"
+              placeholder="Notice Recovery"
+              value={fnfData.notice_recovery}
+              onChange={(e) =>
+                setFnfData({
+                  ...fnfData,
+                  notice_recovery: e.target.value,
+                })
+              }
+            />
 
-      <input
-        type="number"
-        placeholder="Loan Recovery"
-        value={fnfData.loan_recovery}
-        onChange={(e) =>
-          setFnfData({
-            ...fnfData,
-            loan_recovery: e.target.value,
-          })
-        }
-      />
+            <input
+              type="number"
+              placeholder="Loan Recovery"
+              value={fnfData.loan_recovery}
+              onChange={(e) =>
+                setFnfData({
+                  ...fnfData,
+                  loan_recovery: e.target.value,
+                })
+              }
+            />
 
-      <input
-        type="number"
-        placeholder="Bonus"
-        value={fnfData.bonus}
-        onChange={(e) =>
-          setFnfData({
-            ...fnfData,
-            bonus: e.target.value,
-          })
-        }
-      />
+            <input
+              type="number"
+              placeholder="Bonus"
+              value={fnfData.bonus}
+              onChange={(e) =>
+                setFnfData({
+                  ...fnfData,
+                  bonus: e.target.value,
+                })
+              }
+            />
 
-      <div style={{ marginTop: "12px" }}>
-        <button
-          className="btn-payslip"
-          onClick={handleGenerateFNF}
-        >
-          Generate
-        </button>
+            <div style={{ marginTop: "12px" }}>
+              <button
+                className="btn-payslip"
+                onClick={handleGenerateFNF}
+              >
+                Generate
+              </button>
 
-        <button
-          className="btn-disabled"
-          onClick={() => setShowFNFModal(false)}
-          style={{ marginLeft: "10px" }}
-        >
-          Close
-        </button>
-      </div>
+              <button
+                className="btn-disabled"
+                onClick={() => setShowFNFModal(false)}
+                style={{ marginLeft: "10px" }}
+              >
+                Close
+              </button>
+            </div>
 
-      {fnfResult && (
-        <div className="fnf-summary">
-          <p>Salary Earned: ₹ {fnfResult.salary_earned}</p>
-          <p>Leave Encashment: ₹ {fnfResult.leave_encashment}</p>
-          <p>TDS: ₹ {fnfResult.tds_amount}</p>
-          <h4>
-            Final Amount: ₹ {fnfResult.final_amount}
-          </h4>
+            {fnfResult && (
+              <div className="fnf-summary">
+                <p>
+                  Salary Earned: {formatCurrency(fnfResult.salary_earned)}
+                </p>
+                <p>
+                  Leave Encashment: {formatCurrency(fnfResult.leave_encashment)}
+                </p>
+                <p>
+                  TDS: {formatCurrency(fnfResult.tds_amount)}
+                </p>
+                <h4>
+                  Final Amount: {formatCurrency(fnfResult.final_amount)}
+                </h4>
+              </div>
+            )}
+
+            <div className="payroll-summary">
+              <div className="card">
+                <h4>Total Monthly Payroll</h4>
+                <p>₹ {summary?.total_monthly_ctc}</p>
+              </div>
+
+              <div className="card">
+                <h4>Total Yearly Payroll Liability</h4>
+                <p>₹ {summary?.total_yearly_ctc}</p>
+              </div>
+            </div>
+          </div>
         </div>
       )}
-    </div>
-  </div>
-)}
     </div>
   );
 }

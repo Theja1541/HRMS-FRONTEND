@@ -3,11 +3,6 @@ import { useEmployees } from "../../context/EmployeesContext";
 import { useMemo, useState } from "react";
 import "../../styles/monthlyAttendance.css";
 import {
-  exportAttendanceExcel,
-  exportAttendancePDF,
-} from "../../utils/attendanceExport";
-
-import {
   ResponsiveContainer,
   PieChart,
   Pie,
@@ -24,7 +19,6 @@ export default function EmployeeMonthlyAttendance() {
     new Date().toISOString().slice(0, 7)
   );
 
-  // 🔥 USE PRIMARY KEY
   const employee = employees.find(
     (e) =>
       String(e.id) === employeeId &&
@@ -44,6 +38,10 @@ export default function EmployeeMonthlyAttendance() {
   const totalDays = new Date(year, monthIndex + 1, 0).getDate();
   const days = Array.from({ length: totalDays }, (_, i) => i + 1);
 
+  /* ============================================================
+     STATUS MAPPING
+  ============================================================ */
+
   const records = useMemo(() => {
     return days.map((day) => {
       const date = `${month}-${String(day).padStart(2, "0")}`;
@@ -51,35 +49,66 @@ export default function EmployeeMonthlyAttendance() {
 
       if (!rec) return "-";
 
-      if (rec.status === "PRESENT") return "P";
-      if (rec.status === "LEAVE") return "L";
-      if (rec.status === "ABSENT") return "A";
-
-      return "-";
+      switch (rec.status) {
+        case "PRESENT":
+          return "P";
+        case "HALF_DAY":
+          return "HD";
+        case "PAID_LEAVE":
+          return "PL";
+        case "UNPAID_LEAVE":
+          return "UL";
+        case "ABSENT":
+          return "A";
+        case "HOLIDAY":
+          return "H";
+        case "WEEK_OFF":
+          return "WO";
+        default:
+          return "-";
+      }
     });
   }, [attendance, month, employee.id, days]);
+
+  /* ============================================================
+     SUMMARY
+  ============================================================ */
 
   const summary = useMemo(() => {
     return {
       present: records.filter((r) => r === "P").length,
-      leave: records.filter((r) => r === "L").length,
+      halfDay: records.filter((r) => r === "HD").length,
+      paidLeave: records.filter((r) => r === "PL").length,
+      unpaidLeave: records.filter((r) => r === "UL").length,
       absent: records.filter((r) => r === "A").length,
+      holiday: records.filter((r) => r === "H").length,
+      weekOff: records.filter((r) => r === "WO").length,
     };
   }, [records]);
 
   const pieData = [
     { name: "Present", value: summary.present },
-    { name: "Leave", value: summary.leave },
+    { name: "Half Day", value: summary.halfDay },
+    { name: "Paid Leave", value: summary.paidLeave },
+    { name: "Unpaid Leave", value: summary.unpaidLeave },
     { name: "Absent", value: summary.absent },
   ];
 
-  const colors = ["#16a34a", "#f59e0b", "#ef4444"];
+  const colors = [
+    "#16a34a", // present
+    "#0ea5e9", // half day
+    "#22c55e", // paid leave
+    "#f59e0b", // unpaid leave
+    "#ef4444", // absent
+  ];
 
   return (
     <div className="monthly-attendance-container">
       <div className="monthly-attendance-header">
         <div>
-          <h2>{employee.firstName} {employee.lastName}</h2>
+          <h2>
+            {employee.firstName} {employee.lastName}
+          </h2>
           <p>Monthly attendance</p>
         </div>
 
@@ -90,26 +119,47 @@ export default function EmployeeMonthlyAttendance() {
         />
       </div>
 
+      {/* ================= SUMMARY CARDS ================= */}
+
       <div className="attendance-summary">
         <div className="summary-card present">
           <h3>{summary.present}</h3>
           <span>Present</span>
         </div>
-        <div className="summary-card leave">
-          <h3>{summary.leave}</h3>
-          <span>Leave</span>
+
+        <div className="summary-card halfday">
+          <h3>{summary.halfDay}</h3>
+          <span>Half Day</span>
         </div>
+
+        <div className="summary-card leave">
+          <h3>{summary.paidLeave}</h3>
+          <span>Paid Leave</span>
+        </div>
+
+        <div className="summary-card leave">
+          <h3>{summary.unpaidLeave}</h3>
+          <span>Unpaid Leave</span>
+        </div>
+
         <div className="summary-card absent">
           <h3>{summary.absent}</h3>
           <span>Absent</span>
         </div>
       </div>
 
+      {/* ================= PIE CHART ================= */}
+
       <div className="card">
         <h3>Distribution</h3>
         <ResponsiveContainer width="100%" height={280}>
           <PieChart>
-            <Pie data={pieData} dataKey="value" innerRadius={70} outerRadius={100}>
+            <Pie
+              data={pieData}
+              dataKey="value"
+              innerRadius={70}
+              outerRadius={100}
+            >
               {pieData.map((_, i) => (
                 <Cell key={i} fill={colors[i]} />
               ))}
@@ -119,6 +169,8 @@ export default function EmployeeMonthlyAttendance() {
           </PieChart>
         </ResponsiveContainer>
       </div>
+
+      {/* ================= CALENDAR TABLE ================= */}
 
       <div className="monthly-attendance-table-wrapper">
         <table className="monthly-attendance-table">
@@ -133,10 +185,18 @@ export default function EmployeeMonthlyAttendance() {
                   className={`status-cell ${
                     r === "P"
                       ? "present"
-                      : r === "L"
-                      ? "leave"
+                      : r === "HD"
+                      ? "halfday"
+                      : r === "PL"
+                      ? "paidleave"
+                      : r === "UL"
+                      ? "unpaidleave"
                       : r === "A"
                       ? "absent"
+                      : r === "H"
+                      ? "holiday"
+                      : r === "WO"
+                      ? "weekoff"
                       : "empty"
                   }`}
                 >
@@ -148,10 +208,16 @@ export default function EmployeeMonthlyAttendance() {
         </table>
       </div>
 
+      {/* ================= LEGEND ================= */}
+
       <div className="attendance-legend">
         <span className="legend present">P – Present</span>
-        <span className="legend leave">L – Leave</span>
+        <span className="legend halfday">HD – Half Day</span>
+        <span className="legend paidleave">PL – Paid Leave</span>
+        <span className="legend unpaidleave">UL – Unpaid Leave</span>
         <span className="legend absent">A – Absent</span>
+        <span className="legend holiday">H – Holiday</span>
+        <span className="legend weekoff">WO – Week Off</span>
       </div>
     </div>
   );

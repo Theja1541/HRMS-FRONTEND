@@ -1,19 +1,26 @@
 import { useEffect, useState } from "react";
 
-export default function useCountUp(value, duration = 600) {
+export default function useCountUp(value, duration = 800) {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
     let start = 0;
+
+    if (value === 0) {
+      setCount(0);
+      return;
+    }
+
     const increment = value / (duration / 16);
 
     const timer = setInterval(() => {
       start += increment;
+
       if (start >= value) {
         setCount(value);
         clearInterval(timer);
       } else {
-        setCount(Math.ceil(start));
+        setCount(Math.floor(start));
       }
     }, 16);
 
