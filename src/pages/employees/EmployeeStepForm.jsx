@@ -482,7 +482,8 @@ export default function EmployeeStepForm({ employee }) {
     profile_photo: null,
     resume: null,
     offer_letter: null,
-    id_proof: null,
+    aadhar_card: null,
+    pan_card: null,
     address_proof: null,
     education_cert: null,
     experience_cert: null,
@@ -810,12 +811,23 @@ export default function EmployeeStepForm({ employee }) {
             </div>
 
             <div className="form-field">
-              <label>ID Proof</label>
+              <label>Aadhar Card</label>
               <input
                 type="file"
                 accept=".pdf,.jpg,.jpeg,.png"
                 onChange={(e) =>
-                  update("id_proof", e.target.files[0])
+                  update("aadhar_card", e.target.files[0])
+                }
+              />
+            </div>
+
+            <div className="form-field">
+              <label>PAN Card</label>
+              <input
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                onChange={(e) =>
+                  update("pan_card", e.target.files[0])
                 }
               />
             </div>

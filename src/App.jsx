@@ -58,6 +58,8 @@ import { ToastProvider } from "./context/ToastContext";
 
 import PayrollSummary from "./pages/payroll/PayrollSummary";
 import AddSalaryRevision from "./pages/payroll/AddSalaryRevision";
+import LeaveDashboard from "./pages/leaves/LeaveDashboard";
+import LeaveCalendar from "./pages/leaves/LeaveCalendar";
 
 // export default function App() {
 //   return (
@@ -228,6 +230,8 @@ export default function App() {
             <Route path="monthly" element={<MonthlyAttendance />} />
 
             {/* Leaves */}
+            <Route path="leave-dashboard" element={<LeaveDashboard />} />
+            <Route path="leave-calendar" element={<LeaveCalendar />} />
             <Route path="leaves" element={<Leaves />} />
             <Route path="approvals" element={<LeaveApproval />} />
             <Route path="rejected" element={<LeaveRejected />} />

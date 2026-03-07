@@ -367,7 +367,6 @@
   }
 }
 
-
 /* ===============================
    PAYSLIP SUMMARY CARDS
 ================================ */
@@ -396,7 +395,6 @@
   font-size: 13px;
   opacity: 0.85;
   margin-bottom: 8px;
-  font-weight: 500;
 }
 
 .payslip-summary-grid p {
@@ -1021,4 +1019,85 @@ color:#666;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
+}
+
+
+.payslip-chart{
+margin-top:25px;
+text-align:center;
+}
+
+.payslip-chart h4{
+margin-bottom:10px;
+font-size:16px;
+font-weight:600;
+}
+
+
+.comparison-card{
+margin-top:30px;
+background:white;
+padding:20px;
+border-radius:10px;
+box-shadow:0 2px 8px rgba(0,0,0,0.08);
+}
+
+.comparison-row{
+display:flex;
+justify-content:space-between;
+margin-bottom:8px;
+font-size:14px;
+}
+
+.positive-change{
+color:#2ecc71;
+font-weight:600;
+}
+
+.negative-change{
+color:#e74c3c;
+font-weight:600;
+}
+
+
+/* ===============================
+   SALARY COMPARISON
+================================ */
+
+.comparison-grid{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:15px;
+margin-top:15px;
+}
+
+.comparison-box{
+background:#f8fafc;
+border-radius:10px;
+padding:12px;
+display:flex;
+flex-direction:column;
+font-size:14px;
+}
+
+.comparison-box span{
+color:#64748b;
+font-size:13px;
+margin-bottom:3px;
+}
+
+.comparison-box strong{
+font-size:16px;
+}
+
+.comparison-box.change{
+font-weight:600;
+}
+
+.comparison-box.increase{
+color:#16a34a;
+}
+
+.comparison-box.decrease{
+color:#dc2626;
 }

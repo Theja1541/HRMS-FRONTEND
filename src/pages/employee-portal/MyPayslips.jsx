@@ -133,6 +133,7 @@
 
 import { useEffect, useState } from "react";
 import "../../styles/payroll.css";
+import "../../styles/employeePayslips.css";
 import api from "../../api/axios";
 import { getMyPayslips, downloadPayslipPDF } from "../../api/payroll";
 import companyLogo from "../../assets/company-logo.png";
@@ -145,7 +146,10 @@ import {
   XAxis,
   YAxis,
   Tooltip,
-  ResponsiveContainer
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell
 } from "recharts";
 
 export default function MyPayslips() {
@@ -221,6 +225,18 @@ export default function MyPayslips() {
 
   const safeNumber = (value) => parseFloat(value || 0);
 
+  const getPreviousSlip = (currentSlip) => {
+
+    if (!currentSlip || !slips?.length) return null;
+
+    const index = slips.findIndex((p) => p?.id === currentSlip?.id);
+
+    if (index <= 0) return null;
+
+    return slips[index - 1] || null;
+
+  };
+
   /* =========================================
      DOWNLOAD PDF
   ========================================= */
@@ -266,6 +282,42 @@ export default function MyPayslips() {
     }))
     .reverse();
 
+  const getPayslipChartData = (slip) => {
+
+    if (!slip) return [];
+
+    const earnings =
+      safeNumber(slip.basic) +
+      safeNumber(slip.hra) +
+      safeNumber(slip.da) +
+      safeNumber(slip.conveyance) +
+      safeNumber(slip.medical) +
+      safeNumber(slip.bonus);
+
+    const deductions =
+      safeNumber(slip.employee_pf) +
+      safeNumber(slip.employee_esi) +
+      safeNumber(slip.professional_tax) +
+      safeNumber(slip.lop_deduction) +
+      safeNumber(slip.tds_amount);
+
+    return [
+      { name: "Earnings", value: earnings },
+      { name: "Deductions", value: deductions }
+    ];
+
+  };
+
+  const previousSlip = getPreviousSlip(selectedSlip);
+
+  const salaryDifference =
+    safeNumber(selectedSlip?.net_pay) -
+    safeNumber(previousSlip?.net_pay);
+
+  const isIncrease = salaryDifference > 0;
+
+  const chartColors = ["#22c55e", "#ef4444"];
+
   /* =========================================
      LOADING
   ========================================= */
@@ -289,6 +341,7 @@ export default function MyPayslips() {
     <div className="payroll-page">
 
       {/* HEADER */}
+
       <div className="page-header">
         <div>
           <h2>My Payslips</h2>
@@ -296,14 +349,10 @@ export default function MyPayslips() {
         </div>
       </div>
 
-      {/* =========================================
-         COMPENSATION DASHBOARD
-      ========================================= */}
-
       <CompensationDashboard />
 
       {/* =========================================
-        PAYROLL ANALYTICS
+         PAYROLL ANALYTICS
       ========================================= */}
 
       {summary && (
@@ -313,58 +362,35 @@ export default function MyPayslips() {
           <div className="summary-card">
             <h4>Latest Salary</h4>
             <p>
-              ₹{" "}
-              <CountUp
-                end={safeNumber(summary.latest_net_pay)}
-                duration={1.2}
-                separator=","
-              />
+              ₹ <CountUp end={safeNumber(summary.latest_net_pay)} duration={1.2} separator="," />
             </p>
           </div>
 
           <div className="summary-card">
             <h4>YTD Earnings</h4>
             <p>
-              ₹{" "}
-              <CountUp
-                end={safeNumber(summary.ytd_earnings)}
-                duration={1.2}
-                separator=","
-              />
+              ₹ <CountUp end={safeNumber(summary.ytd_earnings)} duration={1.2} separator="," />
             </p>
           </div>
 
           <div className="summary-card">
             <h4>Total PF</h4>
             <p>
-              ₹{" "}
-              <CountUp
-                end={safeNumber(summary.ytd_pf)}
-                duration={1.2}
-                separator=","
-              />
+              ₹ <CountUp end={safeNumber(summary.ytd_pf)} duration={1.2} separator="," />
             </p>
           </div>
 
           <div className="summary-card">
             <h4>Total Tax Paid</h4>
             <p>
-              ₹{" "}
-              <CountUp
-                end={safeNumber(summary.ytd_tax)}
-                duration={1.2}
-                separator=","
-              />
+              ₹ <CountUp end={safeNumber(summary.ytd_tax)} duration={1.2} separator="," />
             </p>
           </div>
 
           <div className="summary-card">
             <h4>LOP Days</h4>
             <p>
-              <CountUp
-                end={safeNumber(summary.ytd_lop_days)}
-                duration={1}
-              />
+              <CountUp end={safeNumber(summary.ytd_lop_days)} duration={1} />
             </p>
           </div>
 
@@ -387,9 +413,7 @@ export default function MyPayslips() {
             <LineChart data={chartData}>
 
               <XAxis dataKey="month" />
-
               <YAxis />
-
               <Tooltip />
 
               <Line
@@ -542,6 +566,8 @@ export default function MyPayslips() {
 
             </div>
 
+            {/* Earnings & Deductions Grid */}
+
             <div className="payslip-grid">
 
               <div className="payslip-column">
@@ -574,6 +600,80 @@ export default function MyPayslips() {
               </div>
 
             </div>
+
+            {/* PIE CHART */}
+
+            <div className="payslip-chart">
+
+              <h4>Earnings vs Deductions</h4>
+
+              <ResponsiveContainer width="100%" height={220}>
+
+                <PieChart>
+
+                  <Pie
+                    data={getPayslipChartData(selectedSlip)}
+                    dataKey="value"
+                    nameKey="name"
+                    outerRadius={80}
+                    label
+                  >
+
+                    {getPayslipChartData(selectedSlip).map((entry, index) => (
+                      <Cell key={index} fill={chartColors[index]} />
+                    ))}
+
+                  </Pie>
+
+                  <Tooltip />
+
+                </PieChart>
+
+              </ResponsiveContainer>
+
+            </div>
+
+            {/* SALARY COMPARISON */}
+
+            {previousSlip && (
+
+              <div className="comparison-card">
+
+                <h4>Salary Comparison</h4>
+
+                <div className="comparison-grid">
+
+                  <div className="comparison-box">
+                    <span>Previous Salary</span>
+                    <strong>{formatCurrency(previousSlip.net_pay)}</strong>
+                  </div>
+
+                  <div className="comparison-box">
+                    <span>Current Salary</span>
+                    <strong>{formatCurrency(selectedSlip.net_pay)}</strong>
+                  </div>
+
+                  <div className={`comparison-box change ${isIncrease ? "increase" : "decrease"}`}>
+
+                    <span>Change</span>
+
+                    <strong>
+                      {isIncrease ? "↑" : "↓"} {formatCurrency(Math.abs(salaryDifference))}
+                    </strong>
+
+                  </div>
+
+                </div>
+
+                {selectedSlip.lop_days > 0 && (
+                  <div className="lop-info">
+                    Reason: LOP Deduction ({selectedSlip.lop_days} days)
+                  </div>
+                )}
+
+              </div>
+
+            )}
 
             <div className="net-pay-box">
 

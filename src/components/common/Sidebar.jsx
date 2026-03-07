@@ -58,6 +58,9 @@ export default function Sidebar() {
             <NavLink to="/leaves" className="sidebar-subitem">
               📊 Leave Dashboard
             </NavLink>
+            <NavLink to="/leave-calendar" className="sidebar-subitem">
+              📅 Leave Calendar
+            </NavLink>
             <NavLink to="/approvals" className="sidebar-subitem">
               ✅ Leave Approvals
             </NavLink>
