@@ -131,13 +131,16 @@
 // }
 
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import "../../styles/payroll.css";
 import "../../styles/employeePayslips.css";
+
 import api from "../../api/axios";
 import { getMyPayslips, downloadPayslipPDF } from "../../api/payroll";
+
 import companyLogo from "../../assets/company-logo.png";
 import CompensationDashboard from "../../components/payroll/CompensationDashboard";
+
 import CountUp from "react-countup";
 
 import {
@@ -156,8 +159,10 @@ export default function MyPayslips() {
 
   const [slips, setSlips] = useState([]);
   const [summary, setSummary] = useState(null);
+
   const [loading, setLoading] = useState(true);
   const [downloadingId, setDownloadingId] = useState(null);
+
   const [selectedSlip, setSelectedSlip] = useState(null);
 
   /* =========================================
@@ -175,8 +180,10 @@ export default function MyPayslips() {
           api.get("/payroll/my-summary/")
         ]);
 
-        const filtered = slipsRes.data.filter(
-          (p) => p.status === "APPROVED" || p.status === "PAID"
+        const slipsData = slipsRes?.data || [];
+
+        const filtered = slipsData.filter(
+          p => p.status === "APPROVED" || p.status === "PAID"
         );
 
         const sorted = filtered.sort(
@@ -208,6 +215,8 @@ export default function MyPayslips() {
 
   const formatMonth = (monthString) => {
 
+    if (!monthString) return "";
+
     const date = new Date(monthString);
 
     return date.toLocaleDateString("en-US", {
@@ -225,17 +234,27 @@ export default function MyPayslips() {
 
   const safeNumber = (value) => parseFloat(value || 0);
 
-  const getPreviousSlip = (currentSlip) => {
+  /* =========================================
+     PREVIOUS SLIP
+  ========================================= */
 
-    if (!currentSlip || !slips?.length) return null;
+  const previousSlip = useMemo(() => {
 
-    const index = slips.findIndex((p) => p?.id === currentSlip?.id);
+    if (!selectedSlip || slips.length === 0) return null;
+
+    const index = slips.findIndex(p => p.id === selectedSlip.id);
 
     if (index <= 0) return null;
 
-    return slips[index - 1] || null;
+    return slips[index - 1];
 
-  };
+  }, [selectedSlip, slips]);
+
+  const salaryDifference =
+    safeNumber(selectedSlip?.net_pay) -
+    safeNumber(previousSlip?.net_pay);
+
+  const isIncrease = salaryDifference > 0;
 
   /* =========================================
      DOWNLOAD PDF
@@ -249,13 +268,21 @@ export default function MyPayslips() {
 
       const response = await downloadPayslipPDF(id);
 
-      const url = window.URL.createObjectURL(response.data);
+      const blob = new Blob([response.data], {
+        type: "application/pdf"
+      });
+
+      const url = window.URL.createObjectURL(blob);
 
       const link = document.createElement("a");
+
       link.href = url;
       link.download = `Payslip_${formatMonth(month)}.pdf`;
+
+      document.body.appendChild(link);
       link.click();
 
+      link.remove();
       window.URL.revokeObjectURL(url);
 
     } catch (error) {
@@ -275,12 +302,14 @@ export default function MyPayslips() {
      CHART DATA
   ========================================= */
 
-  const chartData = slips
-    .map((s) => ({
+  const chartData = useMemo(() => {
+
+    return slips.map(s => ({
       month: formatMonth(s.month),
       salary: safeNumber(s.net_pay)
-    }))
-    .reverse();
+    })).reverse();
+
+  }, [slips]);
 
   const getPayslipChartData = (slip) => {
 
@@ -307,14 +336,6 @@ export default function MyPayslips() {
     ];
 
   };
-
-  const previousSlip = getPreviousSlip(selectedSlip);
-
-  const salaryDifference =
-    safeNumber(selectedSlip?.net_pay) -
-    safeNumber(previousSlip?.net_pay);
-
-  const isIncrease = salaryDifference > 0;
 
   const chartColors = ["#22c55e", "#ef4444"];
 
@@ -343,17 +364,13 @@ export default function MyPayslips() {
       {/* HEADER */}
 
       <div className="page-header">
-        <div>
-          <h2>My Payslips</h2>
-          <p>View and download your monthly salary slips</p>
-        </div>
+        <h2>My Payslips</h2>
+        <p>View and download your monthly salary slips</p>
       </div>
 
       <CompensationDashboard />
 
-      {/* =========================================
-         PAYROLL ANALYTICS
-      ========================================= */}
+      {/* SUMMARY */}
 
       {summary && (
 
@@ -398,9 +415,7 @@ export default function MyPayslips() {
 
       )}
 
-      {/* =========================================
-         SALARY TREND CHART
-      ========================================= */}
+      {/* SALARY TREND */}
 
       {chartData.length > 0 && (
 
@@ -432,9 +447,7 @@ export default function MyPayslips() {
 
       )}
 
-      {/* =========================================
-         PAYSLIP TABLE
-      ========================================= */}
+      {/* PAYSLIP TABLE */}
 
       <div className="table-wrapper">
 
@@ -459,7 +472,7 @@ export default function MyPayslips() {
               </tr>
             )}
 
-            {slips.map((slip) => {
+            {slips.map(slip => {
 
               const canDownload =
                 slip.status === "APPROVED" ||
@@ -494,9 +507,7 @@ export default function MyPayslips() {
                     <button
                       className="btn-payslip"
                       disabled={!canDownload || downloadingId === slip.id}
-                      onClick={() =>
-                        handleDownload(slip.id, slip.month)
-                      }
+                      onClick={() => handleDownload(slip.id, slip.month)}
                     >
                       {downloadingId === slip.id
                         ? "Downloading..."
@@ -517,9 +528,7 @@ export default function MyPayslips() {
 
       </div>
 
-      {/* =========================================
-         PAYSLIP MODAL
-      ========================================= */}
+      {/* PAYSLIP MODAL */}
 
       {selectedSlip && (
 
@@ -533,16 +542,12 @@ export default function MyPayslips() {
             onClick={(e) => e.stopPropagation()}
           >
 
-            <div className="payslip-watermark">
-              CONFIDENTIAL
-            </div>
-
             <div className="payslip-header">
 
               <img src={companyLogo} alt="Company Logo" />
 
               <div>
-                <h3>GMMC Company Pvt Ltd</h3>
+                <h3>Genius Minds Making Code Pvt Ltd</h3>
                 <p>Official Salary Payslip</p>
               </div>
 
@@ -565,115 +570,6 @@ export default function MyPayslips() {
               </div>
 
             </div>
-
-            {/* Earnings & Deductions Grid */}
-
-            <div className="payslip-grid">
-
-              <div className="payslip-column">
-
-                <h4>Earnings</h4>
-
-                <div>Basic: {formatCurrency(selectedSlip.basic)}</div>
-                <div>HRA: {formatCurrency(selectedSlip.hra)}</div>
-                <div>DA: {formatCurrency(selectedSlip.da)}</div>
-                <div>Conveyance: {formatCurrency(selectedSlip.conveyance)}</div>
-                <div>Medical: {formatCurrency(selectedSlip.medical)}</div>
-                <div>Bonus: {formatCurrency(selectedSlip.bonus)}</div>
-
-                <div className="highlight">
-                  Gross: {formatCurrency(selectedSlip.gross_salary)}
-                </div>
-
-              </div>
-
-              <div className="payslip-column">
-
-                <h4>Deductions</h4>
-
-                <div>PF: {formatCurrency(selectedSlip.employee_pf)}</div>
-                <div>ESI: {formatCurrency(selectedSlip.employee_esi)}</div>
-                <div>Professional Tax: {formatCurrency(selectedSlip.professional_tax)}</div>
-                <div>LOP Deduction: {formatCurrency(selectedSlip.lop_deduction)}</div>
-                <div>TDS: {formatCurrency(selectedSlip.tds_amount)}</div>
-
-              </div>
-
-            </div>
-
-            {/* PIE CHART */}
-
-            <div className="payslip-chart">
-
-              <h4>Earnings vs Deductions</h4>
-
-              <ResponsiveContainer width="100%" height={220}>
-
-                <PieChart>
-
-                  <Pie
-                    data={getPayslipChartData(selectedSlip)}
-                    dataKey="value"
-                    nameKey="name"
-                    outerRadius={80}
-                    label
-                  >
-
-                    {getPayslipChartData(selectedSlip).map((entry, index) => (
-                      <Cell key={index} fill={chartColors[index]} />
-                    ))}
-
-                  </Pie>
-
-                  <Tooltip />
-
-                </PieChart>
-
-              </ResponsiveContainer>
-
-            </div>
-
-            {/* SALARY COMPARISON */}
-
-            {previousSlip && (
-
-              <div className="comparison-card">
-
-                <h4>Salary Comparison</h4>
-
-                <div className="comparison-grid">
-
-                  <div className="comparison-box">
-                    <span>Previous Salary</span>
-                    <strong>{formatCurrency(previousSlip.net_pay)}</strong>
-                  </div>
-
-                  <div className="comparison-box">
-                    <span>Current Salary</span>
-                    <strong>{formatCurrency(selectedSlip.net_pay)}</strong>
-                  </div>
-
-                  <div className={`comparison-box change ${isIncrease ? "increase" : "decrease"}`}>
-
-                    <span>Change</span>
-
-                    <strong>
-                      {isIncrease ? "↑" : "↓"} {formatCurrency(Math.abs(salaryDifference))}
-                    </strong>
-
-                  </div>
-
-                </div>
-
-                {selectedSlip.lop_days > 0 && (
-                  <div className="lop-info">
-                    Reason: LOP Deduction ({selectedSlip.lop_days} days)
-                  </div>
-                )}
-
-              </div>
-
-            )}
 
             <div className="net-pay-box">
 
@@ -698,13 +594,6 @@ export default function MyPayslips() {
                 }
               >
                 Download PDF
-              </button>
-
-              <button
-                className="btn-print"
-                onClick={() => window.print()}
-              >
-                Print
               </button>
 
               <button

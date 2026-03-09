@@ -443,6 +443,9 @@ export default function EmployeeStepForm({ employee }) {
   const [idChecking, setIdChecking] = useState(false);
   const [idExists, setIdExists] = useState(false);
   const [idTouched, setIdTouched] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [customRoles, setCustomRoles] = useState([]);
+  const [customDepartments, setCustomDepartments] = useState([]);
 
   const [form, setForm] = useState({
     employee_id: "",
@@ -456,6 +459,7 @@ export default function EmployeeStepForm({ employee }) {
     blood_group: "",
     nationality: "",
 
+    role: "EMPLOYEE",
     department: "",
     designation: "",
     employment_type: "Full-time",
@@ -514,21 +518,51 @@ export default function EmployeeStepForm({ employee }) {
       ...prev,
       ...employee,
       is_active: employee.is_active ?? true,
-      profile_photo: null,
-      resume: null,
-      offer_letter: null,
-      id_proof: null,
-      address_proof: null,
-      education_cert: null,
-      experience_cert: null,
     }));
+    
     if (employee.salary) {
-  setSalary(prev => ({
-    ...prev,
-    ...employee.salary
-  }));
-}
+      setSalary(prev => ({
+        ...prev,
+        ...employee.salary
+      }));
+    }
   }, [employee]);
+
+  /* ================= FETCH CUSTOM ROLES & DEPARTMENTS ================= */
+  useEffect(() => {
+    const fetchRoles = async () => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const res = await fetch('http://127.0.0.1:8000/api/employees/roles/', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const data = await res.json();
+        setCustomRoles(data.roles || []);
+      } catch (err) {
+        console.error('Failed to fetch roles', err);
+      }
+    };
+    
+    const fetchDepartments = async () => {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const res = await fetch('http://127.0.0.1:8000/api/employees/departments/', {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        const data = await res.json();
+        setCustomDepartments(data.departments || []);
+      } catch (err) {
+        console.error('Failed to fetch departments', err);
+      }
+    };
+    
+    fetchRoles();
+    fetchDepartments();
+  }, []);
 
   /* ================= DUPLICATE CHECK ================= */
   useEffect(() => {
@@ -556,14 +590,76 @@ export default function EmployeeStepForm({ employee }) {
 
   const update = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: "" }));
+    }
+  };
+
+  const updateSalary = (field, value) => {
+    setSalary((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors((prev) => ({ ...prev, [field]: "" }));
+    }
+  };
+
+  const validateStep = (currentStep) => {
+    const newErrors = {};
+
+    if (currentStep === 0) {
+      if (!form.employee_id) newErrors.employee_id = "This field is required";
+      if (!form.first_name) newErrors.first_name = "This field is required";
+      if (!form.email) newErrors.email = "This field is required";
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
+        newErrors.email = "Invalid email format";
+      }
+      if (form.mobile && !/^[0-9]{10}$/.test(form.mobile)) {
+        newErrors.mobile = "Mobile number must be 10 digits";
+      }
+      if (idExists && !employee?.id) newErrors.employee_id = "Employee ID already exists";
+    }
+
+    if (currentStep === 1) {
+      if (!form.department) newErrors.department = "This field is required";
+      if (!form.designation) newErrors.designation = "This field is required";
+      if (!form.joining_date) newErrors.joining_date = "This field is required";
+    }
+
+    if (currentStep === 2) {
+      if (!salary.basic || Number(salary.basic) <= 0) {
+        newErrors.basic = "Basic salary is required";
+      }
+    }
+
+    if (currentStep === 3) {
+      if (form.account_number && !/^[0-9]{9,18}$/.test(form.account_number)) {
+        newErrors.account_number = "Account number must be 9-18 digits";
+      }
+      if (form.pan && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(form.pan)) {
+        newErrors.pan = "Invalid PAN format (e.g., ABCDE1234F)";
+      }
+      if (form.ifsc && !/^[A-Z]{4}0[A-Z0-9]{6}$/.test(form.ifsc)) {
+        newErrors.ifsc = "Invalid IFSC format";
+      }
+    }
+
+    if (currentStep === 5) {
+      if (form.emergency_number && !/^[0-9]{10}$/.test(form.emergency_number)) {
+        newErrors.emergency_number = "Mobile number must be 10 digits";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleNext = () => {
-  if (step < steps.length - 1) {
-    setDirection("forward");
-    setStep((prev) => prev + 1);
-  }
-};
+    if (!validateStep(step)) return;
+    
+    if (step < steps.length - 1) {
+      setDirection("forward");
+      setStep((prev) => prev + 1);
+    }
+  };
 
   const handleBack = () => {
     setDirection("backward");
@@ -571,25 +667,34 @@ export default function EmployeeStepForm({ employee }) {
   };
 
   const handleSave = async () => {
-  if (!form.employee_id) {
-    alert("Employee ID is required");
+  if (!form.employee_id || !form.first_name || !form.email) {
+    alert("Employee ID, First Name, and Email are required");
     return;
   }
 
-  if (idExists) {
-    alert("Employee ID already exists");
+  if (idExists && !employee?.id) {
+    alert("Employee ID already exists. Please use a different ID.");
     return;
   }
 
   const formData = new FormData();
+  const fileFields = [
+    "profile_photo", "resume", "offer_letter", "aadhar_card",
+    "pan_card", "address_proof", "education_cert", "experience_cert"
+  ];
 
   Object.keys(form).forEach((key) => {
-    if (form[key] !== null && form[key] !== undefined) {
-      formData.append(key, form[key]);
+    const value = form[key];
+    
+    if (fileFields.includes(key)) {
+      if (value instanceof File) {
+        formData.append(key, value);
+      }
+    } else if (value !== null && value !== undefined) {
+      formData.append(key, value);
     }
   });
 
-  // 👇 append salary JSON
   formData.append("salary", JSON.stringify(salary));
 
   const result = employee?.id
@@ -651,11 +756,30 @@ export default function EmployeeStepForm({ employee }) {
                 update("employee_id", e.target.value.toUpperCase());
                 setIdTouched(true);
               }}
+              disabled={!!employee?.id}
+              error={errors.employee_id}
             />
+
+            {!employee?.id && idChecking && (
+              <small style={{ color: "#64748b" }}>Checking...</small>
+            )}
+
+            {!employee?.id && !idChecking && idTouched && form.employee_id && (
+              idExists ? (
+                <small style={{ color: "red" }}>
+                  ❌ Employee ID already exists
+                </small>
+              ) : (
+                <small style={{ color: "green" }}>
+                  ✅ Employee ID available
+                </small>
+              )
+            )}
 
             <Input label="First Name *"
               value={form.first_name}
               onChange={(e)=>update("first_name", e.target.value)}
+              error={errors.first_name}
             />
 
             <Input label="Last Name"
@@ -663,19 +787,51 @@ export default function EmployeeStepForm({ employee }) {
               onChange={(e)=>update("last_name", e.target.value)}
             />
 
-            <Input label="Email"
+            <Input label="Email *"
               value={form.email}
               onChange={(e)=>update("email", e.target.value)}
+              type="email"
+              error={errors.email}
             />
 
             <Input label="Mobile"
               value={form.mobile}
-              onChange={(e)=>update("mobile", e.target.value)}
+              onChange={(e)=>update("mobile", e.target.value.replace(/\D/g, ''))}
+              maxLength="10"
+              error={errors.mobile}
             />
 
             <Input label="Date of Birth" type="date"
               value={form.dob}
               onChange={(e)=>update("dob", e.target.value)}
+            />
+
+            <div className="form-field">
+              <label>Gender</label>
+              <select
+                value={form.gender || ""}
+                onChange={(e)=>update("gender", e.target.value)}
+              >
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+
+            <Input label="Address"
+              value={form.address}
+              onChange={(e)=>update("address", e.target.value)}
+            />
+
+            <Input label="Blood Group"
+              value={form.blood_group}
+              onChange={(e)=>update("blood_group", e.target.value)}
+            />
+
+            <Input label="Nationality"
+              value={form.nationality}
+              onChange={(e)=>update("nationality", e.target.value)}
             />
           </>
         )}
@@ -683,19 +839,44 @@ export default function EmployeeStepForm({ employee }) {
         {/* ================= STEP 1 ================= */}
         {step === 1 && (
           <>
-            <Input label="Department"
-              value={form.department}
-              onChange={(e)=>update("department", e.target.value)}
-            />
+            <div className="form-field">
+              <label>Role *</label>
+              <select
+                value={form.role || "EMPLOYEE"}
+                onChange={(e)=>update("role", e.target.value)}
+              >
+                <option value="EMPLOYEE">Employee</option>
+                <option value="HR">HR</option>
+                {customRoles.map((role, index) => (
+                  <option key={index} value={role}>{role}</option>
+                ))}
+              </select>
+            </div>
 
-            <Input label="Designation"
+            <div className="form-field">
+              <label>Department *</label>
+              <select
+                value={form.department || ""}
+                onChange={(e)=>update("department", e.target.value)}
+              >
+                <option value="">Select Department</option>
+                {customDepartments.map((dept, index) => (
+                  <option key={index} value={dept}>{dept}</option>
+                ))}
+              </select>
+              {errors.department && <small style={{ color: "red", fontSize: "12px" }}>{errors.department}</small>}
+            </div>
+
+            <Input label="Designation *"
               value={form.designation}
               onChange={(e)=>update("designation", e.target.value)}
+              error={errors.designation}
             />
 
-            <Input label="Joining Date" type="date"
+            <Input label="Joining Date *" type="date"
               value={form.joining_date}
               onChange={(e)=>update("joining_date", e.target.value)}
+              error={errors.joining_date}
             />
 
             <Input label="Work Location"
@@ -719,27 +900,27 @@ export default function EmployeeStepForm({ employee }) {
               </thead>
 
               <tbody>
-                <SalaryRow label="Basic" field="basic" salary={salary} setSalary={setSalary} />
-                <SalaryRow label="DA" field="da" salary={salary} setSalary={setSalary} />
-                <SalaryRow label="HRA" field="hra" salary={salary} setSalary={setSalary} />
-                <SalaryRow label="Conveyance" field="conveyance" salary={salary} setSalary={setSalary} />
-                <SalaryRow label="Medical" field="medical" salary={salary} setSalary={setSalary} />
-                <SalaryRow label="Special Allowance" field="special_allowance" salary={salary} setSalary={setSalary} />
+                <SalaryRow label="Basic" field="basic" salary={salary} setSalary={updateSalary} error={errors.basic} />
+                <SalaryRow label="DA" field="da" salary={salary} setSalary={updateSalary} />
+                <SalaryRow label="HRA" field="hra" salary={salary} setSalary={updateSalary} />
+                <SalaryRow label="Conveyance" field="conveyance" salary={salary} setSalary={updateSalary} />
+                <SalaryRow label="Medical" field="medical" salary={salary} setSalary={updateSalary} />
+                <SalaryRow label="Special Allowance" field="special_allowance" salary={salary} setSalary={updateSalary} />
 
                 <SummaryRow label="Gross Salary (A)" value={gross} />
 
-                <SalaryRow label="Employee PF" field="employee_pf" salary={salary} setSalary={setSalary} />
-                <SalaryRow label="Professional Tax" field="professional_tax" salary={salary} setSalary={setSalary} />
-                <SalaryRow label="Employee ESI" field="employee_esi" salary={salary} setSalary={setSalary} />
-                <SalaryRow label="TDS" field="tds" salary={salary} setSalary={setSalary} />
-                <SalaryRow label="Medical Insurance" field="medical_insurance" salary={salary} setSalary={setSalary} />
+                <SalaryRow label="Employee PF" field="employee_pf" salary={salary} setSalary={updateSalary} />
+                <SalaryRow label="Professional Tax" field="professional_tax" salary={salary} setSalary={updateSalary} />
+                <SalaryRow label="Employee ESI" field="employee_esi" salary={salary} setSalary={updateSalary} />
+                <SalaryRow label="TDS" field="tds" salary={salary} setSalary={updateSalary} />
+                <SalaryRow label="Medical Insurance" field="medical_insurance" salary={salary} setSalary={updateSalary} />
 
                 <SummaryRow label="Total Deductions (B)" value={totalDeductions} />
                 <SummaryRow label="Net Salary (A - B)" value={netSalary} />
 
-                <SalaryRow label="Employer PF" field="employer_pf" salary={salary} setSalary={setSalary} />
-                <SalaryRow label="Employer ESI" field="employer_esi" salary={salary} setSalary={setSalary} />
-                <SalaryRow label="Gratuity" field="gratuity" salary={salary} setSalary={setSalary} />
+                <SalaryRow label="Employer PF" field="employer_pf" salary={salary} setSalary={updateSalary} />
+                <SalaryRow label="Employer ESI" field="employer_esi" salary={salary} setSalary={updateSalary} />
+                <SalaryRow label="Gratuity" field="gratuity" salary={salary} setSalary={updateSalary} />
 
                 <SummaryRow label="CTC (A + C)" value={ctc} />
               </tbody>
@@ -758,17 +939,20 @@ export default function EmployeeStepForm({ employee }) {
 
             <Input label="Account Number"
               value={form.account_number}
-              onChange={(e)=>update("account_number", e.target.value)}
+              onChange={(e)=>update("account_number", e.target.value.replace(/\D/g, ''))}
+              error={errors.account_number}
             />
 
             <Input label="IFSC Code"
               value={form.ifsc}
-              onChange={(e)=>update("ifsc", e.target.value)}
+              onChange={(e)=>update("ifsc", e.target.value.toUpperCase())}
+              error={errors.ifsc}
             />
 
             <Input label="PAN Number"
               value={form.pan}
               onChange={(e)=>update("pan", e.target.value.toUpperCase())}
+              error={errors.pan}
             />
           </>
         )}
@@ -777,93 +961,61 @@ export default function EmployeeStepForm({ employee }) {
         {/* ================= STEP 4 ================= */}
         {step === 4 && (
           <>
-            <div className="form-field">
-              <label>Profile Photo</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) =>
-                  update("profile_photo", e.target.files[0])
-                }
-              />
-            </div>
+            <FileField
+              label="Profile Photo"
+              accept="image/*"
+              currentFile={employee?.profile_photo}
+              onChange={(file) => update("profile_photo", file)}
+            />
 
-            <div className="form-field">
-              <label>Resume</label>
-              <input
-                type="file"
-                accept=".pdf,.doc,.docx"
-                onChange={(e) =>
-                  update("resume", e.target.files[0])
-                }
-              />
-            </div>
+            <FileField
+              label="Resume"
+              accept=".pdf,.doc,.docx"
+              currentFile={employee?.resume}
+              onChange={(file) => update("resume", file)}
+            />
 
-            <div className="form-field">
-              <label>Offer Letter</label>
-              <input
-                type="file"
-                accept=".pdf"
-                onChange={(e) =>
-                  update("offer_letter", e.target.files[0])
-                }
-              />
-            </div>
+            <FileField
+              label="Offer Letter"
+              accept=".pdf"
+              currentFile={employee?.offer_letter}
+              onChange={(file) => update("offer_letter", file)}
+            />
 
-            <div className="form-field">
-              <label>Aadhar Card</label>
-              <input
-                type="file"
-                accept=".pdf,.jpg,.jpeg,.png"
-                onChange={(e) =>
-                  update("aadhar_card", e.target.files[0])
-                }
-              />
-            </div>
+            <FileField
+              label="Aadhar Card"
+              accept=".pdf,.jpg,.jpeg,.png"
+              currentFile={employee?.aadhar_card}
+              onChange={(file) => update("aadhar_card", file)}
+            />
 
-            <div className="form-field">
-              <label>PAN Card</label>
-              <input
-                type="file"
-                accept=".pdf,.jpg,.jpeg,.png"
-                onChange={(e) =>
-                  update("pan_card", e.target.files[0])
-                }
-              />
-            </div>
+            <FileField
+              label="PAN Card"
+              accept=".pdf,.jpg,.jpeg,.png"
+              currentFile={employee?.pan_card}
+              onChange={(file) => update("pan_card", file)}
+            />
 
-            <div className="form-field">
-              <label>Address Proof</label>
-              <input
-                type="file"
-                accept=".pdf,.jpg,.jpeg,.png"
-                onChange={(e) =>
-                  update("address_proof", e.target.files[0])
-                }
-              />
-            </div>
+            <FileField
+              label="Address Proof"
+              accept=".pdf,.jpg,.jpeg,.png"
+              currentFile={employee?.address_proof}
+              onChange={(file) => update("address_proof", file)}
+            />
 
-            <div className="form-field">
-              <label>Education Certificate</label>
-              <input
-                type="file"
-                accept=".pdf"
-                onChange={(e) =>
-                  update("education_cert", e.target.files[0])
-                }
-              />
-            </div>
+            <FileField
+              label="Education Certificate"
+              accept=".pdf"
+              currentFile={employee?.education_cert}
+              onChange={(file) => update("education_cert", file)}
+            />
 
-            <div className="form-field">
-              <label>Experience Certificate</label>
-              <input
-                type="file"
-                accept=".pdf"
-                onChange={(e) =>
-                  update("experience_cert", e.target.files[0])
-                }
-              />
-            </div>
+            <FileField
+              label="Experience Certificate"
+              accept=".pdf"
+              currentFile={employee?.experience_cert}
+              onChange={(file) => update("experience_cert", file)}
+            />
           </>
         )}
 
@@ -877,7 +1029,9 @@ export default function EmployeeStepForm({ employee }) {
 
             <Input label="Emergency Contact Number"
               value={form.emergency_number}
-              onChange={(e)=>update("emergency_number", e.target.value)}
+              onChange={(e)=>update("emergency_number", e.target.value.replace(/\D/g, ''))}
+              maxLength="10"
+              error={errors.emergency_number}
             />
 
             <div className="form-field">
@@ -912,33 +1066,65 @@ export default function EmployeeStepForm({ employee }) {
   );
 }
 
-const Input = ({ label, ...props }) => (
+const Input = ({ label, error, ...props }) => (
   <div className="form-field">
     <label>{label}</label>
     <input {...props} />
+    {error && <small style={{ color: "red", fontSize: "12px" }}>{error}</small>}
   </div>
 );
 
+const FileField = ({ label, accept, currentFile, onChange }) => {
+  const getFileName = (url) => {
+    if (!url) return null;
+    return url.split('/').pop();
+  };
 
-const SalaryRow = ({ label, field, salary, setSalary }) => {
+  return (
+    <div className="form-field">
+      <label>{label}</label>
+      {currentFile && typeof currentFile === 'string' && (
+        <div style={{ marginBottom: '8px', fontSize: '14px', color: '#64748b' }}>
+          Current: <a href={currentFile} target="_blank" rel="noopener noreferrer">{getFileName(currentFile)}</a>
+        </div>
+      )}
+      <input
+        type="file"
+        accept={accept}
+        onChange={(e) => onChange(e.target.files[0])}
+      />
+    </div>
+  );
+};
+
+
+const SalaryRow = ({ label, field, salary, setSalary, error }) => {
   const value = salary[field] || "";
 
   return (
-    <tr>
-      <td>{label}</td>
-      <td>
-        <input
-          type="number"
-          value={value}
-          onChange={(e) =>
-            setSalary({ ...salary, [field]: e.target.value })
-          }
-        />
-      </td>
-      <td>
-        ₹ {(Number(value || 0) * 12).toLocaleString("en-IN")}
-      </td>
-    </tr>
+    <>
+      <tr>
+        <td>{label}</td>
+        <td>
+          <input
+            type="number"
+            value={value}
+            onChange={(e) => setSalary(field, e.target.value)}
+            style={error ? { borderColor: "red" } : {}}
+          />
+        </td>
+        <td>
+          ₹ {(Number(value || 0) * 12).toLocaleString("en-IN")}
+        </td>
+      </tr>
+      {error && (
+        <tr>
+          <td colSpan="3">
+            <small style={{ color: "red", fontSize: "12px" }}>{error}</small>
+          </td>
+        </tr>
+      )}
+    </>
   );
 };
 

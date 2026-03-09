@@ -33,8 +33,8 @@ export default function LeaveApprovals() {
     }
   };
 
-  const pendingLeaves = leaves.filter(
-    (l) => l.status === "PENDING"
+  const approvedLeaves = leaves.filter(
+    (l) => l.status === "APPROVED"
   );
 
   const handleApprove = async (id) => {
@@ -67,8 +67,8 @@ export default function LeaveApprovals() {
       {/* HEADER */}
       <div className="leaves-header approvals">
         <div>
-          <h2>Leave Approvals</h2>
-          <p>Approve pending leave requests</p>
+          <h2>Leave Approvals - Approved Leaves</h2>
+          <p>View all approved leave requests</p>
         </div>
 
         <div className="export-actions">
@@ -76,8 +76,8 @@ export default function LeaveApprovals() {
             className="btn"
             onClick={() =>
               exportLeavesToExcel(
-                pendingLeaves,
-                "Pending_Leaves"
+                approvedLeaves,
+                "Approved_Leaves"
               )
             }
           >
@@ -88,8 +88,8 @@ export default function LeaveApprovals() {
             className="btn"
             onClick={() =>
               exportLeavesToPDF(
-                pendingLeaves,
-                "Pending Leaves"
+                approvedLeaves,
+                "Approved Leaves"
               )
             }
           >
@@ -103,9 +103,9 @@ export default function LeaveApprovals() {
         <div className="leave-empty">
           Loading...
         </div>
-      ) : pendingLeaves.length === 0 ? (
+      ) : approvedLeaves.length === 0 ? (
         <div className="leave-empty">
-          🎉 No pending leave requests
+          No approved leaves yet
         </div>
       ) : (
         <div className="leave-table-card">
@@ -113,41 +113,28 @@ export default function LeaveApprovals() {
             <thead>
               <tr>
                 <th>Employee</th>
-                <th>Dates</th>
-                <th>Type</th>
+                <th>Leave Type</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Days</th>
                 <th>Reason</th>
-                <th>Action</th>
+                <th>Status</th>
               </tr>
             </thead>
 
             <tbody>
-              {pendingLeaves.map((l) => (
+              {approvedLeaves.map((l) => (
                 <tr key={l.id}>
                   <td>{l.employee_name}</td>
-                  <td>
-                    {l.start_date} → {l.end_date}
-                  </td>
                   <td>{l.leave_type_name}</td>
+                  <td>{l.start_date}</td>
+                  <td>{l.end_date}</td>
+                  <td>{l.days}</td>
                   <td>{l.reason}</td>
                   <td>
-                    <button
-                      className="btn primary"
-                      onClick={() =>
-                        handleApprove(l.id)
-                      }
-                    >
-                      Approve
-                    </button>
-
-                    <button
-                      className="btn danger"
-                      style={{ marginLeft: 8 }}
-                      onClick={() =>
-                        handleReject(l.id)
-                      }
-                    >
-                      Reject
-                    </button>
+                    <span className="status-badge approved">
+                      Approved
+                    </span>
                   </td>
                 </tr>
               ))}

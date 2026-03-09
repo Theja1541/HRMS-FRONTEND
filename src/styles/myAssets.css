@@ -1,0 +1,104 @@
+.my-assets-container {
+  padding: 20px;
+}
+
+.my-assets-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.my-assets-header h2 {
+  margin: 0;
+  color: #1f2937;
+}
+
+.btn-refresh {
+  padding: 8px 16px;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-refresh:hover {
+  background: #2563eb;
+}
+
+.assets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.asset-card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.asset-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.asset-icon {
+  font-size: 48px;
+  margin-bottom: 12px;
+}
+
+.asset-card h3 {
+  margin: 0 0 8px 0;
+  color: #1f2937;
+  font-size: 18px;
+}
+
+.asset-type {
+  color: #6b7280;
+  font-size: 14px;
+  margin: 4px 0;
+}
+
+.asset-serial {
+  color: #9ca3af;
+  font-size: 12px;
+  margin: 4px 0;
+}
+
+.asset-date {
+  color: #6b7280;
+  font-size: 13px;
+  margin: 8px 0;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  margin-top: 8px;
+}
+
+.status-badge.status-assigned {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-badge.status-returned {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.loading-text, .no-data {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: #6b7280;
+  padding: 40px;
+}

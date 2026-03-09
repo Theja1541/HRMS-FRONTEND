@@ -2,13 +2,14 @@ import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import "../../styles/sidebar.css";
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen, onClose }) {
   const [collapsed, setCollapsed] = useState(false);
   const [openLeaves, setOpenLeaves] = useState(false);
   const [openPayroll, setOpenPayroll] = useState(false);
+  const [openAssets, setOpenAssets] = useState(false);
 
   return (
-    <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
+    <aside className={`sidebar ${collapsed ? "collapsed" : ""} ${isOpen ? "mobile-open" : ""}`}>
       
       {/* HEADER */}
       <div className="sidebar-header">
@@ -24,19 +25,19 @@ export default function Sidebar() {
       {/* MENU */}
       <nav className="sidebar-menu">
 
-        <NavLink to="/dashboard" className="sidebar-item">
+        <NavLink to="/dashboard" className="sidebar-item" onClick={onClose}>
           🏠 {!collapsed && "Dashboard"}
         </NavLink>
 
-        <NavLink to="/employees" className="sidebar-item">
+        <NavLink to="/employees" className="sidebar-item" onClick={onClose}>
           👥 {!collapsed && "Employees"}
         </NavLink>
 
-        <NavLink to="/attendance" className="sidebar-item">
+        <NavLink to="/attendance" className="sidebar-item" onClick={onClose}>
           📅 {!collapsed && "Attendance"}
         </NavLink>
 
-        <NavLink to="/monthly" className="sidebar-item">
+        <NavLink to="/monthly" className="sidebar-item" onClick={onClose}>
           📊 {!collapsed && "Monthly"}
         </NavLink>
 
@@ -55,17 +56,20 @@ export default function Sidebar() {
 
         {openLeaves && !collapsed && (
           <div className="sidebar-dropdown-menu">
-            <NavLink to="/leaves" className="sidebar-subitem">
-              📊 Leave Dashboard
+            <NavLink to="/leave-dashboard" className="sidebar-subitem" onClick={onClose}>
+              📊 Dashboard
             </NavLink>
-            <NavLink to="/leave-calendar" className="sidebar-subitem">
-              📅 Leave Calendar
+            <NavLink to="/approvals" className="sidebar-subitem" onClick={onClose}>
+              ✅ Approvals
             </NavLink>
-            <NavLink to="/approvals" className="sidebar-subitem">
-              ✅ Leave Approvals
+            <NavLink to="/rejected" className="sidebar-subitem" onClick={onClose}>
+              ❌ Rejected
             </NavLink>
-            <NavLink to="/rejected" className="sidebar-subitem">
-              ❌ Leave Rejected
+            <NavLink to="/leave-calendar" className="sidebar-subitem" onClick={onClose}>
+              📅 Calendar
+            </NavLink>
+            <NavLink to="/leave-settings" className="sidebar-subitem" onClick={onClose}>
+              ⚙️ Settings
             </NavLink>
           </div>
         )}
@@ -85,24 +89,52 @@ export default function Sidebar() {
 
       {openPayroll && !collapsed && (
         <div className="sidebar-dropdown-menu">
-          <NavLink to="/payroll" className="sidebar-subitem">
+          <NavLink to="/payroll" className="sidebar-subitem" onClick={onClose}>
             📄 Generate Payslip
           </NavLink>
 
-          <NavLink to="/payroll-summary" className="sidebar-subitem">
+          <NavLink to="/payroll-summary" className="sidebar-subitem" onClick={onClose}>
             📊 Payroll Summary
           </NavLink>
 
-          <NavLink to="/email-dashboard" className="sidebar-subitem">
+          <NavLink to="/email-dashboard" className="sidebar-subitem" onClick={onClose}>
             📧 Email Dashboard
           </NavLink>
         </div>
       )}
+
+        {/* ASSETS DROPDOWN */}
+        <div
+          className="sidebar-item dropdown"
+          onClick={() => setOpenAssets(!openAssets)}
+        >
+          📦 {!collapsed && "Assets"}
+          {!collapsed && (
+            <span className="dropdown-arrow">
+              {openAssets ? "▲" : "▼"}
+            </span>
+          )}
+        </div>
+
+        {openAssets && !collapsed && (
+          <div className="sidebar-dropdown-menu">
+            <NavLink to="/assets" className="sidebar-subitem" onClick={onClose}>
+              📋 Manage Assets
+            </NavLink>
+            <NavLink to="/asset-returns" className="sidebar-subitem" onClick={onClose}>
+              🔄 Asset Returns
+            </NavLink>
+          </div>
+        )}
+
+        <NavLink to="/settings" className="sidebar-item" onClick={onClose}>
+          ⚙️ {!collapsed && "Settings"}
+        </NavLink>
       </nav>
 
       {/* FOOTER */}
       <div className="sidebar-footer">
-        <NavLink to="/login" className="sidebar-item logout">
+        <NavLink to="/login" className="sidebar-item logout" onClick={onClose}>
           🚪 {!collapsed && "Logout"}
         </NavLink>
       </div>

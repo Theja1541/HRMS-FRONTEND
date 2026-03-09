@@ -138,21 +138,33 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import toast from "react-hot-toast";
-import useCountUp from "../../hooks/useCountUp";
+import CountUp from "react-countup";
+import { FaBell } from "react-icons/fa";
+import { useAuth } from "../../auth/AuthContext.jsx";
+import { getMyNotifications } from "../../api/notifications";
 import "../../styles/employeeDashboard.css";
-import {
-  BarChart3,
-  IndianRupee,
-  FileText,
-  Bell
-} from "lucide-react";
 
 export default function EmployeeDashboard() {
+  const { user } = useAuth();
+  const userName = user?.username?.split("@")[0] || "Employee";
+
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [currentTime, setCurrentTime] = useState(new Date());
+  const [notifications, setNotifications] = useState([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     fetchDashboard();
+    fetchNotifications();
   }, []);
 
   const fetchDashboard = async () => {
@@ -166,11 +178,37 @@ export default function EmployeeDashboard() {
     }
   };
 
-  // ✅ Always call hooks unconditionally
-  const animatedAttendance = useCountUp(data?.attendance_percentage || 0);
-  const animatedSalary = useCountUp(data?.salary_this_month || 0);
-  const animatedPending = useCountUp(data?.pending_leaves || 0);
-  const animatedNotifications = useCountUp(data?.notifications_unread || 0);
+  const fetchNotifications = async () => {
+    try {
+      const res = await getMyNotifications();
+      setNotifications(res.data.notifications || []);
+      setUnreadCount(res.data.unread_count || 0);
+    } catch (err) {
+      console.log("Notification fetch error");
+    }
+  };
+
+  const formatTime = (date) =>
+    date.toLocaleTimeString("en-IN", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
+
+  const formatDate = (date) =>
+    date.toLocaleDateString("en-IN", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+  const getGreeting = () => {
+    const hour = currentTime.getHours();
+    if (hour < 12) return "Good Morning";
+    if (hour < 17) return "Good Afternoon";
+    return "Good Evening";
+  };
 
   if (loading) {
     return <p style={{ padding: 20 }}>Loading dashboard...</p>;
@@ -179,81 +217,115 @@ export default function EmployeeDashboard() {
   if (!data) return null;
 
   return (
-    <div className="employee-dashboard">
-      <h2>Employee Dashboard</h2>
-
-      {/* Top Stats */}
-      <div className="dashboard-cards">
-
-        <div className="dashboard-card">
-          <div className="card-icon blue">
-            <BarChart3 size={22} />
+    <div className="dashboard-page">
+      {/* Hero Section */}
+      <div className="dashboard-hero">
+        <div className="hero-content">
+          <div>
+            <h2>
+              👨💻 {getGreeting()}, {userName}
+            </h2>
+            <p>Your personal workspace & insights</p>
           </div>
 
-          <div className="card-content">
-            <h4>Attendance</h4>
-            <p>{animatedAttendance}%</p>
+          <div className="hero-right">
+            {/* Notification Bell */}
+            <div className="notification-wrapper">
+              <div
+                className="notification-bell"
+                onClick={() => setShowNotifications(!showNotifications)}
+              >
+                <FaBell />
+                {unreadCount > 0 && (
+                  <span className="notification-badge">
+                    {unreadCount}
+                  </span>
+                )}
+              </div>
+
+              {showNotifications && (
+                <div className="notification-dropdown">
+                  {notifications.length === 0 ? (
+                    <div className="notification-empty">
+                      No notifications
+                    </div>
+                  ) : (
+                    notifications.map((n) => (
+                      <div
+                        key={n.id}
+                        className={`notification-item ${
+                          n.is_read ? "" : "unread"
+                        }`}
+                      >
+                        <strong>{n.title}</strong>
+                        <p>{n.message}</p>
+                        <span className="notification-time">
+                          {new Date(n.created_at).toLocaleString()}
+                        </span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Clock */}
+            <div className="hero-clock">
+              <div className="clock-time">
+                {formatTime(currentTime)}
+              </div>
+              <div className="clock-date">
+                {formatDate(currentTime)}
+              </div>
+            </div>
           </div>
         </div>
-
-        <div className="dashboard-card">
-          <div className="card-icon green">
-            <IndianRupee size={22} />
-          </div>
-
-          <div className="card-content">
-            <h4>Salary This Month</h4>
-            <p>₹ {animatedSalary}</p>
-          </div>
-        </div>
-
-        <div className="dashboard-card">
-          <div className="card-icon orange">
-            <FileText size={22} />
-          </div>
-
-          <div className="card-content">
-            <h4>Pending Leaves</h4>
-            <p>{animatedPending}</p>
-          </div>
-        </div>
-
-        <div className="dashboard-card">
-          <div className="card-icon purple">
-            <Bell size={22} />
-          </div>
-
-          <div className="card-content">
-            <h4>Unread Notifications</h4>
-            <p>{animatedNotifications}</p>
-          </div>
-        </div>
-
       </div>
 
-      {/* Leave Summary Section */}
-      <div className="leave-summary-section">
-        <h3>Leave Summary</h3>
+      {/* KPI Cards */}
+      <div className="dashboard-kpis">
+        <div className="kpi-card blue">
+          <h3><CountUp end={data.attendance_percentage || 0} duration={1.5} />%</h3>
+          <span>Attendance</span>
+        </div>
 
-        <div className="dashboard-cards small">
-          <div className="dashboard-card">
-            <span>Total</span>
-            <strong>{data.leave_summary.total}</strong>
-          </div>
+        <div className="kpi-card green">
+          <h3>₹ <CountUp end={data.salary_this_month || 0} duration={1.5} /></h3>
+          <span>Salary This Month</span>
+        </div>
 
-          <div className="dashboard-card pending">
-            <span>Pending</span>
-            <strong>{data.leave_summary.pending}</strong>
-          </div>
+        <div className="kpi-card orange">
+          <h3><CountUp end={data.pending_leaves || 0} duration={1.5} /></h3>
+          <span>Pending Leaves</span>
+        </div>
 
-          <div className="dashboard-card approved">
-            <span>Approved</span>
-            <strong>{data.leave_summary.approved}</strong>
-          </div>
+        <div className="kpi-card purple">
+          <h3><CountUp end={data.notifications_unread || 0} duration={1.5} /></h3>
+          <span>Unread Notifications</span>
+        </div>
+      </div>
 
-          <div className="dashboard-card rejected">
-            <span>Rejected</span>
-            <strong>{data.leave_summary.rejected}</strong>
+      {/* Leave Summary */}
+      <div className="dashboard-grid">
+        <div className="dashboard-card">
+          <h3>Leave Summary</h3>
+          <div className="leave-stats">
+            <div>
+              <strong><CountUp end={data.leave_summary.total} duration={1.2} /></strong>
+              <span>Total</span>
+            </div>
+            <div>
+              <strong>{data.leave_summary.pending}</strong>
+              <span>Pending</span>
+            </div>
+            <div>
+              <strong>{data.leave_summary.approved}</strong>
+              <span>Approved</span>
+            </div>
+            <div>
+              <strong>{data.leave_summary.rejected}</strong>
+              <span>Rejected</span>
+            </div>
           </div>
         </div>
       </div>

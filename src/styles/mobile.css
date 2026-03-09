@@ -1,0 +1,329 @@
+/* =========================
+   MOBILE RESPONSIVENESS
+   For all remaining components
+========================= */
+
+/* Tables - General */
+@media (max-width: 768px) {
+  table {
+    font-size: 12px;
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  th, td {
+    padding: 10px 12px !important;
+  }
+}
+
+/* Attendance */
+@media (max-width: 768px) {
+  .attendance-controls {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .attendance-controls input,
+  .attendance-controls select,
+  .attendance-controls button {
+    width: 100%;
+  }
+}
+
+/* Payroll */
+@media (max-width: 768px) {
+  .payroll-filters {
+    flex-direction: column;
+  }
+
+  .payroll-filters select,
+  .payroll-filters button {
+    width: 100%;
+  }
+
+  .payroll-summary-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Leaves */
+@media (max-width: 768px) {
+  .leave-filters {
+    flex-direction: column;
+  }
+
+  .leave-stats {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Employee Portal */
+@media (max-width: 768px) {
+  .employee-dashboard-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .employee-stats {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Forms - General */
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+  }
+
+  .form-group {
+    width: 100% !important;
+  }
+}
+
+/* Modals */
+@media (max-width: 480px) {
+  .modal-content {
+    width: 95% !important;
+    max-width: 95% !important;
+    padding: 16px !important;
+  }
+
+  .modal-header h3 {
+    font-size: 16px !important;
+  }
+}
+
+/* Cards */
+@media (max-width: 768px) {
+  .card-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Buttons */
+@media (max-width: 480px) {
+  .button-group {
+    flex-direction: column;
+  }
+
+  .button-group button {
+    width: 100%;
+  }
+}
+
+/* Header Actions */
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 12px;
+  }
+
+  .header-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .header-actions button {
+    width: 100%;
+  }
+}
+
+/* Employee Sidebar */
+@media (max-width: 768px) {
+  .employee-sidebar {
+    position: fixed;
+    left: -260px;
+    top: 0;
+    height: 100vh;
+    z-index: 999;
+    transition: left 0.3s ease;
+  }
+
+  .employee-sidebar.mobile-open {
+    left: 0;
+  }
+}
+
+/* Salary Timeline */
+@media (max-width: 768px) {
+  .salary-timeline {
+    padding: 16px;
+  }
+
+  .timeline-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+/* Leave Calendar */
+@media (max-width: 768px) {
+  .calendar-grid {
+    font-size: 12px;
+  }
+
+  .calendar-day {
+    padding: 8px 4px;
+  }
+}
+
+/* Payslip */
+@media (max-width: 768px) {
+  .payslip-container {
+    padding: 16px;
+  }
+
+  .payslip-header {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+/* Super Admin */
+@media (max-width: 768px) {
+  .superadmin-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .user-management-table {
+    overflow-x: auto;
+  }
+}
+
+/* Attendance Summary */
+@media (max-width: 768px) {
+  .attendance-summary-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Monthly Attendance */
+@media (max-width: 768px) {
+  .monthly-attendance-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .month-selector {
+    width: 100%;
+  }
+}
+
+/* Email Dashboard */
+@media (max-width: 768px) {
+  .email-stats {
+    grid-template-columns: 1fr !important;
+  }
+
+  .email-list {
+    font-size: 12px;
+  }
+}
+
+/* Profile */
+@media (max-width: 768px) {
+  .profile-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .profile-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .profile-avatar {
+    margin: 0 auto;
+  }
+}
+
+/* Documents */
+@media (max-width: 768px) {
+  .documents-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Leave Balance */
+@media (max-width: 768px) {
+  .leave-balance-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Apply Leave */
+@media (max-width: 768px) {
+  .leave-form {
+    padding: 16px;
+  }
+
+  .date-range {
+    flex-direction: column;
+  }
+}
+
+/* Navbar */
+@media (max-width: 768px) {
+  .navbar {
+    padding: 12px 16px;
+  }
+
+  .navbar-menu {
+    display: none;
+  }
+
+  .mobile-menu-toggle {
+    display: block;
+  }
+}
+
+/* Toast Notifications */
+@media (max-width: 480px) {
+  .toast {
+    width: 90% !important;
+    left: 5% !important;
+    right: 5% !important;
+  }
+}
+
+/* Dropdown Menus */
+@media (max-width: 768px) {
+  .dropdown-menu {
+    position: fixed !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    right: auto !important;
+    width: 90%;
+    max-width: 300px;
+  }
+}
+
+/* Filters */
+@media (max-width: 768px) {
+  .filter-bar {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .filter-bar input,
+  .filter-bar select {
+    width: 100%;
+  }
+}
+
+/* Pagination */
+@media (max-width: 480px) {
+  .pagination {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .pagination button {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+}

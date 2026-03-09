@@ -9,32 +9,32 @@ export default function EmployeeSidebar() {
   const location = useLocation();
 
   const [leaveOpen, setLeaveOpen] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
   const [payslipOpen, setPayslipOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
 
   const handleLogout = () => {
     logout();
     navigate("/login", { replace: true });
   };
 
- useEffect(() => {
+  useEffect(() => {
 
-  if (
-    location.pathname.includes("/employee/apply-leave") ||
-    location.pathname.includes("/employee/my-leaves") ||
-    location.pathname.includes("/employee/leave-balance")
-  ) {
-    setLeaveOpen(true);
-  }
+    if (
+      location.pathname.includes("/employee/apply-leave") ||
+      location.pathname.includes("/employee/my-leaves") ||
+      location.pathname.includes("/employee/leave-balance")
+    ) {
+      setLeaveOpen(true);
+    }
 
-  if (
-    location.pathname.includes("/employee/my-payslips") ||
-    location.pathname.includes("/employee/salary-timeline")
-  ) {
-    setPayslipOpen(true);
-  }
+    if (
+      location.pathname.includes("/employee/my-payslips") ||
+      location.pathname.includes("/employee/salary-timeline")
+    ) {
+      setPayslipOpen(true);
+    }
 
-}, [location.pathname]);
+  }, [location.pathname]);
 
   return (
     <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
@@ -65,67 +65,96 @@ export default function EmployeeSidebar() {
         </NavLink>
 
         {/* LEAVES */}
-        <div
-          className={`sidebar-item dropdown-parent ${
-            leaveOpen ? "open" : ""
-          }`}
-          onClick={() => !collapsed && setLeaveOpen(!leaveOpen)}
-        >
-          <span>🍃</span>
-          {!collapsed && <span>Leaves</span>}
-          {!collapsed && (
-            <span className="dropdown-arrow">
-              ▼
-            </span>
-          )}
-        </div>
+        {!collapsed && (
+          <>
+            <div
+              className={`sidebar-item dropdown-parent ${leaveOpen ? "open" : ""}`}
+              onClick={() => {
+                setLeaveOpen(!leaveOpen);
+                setPayslipOpen(false);
+              }}
+            >
+              <span>🍃</span>
+              <span>Leaves</span>
+              <span className="dropdown-arrow">▼</span>
+            </div>
 
-        {/* Always render, control via CSS height */}
-        <div className={`dropdown-wrapper ${leaveOpen ? "show" : ""}`}>
-          <NavLink to="/employee/apply-leave" className="sidebar-item child">
-            Apply Leave
-          </NavLink>
+            <div className={`dropdown-wrapper ${leaveOpen ? "show" : ""}`}>
+              <div>
 
-          <NavLink to="/employee/my-leaves" className="sidebar-item child">
-            My Leaves
-          </NavLink>
+                <NavLink to="/employee/apply-leave" className="sidebar-item child">
+                  Apply Leave
+                </NavLink>
 
-          <NavLink to="/employee/leave-balance" className="sidebar-item child">
-            Leave Balance
+                <NavLink to="/employee/my-leaves" className="sidebar-item child">
+                  My Leaves
+                </NavLink>
+
+                <NavLink to="/employee/leave-balance" className="sidebar-item child">
+                  Leave Balance
+                </NavLink>
+
+              </div>
+            </div>
+          </>
+        )}
+
+        {collapsed && (
+          <NavLink to="/employee/apply-leave" className="sidebar-item">
+            <span>🍃</span>
           </NavLink>
-        </div>
+        )}
 
         {/* PAYSLIPS */}
-          <div
-            className={`sidebar-item dropdown-parent ${
-              payslipOpen ? "open" : ""
-            }`}
-            onClick={() => !collapsed && setPayslipOpen(!payslipOpen)}
-          >
+        {!collapsed && (
+          <>
+            <div
+              className={`sidebar-item dropdown-parent ${payslipOpen ? "open" : ""}`}
+              onClick={() => {
+                setPayslipOpen(!payslipOpen);
+                setLeaveOpen(false);
+              }}
+            >
+              <span>💰</span>
+              <span>Payslips</span>
+              <span className="dropdown-arrow">▼</span>
+            </div>
+
+            <div className={`dropdown-wrapper ${payslipOpen ? "show" : ""}`}>
+              <div>
+
+                <NavLink to="/employee/my-payslips" className="sidebar-item child">
+                  My Payslips
+                </NavLink>
+
+                <NavLink to="/employee/salary-timeline" className="sidebar-item child">
+                  Salary Growth Timeline
+                </NavLink>
+
+              </div>
+            </div>
+          </>
+        )}
+
+        {collapsed && (
+          <NavLink to="/employee/my-payslips" className="sidebar-item">
             <span>💰</span>
-            {!collapsed && <span>Payslips</span>}
-            {!collapsed && (
-              <span className="dropdown-arrow">
-                ▼
-              </span>
-            )}
-          </div>
-
-          <div className={`dropdown-wrapper ${payslipOpen ? "show" : ""}`}>
-
-            <NavLink to="/employee/my-payslips" className="sidebar-item child">
-              My Payslips
-            </NavLink>
-
-            <NavLink to="/employee/salary-timeline" className="sidebar-item child">
-              Salary Growth Timeline
-            </NavLink>
-
-          </div>
+          </NavLink>
+        )}
 
         <NavLink to="/employee/profile" className="sidebar-item">
           <span>👤</span>
           {!collapsed && <span>My Profile</span>}
+        </NavLink>
+
+        <NavLink to="/employee/asset-returns" className="sidebar-item">
+          <span>📦</span>
+          {!collapsed && <span>Asset Returns</span>}
+        </NavLink>
+
+        <NavLink to="/employee/settings" className="sidebar-item">
+          <span>⚙️</span>
+          {!collapsed && <span>Settings</span>}
         </NavLink>
 
       </div>
@@ -137,6 +166,7 @@ export default function EmployeeSidebar() {
           {!collapsed && <span>Logout</span>}
         </div>
       </div>
+
     </aside>
   );
 }

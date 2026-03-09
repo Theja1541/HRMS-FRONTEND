@@ -23,7 +23,6 @@
 }
 
 
-
 .employees-header h2 {
   font-size: 20px;
   font-weight: 600;
@@ -38,7 +37,7 @@
 }
 
 .employees-controls input,
-.employees-controls select {
+.employees-controls select:not(.role-filter-dropdown) {
   padding: 10px 14px;
   border-radius: 8px;
   border: 1px solid #d1d5db;
@@ -53,6 +52,39 @@
   border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
   outline: none;
+}
+
+/* ================= ROLE FILTER DROPDOWN ================= */
+
+.role-filter-dropdown {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 600;
+  border: none;
+  padding: 11px 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.role-filter-dropdown:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+}
+
+.role-filter-dropdown:focus {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.3);
+}
+
+.role-filter-dropdown option {
+  background: #ffffff;
+  color: #1f2937;
+  padding: 12px;
+  font-weight: 600;
+  font-size: 14px;
 }
 
 /* ================= CARD ================= */
@@ -73,33 +105,58 @@
 
 .employees-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   font-size: 14px;
 }
 
 .employees-table thead {
-  background: #f8fafc;
+  background: linear-gradient(135deg, #205cbc 0%, #2d558c 100%);
 }
 
 .employees-table th {
-  padding: 16px 24px;
+  padding: 18px 24px;
   text-align: left;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 13px;
-  color: #475569;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 3px solid #3b82f6;
+}
+
+.employees-table th:first-child {
+  border-top-left-radius: 12px;
+}
+
+.employees-table th:last-child {
+  border-top-right-radius: 12px;
 }
 
 .employees-table td {
-  padding: 18px 24px;
-  border-top: 1px solid #f1f5f9;
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+  font-weight: 500;
 }
 
 .employees-table tbody tr {
-  transition: background 0.2s ease;
+  transition: all 0.3s ease;
+  background: white;
+  position: relative;
 }
 
 .employees-table tbody tr:hover {
-  background: #f8fafc;
+  background: linear-gradient(90deg, #f0f9ff 0%, #e0f2fe 100%);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.employees-table tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 12px;
+}
+
+.employees-table tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 12px;
 }
 
 /* ================= EMPTY STATE ================= */
@@ -121,6 +178,7 @@
 .action-dropdown {
   position: relative;
   display: inline-block;
+  z-index: 10;
 }
 
 .action-trigger {
@@ -131,6 +189,8 @@
   padding: 6px 10px;
   border-radius: 6px;
   transition: background 0.2s ease;
+  position: relative;
+  z-index: 11;
 }
 
 .action-trigger:hover {
@@ -140,37 +200,40 @@
 .dropdown-menu {
   position: absolute;
   right: 0;
-  top: 36px;
-
+  top: 35px;
   min-width: 150px;
   padding: 8px;
-
   background: white;
   border-radius: 10px;
   border: 1px solid #e5e7eb;
-
-  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
-
+  box-shadow: 0 15px 35px rgba(0,0,0,0.2);
   display: flex;
   flex-direction: column;
   gap: 6px;
+  z-index: 9999;
+}
 
-  z-index: 999;
+.dropdown-menu button:hover {
+  background: #f1f5f9;
 }
 
 .dropdown-menu button {
-  padding: 8px 10px;
+  padding: 10px 14px;
   border-radius: 6px;
   border: none;
   background: transparent;
   text-align: left;
-  font-size: 13px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  transition: background 0.2s ease;
+  transition: all 0.2s ease;
+  color: #374151;
+  white-space: nowrap;
 }
 
 .dropdown-menu button:hover {
   background: #f3f4f6;
+  transform: translateX(4px);
 }
 
 .dropdown-menu button:last-child {
@@ -229,4 +292,64 @@
 
 .btn.primary:hover {
   background: #1e40af;
+}
+
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .employees-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .employees-controls {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .employees-controls input,
+  .employees-controls select {
+    width: 100%;
+    min-width: auto;
+  }
+
+  .employees-table {
+    font-size: 12px;
+  }
+
+  .employees-table th,
+  .employees-table td {
+    padding: 12px 16px;
+  }
+
+  .dropdown-menu {
+    right: auto;
+    left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .employees-table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .employees-header h2 {
+    font-size: 18px;
+  }
+}
+
+/* allow dropdown to overflow table */
+.employees-table {
+  overflow: visible;
+}
+
+.employees-table tbody tr {
+  overflow: visible;
+}
+
+.actions-cell {
+  position: relative;
+  overflow: visible;
 }

@@ -118,7 +118,46 @@ export default function Dashboard() {
   /* ===============================
      EMPLOYEE DATA
   ================================ */
-  const { employees = [], leaves = [] } = useEmployees();
+  const { employees = [] } = useEmployees();
+  const [pendingLeaves, setPendingLeaves] = useState(0);
+  const [onLeaveToday, setOnLeaveToday] = useState(0);
+
+  useEffect(() => {
+    async function fetchPendingLeaves() {
+      try {
+        const res = await fetch('http://127.0.0.1:8000/api/leaves/requests/?status=PENDING', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          }
+        });
+        const data = await res.json();
+        setPendingLeaves(data.length || 0);
+      } catch (err) {
+        console.log('Failed to fetch pending leaves');
+      }
+    }
+
+    async function fetchOnLeaveToday() {
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        const res = await fetch('http://127.0.0.1:8000/api/leaves/requests/?status=APPROVED', {
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+          }
+        });
+        const data = await res.json();
+        const todayLeaves = data.filter(leave => 
+          leave.start_date <= today && leave.end_date >= today
+        );
+        setOnLeaveToday(todayLeaves.length || 0);
+      } catch (err) {
+        console.log('Failed to fetch on leave today');
+      }
+    }
+
+    fetchPendingLeaves();
+    fetchOnLeaveToday();
+  }, []);
 
   const totalEmployees = employees.length;
 
@@ -127,17 +166,6 @@ export default function Dashboard() {
   ).length;
 
   const today = new Date().toISOString().slice(0, 10);
-
-  const onLeaveToday = leaves.filter(
-    (l) =>
-      l.status === "Approved" &&
-      today >= l.fromDate &&
-      today <= l.toDate
-  ).length;
-
-  const pendingLeaves = leaves.filter(
-    (l) => l.status === "Pending"
-  ).length;
 
   const recentEmployees = [...employees]
     .slice(-5)
@@ -225,22 +253,22 @@ export default function Dashboard() {
 
       {/* ================= KPI CARDS ================= */}
       <div className="dashboard-kpis">
-        <div className="kpi-card blue">
+        <div className="kpi-card blue" onClick={() => window.location.href = '/employees'} style={{ cursor: 'pointer' }}>
           <h3><CountUp end={totalEmployees} duration={1.5} /></h3>
           <span>Total Employees</span>
         </div>
 
-        <div className="kpi-card green">
+        <div className="kpi-card green" style={{ cursor: 'default' }}>
           <h3><CountUp end={activeEmployees} duration={1.5} /></h3>
           <span>Active Employees</span>
         </div>
 
-        <div className="kpi-card orange">
+        <div className="kpi-card orange" onClick={() => window.location.href = '/approvals'} style={{ cursor: 'pointer' }}>
           <h3><CountUp end={onLeaveToday} duration={1.5} /></h3>
           <span>On Leave Today</span>
         </div>
 
-        <div className="kpi-card purple">
+        <div className="kpi-card purple" onClick={() => window.location.href = '/leave-dashboard'} style={{ cursor: 'pointer' }}>
           <h3><CountUp end={pendingLeaves} duration={1.5} /></h3>
           <span>Pending Leave Requests</span>
         </div>

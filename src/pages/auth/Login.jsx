@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
+import api from "../../api/axios";
 import "../../styles/login.css";
 
 export default function Login() {
@@ -11,6 +12,13 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // Forgot Password State
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotError, setForgotError] = useState("");
+  const [forgotSuccess, setForgotSuccess] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
 
   const handleSubmit = async (e) => {
   e.preventDefault();
@@ -69,6 +77,41 @@ export default function Login() {
   }
 };
 
+  // Handle Forgot Password
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    setForgotError("");
+    setForgotSuccess("");
+
+    if (!forgotEmail.trim()) {
+      setForgotError("Please enter your email");
+      return;
+    }
+
+    try {
+      setForgotLoading(true);
+
+      await api.post("/accounts/forgot-password/", {
+        email: forgotEmail.trim()
+      });
+
+      setForgotSuccess("Temporary password sent to your email!");
+      setForgotEmail("");
+
+      setTimeout(() => {
+        setShowForgotPassword(false);
+        setForgotSuccess("");
+      }, 3000);
+
+    } catch (err) {
+      setForgotError(
+        err.response?.data?.error || "Failed to send temporary password"
+      );
+    } finally {
+      setForgotLoading(false);
+    }
+  };
+
   return (
     <div className="login-container">
       <form className="login-card" onSubmit={handleSubmit}>
@@ -105,7 +148,62 @@ export default function Login() {
         >
           {loading ? "Signing in..." : "Login"}
         </button>
+
+        <button
+          type="button"
+          className="forgot-password-link"
+          onClick={() => setShowForgotPassword(true)}
+        >
+          Forgot Password?
+        </button>
       </form>
+
+      {/* Forgot Password Modal */}
+      {showForgotPassword && (
+        <div className="modal-overlay" onClick={() => setShowForgotPassword(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Forgot Password</h3>
+              <button
+                className="modal-close"
+                onClick={() => setShowForgotPassword(false)}
+              >
+                ×
+              </button>
+            </div>
+
+            <form onSubmit={handleForgotPassword}>
+              <p className="modal-subtitle">
+                Enter your registered email to receive a temporary password
+              </p>
+
+              {forgotError && (
+                <div className="login-error">{forgotError}</div>
+              )}
+
+              {forgotSuccess && (
+                <div className="login-success">{forgotSuccess}</div>
+              )}
+
+              <input
+                type="email"
+                placeholder="Enter your email"
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+                autoFocus
+              />
+
+              <button
+                type="submit"
+                className="login-btn"
+                disabled={forgotLoading}
+              >
+                {forgotLoading ? "Sending..." : "Send Temporary Password"}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

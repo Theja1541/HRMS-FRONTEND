@@ -1,81 +1,53 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
-import toast from "react-hot-toast";
+import { useAuth } from "../../auth/AuthContext";
 import "../../styles/employeeProfile.css";
 
 export default function MyProfile() {
-  const [profile, setProfile] = useState(null);
+  const { user } = useAuth();
+  const [employee, setEmployee] = useState(null);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState(false);
-
-  const [form, setForm] = useState({
-    mobile: "",
-  });
-
-  const [passwordData, setPasswordData] = useState({
-    old_password: "",
-    new_password: "",
-    confirm_password: "",
-  });
+  const [editData, setEditData] = useState({});
 
   useEffect(() => {
     fetchProfile();
   }, []);
 
-  /* ================= FETCH PROFILE ================= */
-
   const fetchProfile = async () => {
     try {
+      setLoading(true);
       const res = await api.get("/employees/me/");
-      setProfile(res.data);
-      setForm({ mobile: res.data.mobile || "" });
-    } catch {
-      toast.error("Failed to load profile");
+      setEmployee(res.data);
+      setEditData({
+        mobile: res.data.mobile || "",
+        address: res.data.address || "",
+        emergency_contact_name: res.data.emergency_contact_name || "",
+        emergency_contact_number: res.data.emergency_contact_number || "",
+        emergency_notes: res.data.emergency_notes || "",
+      });
+    } catch (err) {
+      console.error("Failed to load profile", err);
     } finally {
       setLoading(false);
     }
   };
 
-  /* ================= UPDATE MOBILE ================= */
-
-  const handleProfileUpdate = async () => {
+  const handleSave = async () => {
     try {
-      await api.patch("/employees/me/", {
-        mobile: form.mobile,
+      const formData = new FormData();
+      Object.keys(editData).forEach(key => {
+        if (editData[key]) formData.append(key, editData[key]);
       });
 
-      toast.success("Profile updated successfully");
+      await api.put("/employees/me/", formData);
+      await fetchProfile();
       setEditing(false);
-      fetchProfile();
-    } catch {
-      toast.error("Failed to update profile");
+      alert("Profile updated successfully");
+    } catch (err) {
+      alert("Failed to update profile");
     }
   };
-
-  /* ================= CHANGE PASSWORD ================= */
-
-  const handlePasswordChange = async () => {
-    if (passwordData.new_password !== passwordData.confirm_password) {
-      toast.error("Passwords do not match");
-      return;
-    }
-
-    try {
-      await api.post("/accounts/change-password/", passwordData);
-
-      toast.success("Password changed successfully");
-
-      setPasswordData({
-        old_password: "",
-        new_password: "",
-        confirm_password: "",
-      });
-    } catch {
-      toast.error("Failed to change password");
-    }
-  };
-
-  /* ================= UPLOAD PHOTO ================= */
 
   const handlePhotoUpload = async (e) => {
     const file = e.target.files[0];
@@ -85,181 +57,263 @@ export default function MyProfile() {
     formData.append("profile_photo", file);
 
     try {
-      await api.patch("/employees/me/", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      toast.success("Profile photo updated");
-      fetchProfile();
-    } catch {
-      toast.error("Failed to upload photo");
+      await api.put("/employees/me/", formData);
+      await fetchProfile();
+      alert("Photo updated successfully");
+    } catch (err) {
+      alert("Failed to upload photo");
     }
   };
 
-  /* ================= LOADING STATES ================= */
+  if (loading) {
+    return (
+      <div className="profile-page">
+        <div className="loading-state">
+          <div className="spinner"></div>
+          <p>Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
 
-  if (loading)
-    return <p style={{ padding: 20 }}>Loading profile...</p>;
+  if (!employee) {
+    return (
+      <div className="profile-page">
+        <div className="empty-state">Profile not found</div>
+      </div>
+    );
+  }
 
-  if (!profile)
-    return <p style={{ padding: 20 }}>No profile found</p>;
-
-  /* ================= UI ================= */
+  const salary = employee.salary || {};
 
   return (
-    <div className="employee-profile-page">
+    <div className="profile-page">
 
-      {/* HERO SECTION */}
-      <div className="profile-hero">
-
-        <div className="profile-avatar-wrapper">
-          {profile.profile_photo ? (
-            <img
-              src={`http://127.0.0.1:8000${profile.profile_photo}`}
-              alt="Profile"
-              className="profile-avatar-img"
-            />
-          ) : (
-            <div className="profile-avatar">
-              {profile.first_name?.charAt(0)}
-            </div>
-          )}
-
+      {/* HEADER */}
+      <div className="profile-header">
+        <div className="profile-photo-section">
+          <div className="profile-photo">
+            {employee.profile_photo ? (
+              <img src={employee.profile_photo} alt="Profile" />
+            ) : (
+              <div className="photo-placeholder">
+                {employee.first_name?.[0]}{employee.last_name?.[0]}
+              </div>
+            )}
+          </div>
           <label className="photo-upload-btn">
-            Change Photo
-            <input
-              type="file"
-              accept="image/*"
-              hidden
-              onChange={handlePhotoUpload}
-            />
+            📷 Change Photo
+            <input type="file" accept="image/*" onChange={handlePhotoUpload} hidden />
           </label>
         </div>
 
         <div className="profile-info">
-          <h2>
-            {profile.first_name} {profile.last_name}
-          </h2>
-          <p>{profile.designation}</p>
-          <span className={`status-badge ${profile.is_active ? "active" : "inactive"}`}>
-            {profile.is_active ? "Active" : "Inactive"}
-          </span>
+          <h1>{employee.first_name} {employee.last_name}</h1>
+          <p className="employee-id">ID: {employee.employee_id}</p>
+          <div className="profile-badges">
+            <span className="badge">{employee.department}</span>
+            <span className="badge">{employee.designation}</span>
+          </div>
         </div>
 
-        <button
-          className="edit-btn"
-          onClick={() => setEditing(!editing)}
-        >
-          {editing ? "Cancel" : "Edit Profile"}
-        </button>
-
+        <div className="profile-actions">
+          {!editing ? (
+            <button className="btn-edit" onClick={() => setEditing(true)}>
+              ✏️ Edit Profile
+            </button>
+          ) : (
+            <>
+              <button className="btn-save" onClick={handleSave}>
+                ✅ Save
+              </button>
+              <button className="btn-cancel" onClick={() => setEditing(false)}>
+                ❌ Cancel
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
-      {/* PROFILE DETAILS CARD */}
-      <div className="profile-card">
+      {/* SECTIONS GRID */}
+      <div className="profile-grid">
 
-        <div className="profile-grid">
-
-          <div className="profile-item">
-            <span>Employee ID</span>
-            <strong>{profile.employee_id}</strong>
-          </div>
-
-          <div className="profile-item">
-            <span>Email</span>
-            <strong>{profile.email}</strong>
-          </div>
-
-          <div className="profile-item">
-            <span>Department</span>
-            <strong>{profile.department}</strong>
-          </div>
-
-          <div className="profile-item">
-            <span>Joining Date</span>
-            <strong>{profile.joining_date}</strong>
-          </div>
-
-          {/* Editable Mobile */}
-          <div className="profile-item full-width">
-            <span>Mobile</span>
-
-            {editing ? (
-              <div className="edit-row">
-                <input
-                  type="text"
-                  value={form.mobile}
-                  onChange={(e) =>
-                    setForm({ ...form, mobile: e.target.value })
-                  }
+        {/* PERSONAL INFO */}
+        <div className="profile-section">
+          <h3>👤 Personal Information</h3>
+          <div className="info-grid">
+            <InfoItem label="Email" value={employee.email} />
+            <InfoItem 
+              label="Mobile" 
+              value={editing ? (
+                <input 
+                  type="text" 
+                  value={editData.mobile} 
+                  onChange={(e) => setEditData({...editData, mobile: e.target.value})}
+                  className="edit-input"
                 />
-                <button
-                  className="save-btn"
-                  onClick={handleProfileUpdate}
-                >
-                  Save
-                </button>
-              </div>
+              ) : employee.mobile} 
+            />
+            <InfoItem label="Date of Birth" value={employee.date_of_birth} />
+            <InfoItem label="Gender" value={employee.gender} />
+            <InfoItem label="Blood Group" value={employee.blood_group} />
+            <InfoItem label="Nationality" value={employee.nationality} />
+          </div>
+          <div className="info-full">
+            <label>Address</label>
+            {editing ? (
+              <textarea 
+                value={editData.address} 
+                onChange={(e) => setEditData({...editData, address: e.target.value})}
+                className="edit-textarea"
+                rows="3"
+              />
             ) : (
-              <strong>{profile.mobile}</strong>
+              <p>{employee.address || "Not provided"}</p>
             )}
           </div>
-
         </div>
-      </div>
 
-      {/* CHANGE PASSWORD SECTION */}
-      <div className="profile-card">
-        <h3>Change Password</h3>
-
-        <div className="password-grid">
-
-          <input
-            type="password"
-            placeholder="Old Password"
-            value={passwordData.old_password}
-            onChange={(e) =>
-              setPasswordData({
-                ...passwordData,
-                old_password: e.target.value,
-              })
-            }
-          />
-
-          <input
-            type="password"
-            placeholder="New Password"
-            value={passwordData.new_password}
-            onChange={(e) =>
-              setPasswordData({
-                ...passwordData,
-                new_password: e.target.value,
-              })
-            }
-          />
-
-          <input
-            type="password"
-            placeholder="Confirm Password"
-            value={passwordData.confirm_password}
-            onChange={(e) =>
-              setPasswordData({
-                ...passwordData,
-                confirm_password: e.target.value,
-              })
-            }
-          />
-
-          <button
-            className="save-btn"
-            onClick={handlePasswordChange}
-          >
-            Update Password
-          </button>
-
+        {/* JOB DETAILS */}
+        <div className="profile-section">
+          <h3>💼 Job Details</h3>
+          <div className="info-grid">
+            <InfoItem label="Department" value={employee.department} />
+            <InfoItem label="Designation" value={employee.designation} />
+            <InfoItem label="Employment Type" value={employee.employment_type} />
+            <InfoItem label="Joining Date" value={employee.date_of_joining} />
+            <InfoItem label="Work Location" value={employee.work_location} />
+            <InfoItem label="Reporting Manager" value={employee.reporting_manager} />
+          </div>
         </div>
-      </div>
 
+        {/* SALARY */}
+        <div className="profile-section">
+          <h3>💰 Salary Structure</h3>
+          <div className="salary-grid">
+            <SalaryItem label="Basic" value={salary.basic} />
+            <SalaryItem label="HRA" value={salary.hra} />
+            <SalaryItem label="DA" value={salary.da} />
+            <SalaryItem label="Conveyance" value={salary.conveyance} />
+            <SalaryItem label="Medical" value={salary.medical} />
+            <SalaryItem label="Special Allowance" value={salary.special_allowance} />
+          </div>
+          <div className="salary-summary">
+            <div className="summary-item">
+              <span>Gross Salary</span>
+              <strong>₹{salary.gross_salary || 0}</strong>
+            </div>
+            <div className="summary-item">
+              <span>Total Deductions</span>
+              <strong>₹{salary.total_deductions || 0}</strong>
+            </div>
+            <div className="summary-item total">
+              <span>Net Salary</span>
+              <strong>₹{salary.net_salary || 0}</strong>
+            </div>
+            <div className="summary-item ctc">
+              <span>CTC (Annual)</span>
+              <strong>₹{salary.ctc || 0}</strong>
+            </div>
+          </div>
+        </div>
+
+        {/* BANK & COMPLIANCE */}
+        <div className="profile-section">
+          <h3>🏦 Bank & Compliance</h3>
+          <div className="info-grid">
+            <InfoItem label="Bank Name" value={employee.bank_name} />
+            <InfoItem label="Account Number" value={employee.bank_account_number} />
+            <InfoItem label="IFSC Code" value={employee.bank_ifsc} />
+            <InfoItem label="PAN Number" value={employee.pan_number} />
+            <InfoItem label="UAN Number" value={employee.uan_number} />
+            <InfoItem label="ESI Number" value={employee.esi_number} />
+          </div>
+        </div>
+
+        {/* DOCUMENTS */}
+        <div className="profile-section">
+          <h3>📄 Documents</h3>
+          <div className="documents-list">
+            <DocumentItem label="Resume" file={employee.resume} />
+            <DocumentItem label="Offer Letter" file={employee.offer_letter} />
+            <DocumentItem label="Aadhaar Card" file={employee.aadhaar_card} />
+            <DocumentItem label="PAN Card" file={employee.pan_card} />
+            <DocumentItem label="Education Certificate" file={employee.education_certificate} />
+            <DocumentItem label="Experience Certificate" file={employee.experience_certificate} />
+          </div>
+        </div>
+
+        {/* EMERGENCY CONTACT */}
+        <div className="profile-section">
+          <h3>🚨 Emergency Contact</h3>
+          <div className="info-grid">
+            <InfoItem 
+              label="Contact Name" 
+              value={editing ? (
+                <input 
+                  type="text" 
+                  value={editData.emergency_contact_name} 
+                  onChange={(e) => setEditData({...editData, emergency_contact_name: e.target.value})}
+                  className="edit-input"
+                />
+              ) : employee.emergency_contact_name} 
+            />
+            <InfoItem 
+              label="Contact Number" 
+              value={editing ? (
+                <input 
+                  type="text" 
+                  value={editData.emergency_contact_number} 
+                  onChange={(e) => setEditData({...editData, emergency_contact_number: e.target.value})}
+                  className="edit-input"
+                />
+              ) : employee.emergency_contact_number} 
+            />
+          </div>
+          <div className="info-full">
+            <label>Notes</label>
+            {editing ? (
+              <textarea 
+                value={editData.emergency_notes} 
+                onChange={(e) => setEditData({...editData, emergency_notes: e.target.value})}
+                className="edit-textarea"
+                rows="2"
+              />
+            ) : (
+              <p>{employee.emergency_notes || "Not provided"}</p>
+            )}
+          </div>
+        </div>
+
+      </div>
     </div>
   );
 }
+
+// Reusable Components
+const InfoItem = ({ label, value }) => (
+  <div className="info-item">
+    <label>{label}</label>
+    <p>{value || "Not provided"}</p>
+  </div>
+);
+
+const SalaryItem = ({ label, value }) => (
+  <div className="salary-item">
+    <span>{label}</span>
+    <strong>₹{value || 0}</strong>
+  </div>
+);
+
+const DocumentItem = ({ label, file }) => (
+  <div className="document-item">
+    <span>{label}</span>
+    {file ? (
+      <a href={file} target="_blank" rel="noopener noreferrer" className="doc-link">
+        📎 View
+      </a>
+    ) : (
+      <span className="doc-empty">Not uploaded</span>
+    )}
+  </div>
+);

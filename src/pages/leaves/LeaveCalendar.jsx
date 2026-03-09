@@ -5,7 +5,7 @@ import moment from "moment";
 import Select from "react-select";
 
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import "../../styles/leaves.css";
+import "../../styles/leaveCalendar.css";
 
 const localizer = momentLocalizer(moment);
 
@@ -57,8 +57,14 @@ export default function LeaveCalendar() {
   /* ================= FETCH CALENDAR ================= */
 
   useEffect(() => {
+
+  const timer = setTimeout(() => {
     fetchCalendar();
-  }, [selectedEmployee, selectedDepartment, leaveType]);
+  }, 300);
+
+  return () => clearTimeout(timer);
+
+}, [selectedEmployee, selectedDepartment, leaveType]);
 
   const fetchCalendar = async () => {
 
@@ -82,7 +88,23 @@ export default function LeaveCalendar() {
         type: e.type
       }));
 
-      setEvents(formatted);
+      // Build daily summary events
+      const summaryEvents = [];
+
+      Object.entries(counts).forEach(([date, count]) => {
+
+        summaryEvents.push({
+          title: `${count} ${count === 1 ? "employee" : "employees"} on leave`,
+          start: new Date(date),
+          end: new Date(date),
+          allDay: true,
+          count: count,
+          type: "summary"
+        });
+
+      });
+
+      setEvents(summaryEvents);
 
       /* ================= BUILD HEATMAP ================= */
 
@@ -151,16 +173,28 @@ export default function LeaveCalendar() {
   /* ================= HEATMAP ================= */
 
   const dayPropGetter = (date) => {
-
     const key = moment(date).format("YYYY-MM-DD");
     const count = leaveHeatmap[key] || 0;
 
     let backgroundColor = "";
+    let color = "";
 
-    if (count >= 5) backgroundColor = "#fee2e2";
-    else if (count >= 3) backgroundColor = "#fef3c7";
+    // Heatmap intensity based on leave count
+    if (count >= 10) {
+      backgroundColor = "#fee2e2"; // Red - Critical
+      color = "#991b1b";
+    } else if (count >= 7) {
+      backgroundColor = "#fed7aa"; // Orange - High
+      color = "#9a3412";
+    } else if (count >= 4) {
+      backgroundColor = "#fef3c7"; // Yellow - Medium
+      color = "#92400e";
+    } else if (count >= 2) {
+      backgroundColor = "#dbeafe"; // Blue - Low
+      color = "#1e40af";
+    }
 
-    return { style: { backgroundColor } };
+    return { style: { backgroundColor, color } };
   };
 
   /* ================= DATE CLICK ================= */
@@ -185,139 +219,213 @@ export default function LeaveCalendar() {
     setSelectedDate(date);
   };
 
-  /* ================= DATE CELL ================= */
+  /* ================= DATE CELL WITH COUNT BADGE ================= */
 
-  const DateCellWrapper = ({ value }) => {
-
+  const DateCellWrapper = ({ value, children }) => {
     const key = moment(value).format("YYYY-MM-DD");
-    const events = dayEvents[key] || [];
+    const count = leaveHeatmap[key] || 0;
 
-    if (events.length === 0) {
-      return <span>{moment(value).date()}</span>;
+    if (count === 0) {
+      return <div className="rbc-day-bg">{children}</div>;
     }
 
-    const avatars = events.slice(0, 3);
-    const remaining = events.length - 3;
-
     return (
-      <div className="calendar-day-cell">
-
-        <div className="calendar-date">
-          {moment(value).date()}
+      <div className="rbc-day-bg custom-date-cell">
+        {children}
+        <div className="leave-count-badge">
+          {count} {count === 1 ? 'leave' : 'leaves'}
         </div>
-
-        <div className="leave-avatar-group">
-
-          {avatars.map((e, i) => (
-            <img
-              key={i}
-              src={e.avatar || "/default-avatar.png"}
-              className="stack-avatar"
-              alt=""
-            />
-          ))}
-
-          {remaining > 0 && (
-            <span className="avatar-more">+{remaining}</span>
-          )}
-
-        </div>
-
       </div>
     );
   };
 
-  /* ================= EVENT COMPONENT ================= */
+  /* ================= EVENT COMPONENT - SIMPLIFIED ================= */
 
   const EventComponent = ({ event }) => {
 
-    const start = moment(event.start).format("MMM D");
-    const end = moment(event.end).format("MMM D");
+  if (event.type === "summary") {
 
     return (
-      <div
-        className="calendar-event"
-        title={`Employee: ${event.title}
-Leave Type: ${event.leave_type}
-From: ${start}
-To: ${end}`}
-      >
-
-        {event.avatar && (
-          <img
-            src={event.avatar}
-            className="calendar-avatar"
-            alt=""
-          />
-        )}
-
-        <span>{event.title}</span>
-
+      <div className="calendar-summary-event">
+        👥 {event.count} on leave
       </div>
     );
-  };
+  }
+
+  return null;
+};
 
   /* ================= UI ================= */
 
   return (
-
-    <div className="leave-calendar-page">
-
-      <div className="leave-calendar-header">
-        <h2>Leave Calendar</h2>
-        <p>Company-wide employee leave schedule</p>
-      </div>
-
-      {/* FILTERS */}
-
-      <div className="calendar-filters">
-
-        <div className="filter-box">
-          <label>Employee</label>
-
-          <Select
-            options={employeeOptions}
-            value={selectedEmployee}
-            onChange={setSelectedEmployee}
-            placeholder="Search employee..."
-            isClearable
+    <div className="leave-calendar-container">
+      
+      {/* HEADER */}
+      <div className="calendar-page-header">
+        <div className="header-left">
+          <h1>Leave Calendar</h1>
+          <p>Track and manage employee leaves across the organization</p>
+        </div>
+        <div className="header-right">
+          <button className="today-btn" onClick={() => setDate(new Date())}>
+            <span>📍</span> Today
+          </button>
+          <input 
+            type="date" 
+            value={moment(date).format('YYYY-MM-DD')}
+            onChange={(e) => setDate(new Date(e.target.value))}
+            className="date-picker"
           />
         </div>
+      </div>
 
-        <div className="filter-box">
-          <label>Department</label>
+      {/* FILTERS & STATS ROW */}
+      <div className="calendar-controls">
+        
+        {/* LEFT: FILTERS */}
+        <div className="filters-section">
+          <div className="filter-group">
+            <label>👤 Employee</label>
+            <Select
+              options={employeeOptions}
+              value={selectedEmployee}
+              onChange={setSelectedEmployee}
+              placeholder="All Employees"
+              isClearable
+              className="react-select-container"
+              classNamePrefix="react-select"
+            />
+          </div>
 
-          <select
-            value={selectedDepartment}
-            onChange={(e)=>setSelectedDepartment(e.target.value)}
-          >
-            <option value="">All</option>
-            <option value="HR">HR</option>
-            <option value="IT">IT</option>
-            <option value="Finance">Finance</option>
-          </select>
+          <div className="filter-group">
+            <label>🏢 Department</label>
+            <select value={selectedDepartment} onChange={(e)=>setSelectedDepartment(e.target.value)}>
+              <option value="">All Departments</option>
+              <option value="HR">HR</option>
+              <option value="IT">IT</option>
+              <option value="Finance">Finance</option>
+              <option value="Sales">Sales</option>
+            </select>
+          </div>
+
+          <div className="filter-group">
+            <label>🍃 Leave Type</label>
+            <select value={leaveType} onChange={(e)=>setLeaveType(e.target.value)}>
+              <option value="">All Types</option>
+              <option value="Sick Leave">Sick Leave</option>
+              <option value="Casual Leave">Casual Leave</option>
+              <option value="Earned Leave">Earned Leave</option>
+            </select>
+          </div>
         </div>
 
-        <div className="filter-box">
-          <label>Leave Type</label>
-
-          <select
-            value={leaveType}
-            onChange={(e)=>setLeaveType(e.target.value)}
-          >
-            <option value="">All</option>
-            <option value="Sick Leave">Sick</option>
-            <option value="Casual Leave">Casual</option>
-            <option value="Earned Leave">Earned</option>
-          </select>
+        {/* RIGHT: VIEW SWITCHER */}
+        <div className="view-controls">
+          <div className="view-tabs">
+            <button 
+              className={view === 'month' ? 'active' : ''}
+              onClick={() => setView('month')}
+            >
+              Month
+            </button>
+            <button 
+              className={view === 'week' ? 'active' : ''}
+              onClick={() => setView('week')}
+            >
+              Week
+            </button>
+            <button 
+              className={view === 'day' ? 'active' : ''}
+              onClick={() => setView('day')}
+            >
+              Day
+            </button>
+            <button 
+              className={view === 'agenda' ? 'active' : ''}
+              onClick={() => setView('agenda')}
+            >
+              List
+            </button>
+          </div>
         </div>
+      </div>
 
+      {/* STATS CARDS */}
+      <div className="calendar-stats">
+        <div className="stat-card">
+          <div className="stat-icon" style={{background: '#dbeafe'}}>
+            <span style={{color: '#2563eb'}}>👥</span>
+          </div>
+          <div className="stat-info">
+            <span className="stat-label">Total Leaves</span>
+            <span className="stat-value">{events.length}</span>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon" style={{background: '#fef3c7'}}>
+            <span style={{color: '#f59e0b'}}>📅</span>
+          </div>
+          <div className="stat-info">
+            <span className="stat-label">Days with Leaves</span>
+            <span className="stat-value">{Object.keys(leaveHeatmap).length}</span>
+          </div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-icon" style={{background: '#fee2e2'}}>
+            <span style={{color: '#ef4444'}}>⚠️</span>
+          </div>
+          <div className="stat-info">
+            <span className="stat-label">Peak Day</span>
+            <span className="stat-value">
+              {Object.values(leaveHeatmap).length
+              ? Math.max(...Object.values(leaveHeatmap))
+              : 0} leaves
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* LEGEND */}
+      <div className="calendar-legend">
+        <div className="legend-title">Leave Density:</div>
+        <div className="legend-item">
+          <span className="legend-box" style={{background: '#dbeafe'}}></span>
+          <span>2-3 leaves</span>
+        </div>
+        <div className="legend-item">
+          <span className="legend-box" style={{background: '#fef3c7'}}></span>
+          <span>4-6 leaves</span>
+        </div>
+        <div className="legend-item">
+          <span className="legend-box" style={{background: '#fed7aa'}}></span>
+          <span>7-9 leaves</span>
+        </div>
+        <div className="legend-item">
+          <span className="legend-box" style={{background: '#fee2e2'}}></span>
+          <span>10+ leaves</span>
+        </div>
+        <div className="legend-divider"></div>
+        <div className="legend-title">Departments:</div>
+        <div className="legend-item">
+          <span className="legend-dot" style={{background: '#2563eb'}}></span>
+          <span>HR</span>
+        </div>
+        <div className="legend-item">
+          <span className="legend-dot" style={{background: '#7c3aed'}}></span>
+          <span>IT</span>
+        </div>
+        <div className="legend-item">
+          <span className="legend-dot" style={{background: '#f59e0b'}}></span>
+          <span>Finance</span>
+        </div>
+        <div className="legend-item">
+          <span className="legend-dot" style={{background: '#10b981'}}></span>
+          <span>Sales</span>
+        </div>
       </div>
 
       {/* CALENDAR */}
-
-      <div className="calendar-container">
-
+      <div className="calendar-wrapper">
         <Calendar
           localizer={localizer}
           events={events}
@@ -333,101 +441,86 @@ To: ${end}`}
           onView={setView}
           date={date}
           onNavigate={setDate}
-          views={["month","week","day","agenda"]}
+          views={['month','week','day','agenda']}
           eventPropGetter={eventStyleGetter}
           dayPropGetter={dayPropGetter}
           components={{
             event: EventComponent,
-            dateCellWrapper: DateCellWrapper
+            dateCellWrapper: DateCellWrapper,
           }}
-          style={{height:700}}
+          style={{height: 650}}
         />
-
       </div>
 
-      {/* EVENT MODAL */}
-
+      {/* EVENT DETAIL MODAL */}
       {showModal && selectedEvent && (
-
-        <div className="leave-modal-overlay">
-
-          <div className="leave-modal">
-
-            <h3>Leave Details</h3>
-
-            <p><strong>Employee:</strong> {selectedEvent.title}</p>
-            <p><strong>Leave Type:</strong> {selectedEvent.leave_type}</p>
-            <p><strong>From:</strong> {moment(selectedEvent.start).format("MMM D")}</p>
-            <p><strong>To:</strong> {moment(selectedEvent.end).format("MMM D")}</p>
-
-            <button
-              className="modal-close"
-              onClick={()=>setShowModal(false)}
-            >
-              Close
-            </button>
-
+        <div className="modal-overlay" onClick={() => setShowModal(false)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Leave Details</h3>
+              <button className="close-btn" onClick={() => setShowModal(false)}>×</button>
+            </div>
+            <div className="modal-body">
+              {selectedEvent.avatar && (
+                <img src={selectedEvent.avatar} alt="" className="employee-avatar-large" />
+              )}
+              <div className="detail-row">
+                <span className="label">Employee:</span>
+                <span className="value">{selectedEvent.title}</span>
+              </div>
+              <div className="detail-row">
+                <span className="label">Department:</span>
+                <span className="value">{selectedEvent.department || 'N/A'}</span>
+              </div>
+              <div className="detail-row">
+                <span className="label">Leave Type:</span>
+                <span className="value">{selectedEvent.leave_type}</span>
+              </div>
+              <div className="detail-row">
+                <span className="label">Duration:</span>
+                <span className="value">
+                  {moment(selectedEvent.start).format('MMM D, YYYY')} - {moment(selectedEvent.end).format('MMM D, YYYY')}
+                </span>
+              </div>
+              <div className="detail-row">
+                <span className="label">Total Days:</span>
+                <span className="value">{moment(selectedEvent.end).diff(moment(selectedEvent.start), 'days') + 1} days</span>
+              </div>
+            </div>
           </div>
-
         </div>
-
       )}
 
-      {/* DAY PANEL */}
-
+      {/* DAY DETAILS PANEL */}
       {selectedDate && (
-
-        <div className="leave-day-panel">
-
-          <div className="day-panel-header">
-
-            <h3>
-              Leave Details — {moment(selectedDate).format("MMMM D")}
-            </h3>
-
-            <button
-              className="panel-close"
-              onClick={()=>setSelectedDate(null)}
-            >
-              ✕
-            </button>
-
+        <div className="side-panel">
+          <div className="panel-header">
+            <h3>{moment(selectedDate).format('MMMM D, YYYY')}</h3>
+            <button className="close-btn" onClick={() => setSelectedDate(null)}>×</button>
           </div>
-
-          <div className="day-panel-content">
-
-            {Object.entries(dayDetails).map(([dept, employees])=>(
-              <div key={dept} className="dept-group">
-
-                <h4>{dept}</h4>
-
-                {employees.map((emp,i)=>(
-                  <div key={i} className="employee-row">
-
-                    {emp.avatar && (
-                      <img
-                        src={emp.avatar}
-                        className="employee-avatar"
-                        alt=""
-                      />
-                    )}
-
-                    <span>{emp.title}</span>
-
-                    <span className="leave-type">
-                      {emp.leave_type}
-                    </span>
-
-                  </div>
-                ))}
-
+          <div className="panel-body">
+            {Object.keys(dayDetails).length === 0 ? (
+              <div className="empty-state">
+                <p>No leaves on this date</p>
               </div>
-            ))}
-
+            ) : (
+              Object.entries(dayDetails).map(([dept, employees]) => (
+                <div key={dept} className="dept-section">
+                  <h4>{dept}</h4>
+                  {employees.map((emp, i) => (
+                    <div key={i} className="employee-card">
+                      {emp.avatar && <img src={emp.avatar} alt="" />}
+                      <div className="emp-info">
+                        <span className="emp-name">{emp.title}</span>
+                        <span className="emp-leave-type">{emp.leave_type}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ))
+            )}
           </div>
-
         </div>
-
       )}
 
     </div>

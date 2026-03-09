@@ -322,7 +322,7 @@
 //             <option value="ALL">All</option>
 //             <option value="DRAFT">Draft</option>
 //             <option value="APPROVED">Approved</option>
-//             <option value="PAID">Paid</option>
+//             <option value="PAID"</option>
 //             <option value="CANCELLED">Cancelled</option>
 //           </select>
 //         </div>
@@ -496,6 +496,9 @@ import {
   bulkEmailPayslips,
   sendSinglePayslipEmail,
   generateFullFinal,
+  approvePayslip,
+  markPayslipPaid,
+  exportSalaryBankFile,
 } from "../../api/payroll";
 
 import "../../styles/payroll.css";
@@ -607,9 +610,13 @@ export default function Payroll() {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = "Payslip.pdf";
+      link.download = `Payslip_${month}.pdf`;
       link.click();
-    } catch {
+      window.URL.revokeObjectURL(url);
+      
+      toast.success("Payslip downloaded successfully");
+    } catch (err) {
+      console.error("Download error:", err);
       toast.error("Download failed");
     }
   };
@@ -741,14 +748,14 @@ export default function Payroll() {
   ============================================ */
 
   const handleApprove = async (payslipId) => {
-  try {
-    await api.post(`/payroll/payslip/${payslipId}/approve/`);
-    toast.success("Payslip approved");
-    fetchStatus();
-  } catch {
-    toast.error("Approval failed");
-  }
-};
+    try {
+      await approvePayslip(payslipId);
+      toast.success("Payslip approved");
+      fetchStatus();
+    } catch {
+      toast.error("Approval failed");
+    }
+  };
 
 
   /* ============================================
@@ -757,7 +764,7 @@ export default function Payroll() {
 
   const handleMarkPaid = async (payslipId) => {
     try {
-      await api.post(`/payroll/payslip/${payslipId}/mark-paid/`);
+      await markPayslipPaid(payslipId);
       toast.success("Salary marked as PAID");
       fetchStatus();
     } catch {
@@ -781,6 +788,40 @@ export default function Payroll() {
     } catch (err) {
       toast.error(
         err.response?.data?.error || "FNF generation failed"
+      );
+    }
+  };
+
+  /* ============================================
+     Export Bank Salary File
+  ============================================ */
+
+  const handleExportBankFile = async () => {
+    try {
+      const [year, monthNum] = month.split("-");
+      const companyAccount = "1234567890";
+
+      const res = await exportSalaryBankFile(
+        parseInt(monthNum),
+        parseInt(year),
+        companyAccount
+      );
+
+      const blob = new Blob([res.data], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Bank_Salary_Upload_${month}.xlsx`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+
+      toast.success("Bank salary file downloaded successfully");
+    } catch (err) {
+      toast.error(
+        err.response?.data?.error || "Export failed"
       );
     }
   };
@@ -815,6 +856,10 @@ export default function Payroll() {
           >
             {loadingBulkEmail ? "Sending..." : "Send Payslips"}
           </button>
+
+          <button className="btn-bank" onClick={handleExportBankFile}>
+            Bank Upload File
+          </button>
         </div>
 
         <div>
@@ -835,7 +880,7 @@ export default function Payroll() {
             className="filter-select"
           >
             <option value="ALL">All</option>
-            <option value="DRAFT">Draft</option>
+            <option value="NOT PAID">Not Paid</option>
             <option value="APPROVED">Approved</option>
             <option value="PAID">Paid</option>
             <option value="CANCELLED">Cancelled</option>
@@ -950,7 +995,7 @@ export default function Payroll() {
                         {emp.payslip_generated && emp.payslip_id && (
                           <>
                             {/* DRAFT STATUS */}
-                            {emp.payslip_status === "DRAFT" && (
+                            {emp.payslip_status === "NOT PAID" && (
                               <>
                                 <button
                                   className="btn-preview"
@@ -1028,34 +1073,32 @@ export default function Payroll() {
                 </tr>
               ))
             )}
-            {showPreview && (
-            <div className="preview-modal">
-              <div className="preview-content">
-
-                <div className="preview-header">
-                  <h3>Payslip Preview</h3>
-
-                  <button
-                    className="btn-close"
-                    onClick={() => setShowPreview(false)}
-                  >
-                    Close
-                  </button>
-                </div>
-
-                <div className="preview-body">
-                  <iframe
-                    src={previewUrl + "#toolbar=0&view=FitH"}
-                    title="Payslip Preview"
-                  />
-                </div>
-
-              </div>
-            </div>
-          )}
           </tbody>
         </table>
       </div>
+
+      {/* ================= PREVIEW MODAL ================= */}
+      {showPreview && (
+        <div className="preview-modal">
+          <div className="preview-content">
+            <div className="preview-header">
+              <h3>Payslip Preview</h3>
+              <button
+                className="btn-close"
+                onClick={() => setShowPreview(false)}
+              >
+                Close
+              </button>
+            </div>
+            <div className="preview-body">
+              <iframe
+                src={previewUrl + "#toolbar=0&view=FitH"}
+                title="Payslip Preview"
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ================= FNF MODAL ================= */}
       {showFNFModal && (
@@ -1143,18 +1186,21 @@ export default function Payroll() {
                 </h4>
               </div>
             )}
+          </div>
+        </div>
+      )}
 
-            <div className="payroll-summary">
-              <div className="card">
-                <h4>Total Monthly Payroll</h4>
-                <p>₹ {summary?.total_monthly_ctc}</p>
-              </div>
+      {/* ================= PAYROLL SUMMARY ================= */}
+      {summary && (
+        <div className="payroll-summary">
+          <div className="card">
+            <h4>Total Monthly Payroll</h4>
+            <p>₹ {summary?.total_monthly_ctc?.toLocaleString("en-IN")}</p>
+          </div>
 
-              <div className="card">
-                <h4>Total Yearly Payroll Liability</h4>
-                <p>₹ {summary?.total_yearly_ctc}</p>
-              </div>
-            </div>
+          <div className="card">
+            <h4>Total Yearly Payroll Liability</h4>
+            <p>₹ {summary?.total_yearly_ctc?.toLocaleString("en-IN")}</p>
           </div>
         </div>
       )}

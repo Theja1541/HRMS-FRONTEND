@@ -1,0 +1,880 @@
+/* ============================================================
+   LEAVE CALENDAR - MODERN UI
+============================================================ */
+
+.leave-calendar-container {
+  padding: 24px;
+  background: #f8fafc;
+  min-height: 100vh;
+}
+
+/* ============================================================
+   PAGE HEADER
+============================================================ */
+
+.calendar-page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 28px 32px;
+  background: linear-gradient(135deg, #0f172a 0%, #1e40af 100%);
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(15, 23, 42, 0.15);
+}
+
+.header-left h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 6px;
+}
+
+.header-left p {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.header-right {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.today-btn {
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.today-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+.date-picker {
+  padding: 10px 16px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  border-radius: 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.date-picker:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.date-picker::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+/* ============================================================
+   CONTROLS ROW
+============================================================ */
+
+.calendar-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 20px;
+  gap: 20px;
+}
+
+/* FILTERS */
+
+.filters-section {
+  display: flex;
+  gap: 16px;
+  flex: 1;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 200px;
+}
+
+.filter-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.filter-group select {
+  padding: 10px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-group select:hover {
+  border-color: #2563eb;
+}
+
+.filter-group select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* React Select Styling */
+.react-select-container {
+  width: 100%;
+}
+
+.react-select__control {
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 10px !important;
+  padding: 2px !important;
+  box-shadow: none !important;
+}
+
+.react-select__control:hover {
+  border-color: #2563eb !important;
+}
+
+.react-select__control--is-focused {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+}
+
+/* VIEW CONTROLS */
+
+.view-controls {
+  display: flex;
+  align-items: flex-end;
+}
+
+.view-tabs {
+  display: flex;
+  background: white;
+  border-radius: 10px;
+  padding: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.view-tabs button {
+  padding: 8px 20px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-tabs button:hover {
+  color: #2563eb;
+  background: #f1f5f9;
+}
+
+.view-tabs button.active {
+  background: #2563eb;
+  color: white;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+/* ============================================================
+   LEGEND
+============================================================ */
+
+.calendar-legend {
+  display: flex;
+  gap: 24px;
+  padding: 16px 20px;
+  background: white;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #475569;
+}
+
+.legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+/* ============================================================
+   CALENDAR WRAPPER
+============================================================ */
+
+.calendar-wrapper {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+/* Calendar Toolbar */
+.rbc-toolbar {
+  padding: 16px 0;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.rbc-toolbar button {
+  padding: 8px 16px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #475569;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.rbc-toolbar button:hover {
+  background: #f8fafc;
+  border-color: #2563eb;
+  color: #2563eb;
+}
+
+.rbc-toolbar button.rbc-active {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+/* Calendar Header */
+.rbc-header {
+  padding: 12px 8px;
+  font-weight: 600;
+  font-size: 13px;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+/* Calendar Cells */
+.rbc-day-bg {
+  transition: background 0.2s;
+}
+
+.rbc-day-bg:hover {
+  background: #f8fafc;
+  cursor: pointer;
+}
+
+.rbc-today {
+  background: #eff6ff !important;
+}
+
+.rbc-off-range-bg {
+  background: #fafafa;
+}
+
+/* Events */
+.rbc-event {
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.rbc-event:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Agenda View */
+.rbc-agenda-view {
+  border: none;
+}
+
+.rbc-agenda-table {
+  border: 1px solid #f1f5f9;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.rbc-agenda-date-cell,
+.rbc-agenda-time-cell {
+  padding: 12px;
+  font-weight: 600;
+  color: #475569;
+}
+
+.rbc-agenda-event-cell {
+  padding: 12px;
+}
+
+/* ============================================================
+   EVENT MODAL
+============================================================ */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 28px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.modal-header h3 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.close-btn {
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: #f1f5f9;
+  border-radius: 8px;
+  font-size: 20px;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.close-btn:hover {
+  background: #e2e8f0;
+  color: #0f172a;
+}
+
+.modal-body {
+  padding: 28px;
+}
+
+.employee-avatar-large {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 20px;
+  border: 4px solid #f1f5f9;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-row .label {
+  font-weight: 600;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.detail-row .value {
+  font-weight: 500;
+  color: #0f172a;
+  font-size: 14px;
+}
+
+/* ============================================================
+   SIDE PANEL
+============================================================ */
+
+.side-panel {
+  position: fixed;
+  right: 0;
+  top: 0;
+  width: 380px;
+  height: 100vh;
+  background: white;
+  box-shadow: -4px 0 20px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  overflow-y: auto;
+  animation: slideInRight 0.3s;
+}
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 2px solid #f1f5f9;
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 10;
+}
+
+.panel-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.panel-body {
+  padding: 24px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: #94a3b8;
+}
+
+.dept-section {
+  margin-bottom: 24px;
+}
+
+.dept-section h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+}
+
+.employee-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  background: #f8fafc;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  transition: all 0.2s;
+}
+
+.employee-card:hover {
+  background: #f1f5f9;
+  transform: translateX(4px);
+}
+
+.employee-card img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.emp-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.emp-name {
+  font-weight: 600;
+  color: #0f172a;
+  font-size: 14px;
+}
+
+.emp-leave-type {
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* ============================================================
+   ANIMATIONS
+============================================================ */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media (max-width: 1200px) {
+  .filters-section {
+    flex-wrap: wrap;
+  }
+  
+  .filter-group {
+    min-width: 180px;
+  }
+}
+
+@media (max-width: 768px) {
+  .calendar-page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .calendar-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .view-controls {
+    width: 100%;
+  }
+  
+  .view-tabs {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .side-panel {
+    width: 100%;
+  }
+}
+
+
+/* ============================================================
+   STATS CARDS (Above Calendar)
+============================================================ */
+
+.calendar-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  transition: all 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.stat-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+/* ============================================================
+   ENHANCED LEGEND
+============================================================ */
+
+.calendar-legend {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 16px 20px;
+  background: white;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  flex-wrap: wrap;
+}
+
+.legend-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.legend-divider {
+  width: 1px;
+  height: 20px;
+  background: #e2e8f0;
+}
+
+.legend-box {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+}
+
+/* ============================================================
+   HEATMAP STYLING
+============================================================ */
+
+.custom-date-cell {
+  position: relative;
+  height: 100%;
+}
+
+.leave-count-badge {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  padding: 2px 6px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* Heatmap colors with better contrast */
+.rbc-day-bg[style*="fee2e2"] {
+  border: 2px solid #fca5a5 !important;
+}
+
+.rbc-day-bg[style*="fed7aa"] {
+  border: 2px solid #fb923c !important;
+}
+
+.rbc-day-bg[style*="fef3c7"] {
+  border: 2px solid #fbbf24 !important;
+}
+
+.rbc-day-bg[style*="dbeafe"] {
+  border: 2px solid #93c5fd !important;
+}
+
+/* ============================================================
+   SIMPLIFIED EVENT DISPLAY
+============================================================ */
+
+.calendar-event-simple {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.event-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+.event-name {
+  font-size: 11px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============================================================
+   MONTH VIEW - LIMIT EVENTS DISPLAY
+============================================================ */
+
+.rbc-month-view .rbc-row-content {
+  max-height: 120px;
+  overflow: hidden;
+}
+
+.rbc-show-more {
+  background: #f1f5f9;
+  color: #2563eb;
+  font-weight: 600;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-top: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.rbc-show-more:hover {
+  background: #e2e8f0;
+  transform: translateY(-1px);
+}
+
+/* ============================================================
+   SIDE PANEL - ENHANCED FOR MANY EMPLOYEES
+============================================================ */
+
+.panel-body {
+  padding: 20px;
+  max-height: calc(100vh - 80px);
+  overflow-y: auto;
+}
+
+.panel-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.panel-body::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.panel-body::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.panel-body::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.dept-section {
+  margin-bottom: 24px;
+}
+
+.dept-section h4 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 700;
+  color: #475569;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.dept-count {
+  background: #f1f5f9;
+  color: #64748b;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.employee-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  background: #f8fafc;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  transition: all 0.2s;
+  cursor: pointer;
+}
+
+.employee-card:hover {
+  background: #e2e8f0;
+  transform: translateX(4px);
+}
+
+/* ============================================================
+   RESPONSIVE ADJUSTMENTS
+============================================================ */
+
+@media (max-width: 1024px) {
+  .calendar-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .calendar-stats {
+    grid-template-columns: 1fr;
+  }
+  
+  .leave-count-badge {
+    font-size: 9px;
+    padding: 1px 4px;
+  }
+}
+
+.calendar-summary-event{
+background:#2563eb;
+color:white;
+padding:4px 8px;
+border-radius:6px;
+font-size:12px;
+font-weight:500;
+text-align:center;
+}

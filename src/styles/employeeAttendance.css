@@ -89,6 +89,34 @@
   color: #0f172a;
 }
 
+.attendance-ring {
+  position: relative;
+  display: inline-block;
+  margin: 10px 0;
+}
+
+.ring-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.ring-text h3 {
+  font-size: 28px;
+  font-weight: 700;
+  margin: 0;
+  color: #0f172a;
+}
+
+.ring-text span {
+  font-size: 12px;
+  color: #64748b;
+  display: block;
+  margin-top: 2px;
+}
+
 .performance-label {
   margin-top: 12px;
   font-size: 13px;
@@ -176,13 +204,15 @@
 }
 
 .summary-card h3 {
-  font-size: 22px;
+  font-size: 28px;
   font-weight: 700;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  color: #0f172a;
 }
 
 .summary-card span {
   font-size: 13px;
+  font-weight: 500;
   color: #64748b;
 }
 
@@ -212,52 +242,101 @@
 ============================================================ */
 
 .attendance-status-card {
-  background: #ffffff;
-  padding: 22px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  padding: 24px;
   border-radius: 18px;
   box-shadow: 0 15px 35px rgba(15, 23, 42, 0.06);
+  border: 1px solid #e2e8f0;
 }
 
 .attendance-status-card h3 {
   font-size: 16px;
-  margin-bottom: 14px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #0f172a;
+}
+
+.status-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
 }
 
 .status-pill {
-  display: inline-block;
-  padding: 6px 14px;
-  border-radius: 30px;
-  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  font-size: 14px;
   font-weight: 600;
   text-transform: capitalize;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.status-pill:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+.status-icon {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+}
+
+.status-text {
+  font-weight: 600;
+}
+
+.status-time {
+  font-size: 18px;
+  font-weight: 600;
+  color: #475569;
+  padding: 8px 16px;
+  background: #f1f5f9;
+  border-radius: 10px;
 }
 
 /* Status Variants */
 .status-pill.present {
-  background: #dcfce7;
+  background: linear-gradient(135deg, #dcfce7, #bbf7d0);
   color: #15803d;
+  border: 2px solid #86efac;
+}
+
+.status-pill.half-day {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #a16207;
+  border: 2px solid #fcd34d;
 }
 
 .status-pill.absent {
-  background: #fee2e2;
+  background: linear-gradient(135deg, #fee2e2, #fecaca);
   color: #b91c1c;
+  border: 2px solid #fca5a5;
 }
 
 .status-pill.paid_leave,
 .status-pill.paid-leave {
-  background: #dbeafe;
+  background: linear-gradient(135deg, #dbeafe, #bfdbfe);
   color: #1d4ed8;
+  border: 2px solid #93c5fd;
 }
 
 .status-pill.unpaid_leave,
 .status-pill.unpaid-leave {
-  background: #ffedd5;
+  background: linear-gradient(135deg, #ffedd5, #fed7aa);
   color: #c2410c;
+  border: 2px solid #fdba74;
 }
 
 .status-pill.not-marked {
-  background: #e2e8f0;
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
   color: #475569;
+  border: 2px solid #cbd5e1;
 }
 
 /* ============================================================

@@ -739,3 +739,238 @@ margin-bottom:10px;
 border-radius:6px;
 padding:4px 10px;
 }
+
+
+/* ================= TABS ================= */
+
+.leave-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 0;
+}
+
+.tab-btn {
+  padding: 12px 24px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+  margin-bottom: -2px;
+}
+
+.tab-btn:hover {
+  color: #2563eb;
+  background: #f8fafc;
+}
+
+.tab-btn.active {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+  font-weight: 600;
+}
+
+
+/* ================= VIEW SWITCHER ================= */
+
+.leave-calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding: 20px;
+  background: linear-gradient(135deg, #0f172a, #2563eb);
+  border-radius: 16px;
+  color: white;
+}
+
+.leave-calendar-header h2 {
+  font-size: 24px;
+  margin-bottom: 4px;
+  color: white;
+}
+
+.leave-calendar-header p {
+  font-size: 14px;
+  opacity: 0.9;
+  color: white;
+}
+
+.view-switcher {
+  display: flex;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  padding: 6px;
+  border-radius: 12px;
+}
+
+.view-switcher button {
+  padding: 8px 16px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-switcher button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+.view-switcher button.active {
+  background: white;
+  color: #2563eb;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ================= FILTER BOX ================= */
+
+.calendar-filters {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.filter-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.filter-box label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.filter-box select {
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-box select:hover {
+  border-color: #2563eb;
+}
+
+.filter-box select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+
+/* ================= HEADER CONTROLS ================= */
+
+.header-controls {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+/* ================= DATE PICKER ================= */
+
+.date-picker-box {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.date-picker-box label {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.date-input {
+  padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  font-size: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.date-input:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.date-input:focus {
+  outline: none;
+  background: white;
+  color: #0f172a;
+  border-color: white;
+}
+
+/* Date input calendar icon color */
+.date-input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
+.date-input:focus::-webkit-calendar-picker-indicator {
+  filter: invert(0);
+}
+
+/* ================= QUICK NAVIGATION ================= */
+
+.quick-nav {
+  display: flex;
+  align-items: flex-end;
+}
+
+.today-btn {
+  padding: 8px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.today-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-1px);
+}
+
+.today-btn:active {
+  transform: translateY(0);
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 1024px) {
+  .header-controls {
+    flex-wrap: wrap;
+  }
+  
+  .view-switcher {
+    width: 100%;
+  }
+}

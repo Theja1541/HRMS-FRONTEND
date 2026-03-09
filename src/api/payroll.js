@@ -129,3 +129,12 @@ export const checkEmployeeId = (employeeId) =>
 
 export const getSalaryTimeline = (employeeId) =>
   api.get(`/payroll/salary-revisions/employee/${employeeId}/`);
+
+export const exportSalaryBankFile = (month, year, companyAccount) =>
+  api.post("/payroll/export-salary-bank-file/", {
+    month,
+    year,
+    company_account: companyAccount,
+  }, {
+    responseType: "blob",
+  });

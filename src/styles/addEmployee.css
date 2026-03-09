@@ -555,3 +555,21 @@
   letter-spacing: 0.3px;
 }
 
+
+
+/* Disabled Input */
+.form-field input:disabled,
+.form-field select:disabled {
+  background: #f1f5f9;
+  color: #64748b;
+  cursor: not-allowed;
+  border-color: #cbd5e1;
+}
+
+/* Validation Messages */
+.form-field small {
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+  font-weight: 500;
+}

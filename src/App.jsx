@@ -27,6 +27,7 @@ import Leaves from "./pages/leaves/Leaves";
 import LeaveApproval from "./pages/leaves/LeavesApprovals";
 import LeaveRejected from "./pages/leaves/LeaveRejected";
 import LeaveHistory from "./pages/leaves/LeaveHistory";
+import LeaveSettings from "./pages/leaves/LeaveSettings";
 import Payroll from "./pages/payroll/Payroll";
 import EmailDashboard from "./pages/payroll/EmailDashboard";
 import SalaryEditor from "./pages/payroll/SalaryEditor";
@@ -43,6 +44,7 @@ import MyDocuments from "./pages/employee-portal/MyDocuments";
 import MyPayslips from "./pages/employee-portal/MyPayslips";
 import MyLeaveBalance from "./pages/employee-portal/MyLeaveBalance";
 import SalaryGrowthTimeline from "./pages/employee-portal/SalaryGrowthTimeline";
+import Settings from "./pages/auth/Settings";
 
 /* Super Admin */
 import SuperAdminLayout from "./components/superadmin/SuperAdminLayout";
@@ -60,6 +62,9 @@ import PayrollSummary from "./pages/payroll/PayrollSummary";
 import AddSalaryRevision from "./pages/payroll/AddSalaryRevision";
 import LeaveDashboard from "./pages/leaves/LeaveDashboard";
 import LeaveCalendar from "./pages/leaves/LeaveCalendar";
+import AssetReturnManagement from "./pages/assets/AssetReturnManagement";
+import AssetManagement from "./pages/assets/AssetManagement";
+import MyAssetReturns from "./pages/employee-portal/MyAssetReturns";
 
 // export default function App() {
 //   return (
@@ -236,6 +241,7 @@ export default function App() {
             <Route path="approvals" element={<LeaveApproval />} />
             <Route path="rejected" element={<LeaveRejected />} />
             <Route path="history" element={<LeaveHistory />} />
+            <Route path="leave-settings" element={<LeaveSettings />} />
 
             {/* Payroll */}
             <Route path="payroll" element={<Payroll />} />
@@ -247,6 +253,13 @@ export default function App() {
 
             {/* Email */}
             <Route path="email-dashboard" element={<EmailDashboard />} />
+            
+            {/* Assets */}
+            <Route path="assets" element={<AssetManagement />} />
+            <Route path="asset-returns" element={<AssetReturnManagement />} />
+            
+            {/* Settings */}
+            <Route path="settings" element={<Settings />} />
           </Route>
 
           {/* EMPLOYEE PORTAL */}
@@ -268,6 +281,8 @@ export default function App() {
             <Route path="/employee/salary-timeline" element={<SalaryGrowthTimeline />} />
             <Route path="profile" element={<MyProfile />} />
             <Route path="my-documents" element={<MyDocuments />} />
+            <Route path="asset-returns" element={<MyAssetReturns />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/login" replace />} />
