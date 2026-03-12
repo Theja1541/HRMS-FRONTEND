@@ -29,6 +29,7 @@ export default function EmployeeSidebar() {
 
     if (
       location.pathname.includes("/employee/my-payslips") ||
+      location.pathname.includes("/employee/my-salary") ||
       location.pathname.includes("/employee/salary-timeline")
     ) {
       setPayslipOpen(true);
@@ -125,6 +126,10 @@ export default function EmployeeSidebar() {
 
                 <NavLink to="/employee/my-payslips" className="sidebar-item child">
                   My Payslips
+                </NavLink>
+
+                <NavLink to="/employee/my-salary" className="sidebar-item child">
+                  My Salary
                 </NavLink>
 
                 <NavLink to="/employee/salary-timeline" className="sidebar-item child">

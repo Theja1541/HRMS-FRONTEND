@@ -97,6 +97,10 @@ export default function Sidebar({ isOpen, onClose }) {
             📊 Payroll Summary
           </NavLink>
 
+          <NavLink to="/salary-payment-summary" className="sidebar-subitem" onClick={onClose}>
+            💳 Payment Summary
+          </NavLink>
+
           <NavLink to="/email-dashboard" className="sidebar-subitem" onClick={onClose}>
             📧 Email Dashboard
           </NavLink>

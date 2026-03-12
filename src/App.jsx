@@ -44,6 +44,7 @@ import MyDocuments from "./pages/employee-portal/MyDocuments";
 import MyPayslips from "./pages/employee-portal/MyPayslips";
 import MyLeaveBalance from "./pages/employee-portal/MyLeaveBalance";
 import SalaryGrowthTimeline from "./pages/employee-portal/SalaryGrowthTimeline";
+import MySalary from "./pages/employee-portal/MySalary";
 import Settings from "./pages/auth/Settings";
 
 /* Super Admin */
@@ -60,6 +61,7 @@ import { ToastProvider } from "./context/ToastContext";
 
 import PayrollSummary from "./pages/payroll/PayrollSummary";
 import AddSalaryRevision from "./pages/payroll/AddSalaryRevision";
+import SalaryPaymentSummary from "./pages/payroll/SalaryPaymentSummary";
 import LeaveDashboard from "./pages/leaves/LeaveDashboard";
 import LeaveCalendar from "./pages/leaves/LeaveCalendar";
 import AssetReturnManagement from "./pages/assets/AssetReturnManagement";
@@ -248,6 +250,7 @@ export default function App() {
             {/* <Route path="payroll/salary-structure" element={<SalaryStructure />} /> */}
             {/* <Route path="salary" element={<SalaryStructure />} /> */}
             <Route path="payroll-summary" element={<PayrollSummary />} />
+            <Route path="salary-payment-summary" element={<SalaryPaymentSummary />} />
             <Route path="payroll/full-final" element={<Payroll />} />
             <Route path="employees/:id/salary-revision" element={<AddSalaryRevision />}/>
 
@@ -278,6 +281,7 @@ export default function App() {
             <Route path="my-leaves" element={<MyLeaves />} />
             <Route path="leave-balance" element={<MyLeaveBalance />} />
             <Route path="my-payslips" element={<MyPayslips />} />
+            <Route path="my-salary" element={<MySalary />} />
             <Route path="/employee/salary-timeline" element={<SalaryGrowthTimeline />} />
             <Route path="profile" element={<MyProfile />} />
             <Route path="my-documents" element={<MyDocuments />} />
