@@ -23,6 +23,7 @@ import { usePayroll } from "../../context/PayrollContext";
 import PayrollLockBanner from "../../components/common/PayrollLockBanner";
 import { useAuth } from "../../auth/AuthContext";
 import { reopenPayrollMonth } from "../../api/payroll";
+import EditedAttendanceModal from "../../components/attendance/EditedAttendanceModal";
 
 /* ===== STATUS COLORS ===== */
 const STATUS_COLORS = {
@@ -68,7 +69,6 @@ export default function MonthlyAttendance() {
   const [showEditHistoryModal, setShowEditHistoryModal] = useState(false);
   const [editHistory, setEditHistory] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(false);
-  const [historySearchTerm, setHistorySearchTerm] = useState("");
   const [historyMonth, setHistoryMonth] = useState(
     new Date().toISOString().slice(0, 7)
   );
@@ -332,16 +332,7 @@ export default function MonthlyAttendance() {
     }
   };
 
-  const filteredEditHistory = useMemo(() => {
-    if (!historySearchTerm) return editHistory;
-    
-    const searchLower = historySearchTerm.toLowerCase();
-    return editHistory.filter((record) => {
-      const empName = record.employee_name.toLowerCase();
-      const empId = record.employee_id.toLowerCase();
-      return empName.includes(searchLower) || empId.includes(searchLower);
-    });
-  }, [editHistory, historySearchTerm]);
+
 
   /* =======================
      SUMMARY CALCULATION
@@ -628,130 +619,14 @@ export default function MonthlyAttendance() {
       )}
 
       {/* EDIT HISTORY MODAL */}
-      {showEditHistoryModal && (
-        <div className="modal-overlay" style={{ background: "rgba(0,0,0,0.6)" }}>
-          <div className="modal-card" style={{ maxWidth: "1600px", width: "95%", maxHeight: "90vh", overflow: "hidden", display: "flex", flexDirection: "column", borderRadius: "16px", boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1)" }}>
-            <div style={{ padding: "24px 32px", background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", color: "white" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-                <div>
-                  <h3 style={{ margin: 0, fontSize: "28px", fontWeight: "700", letterSpacing: "-0.5px" }}>📋 Edited Attendance History</h3>
-                  <p style={{ margin: "8px 0 0 0", fontSize: "14px", opacity: 0.9 }}>Track and review all attendance modifications</p>
-                </div>
-                <button 
-                  onClick={() => { setShowEditHistoryModal(false); setHistorySearchTerm(""); }}
-                  style={{ background: "rgba(255,255,255,0.2)", border: "none", color: "white", width: "36px", height: "36px", borderRadius: "50%", cursor: "pointer", fontSize: "20px", transition: "all 0.2s" }}
-                  onMouseEnter={(e) => e.target.style.background = "rgba(255,255,255,0.3)"}
-                  onMouseLeave={(e) => e.target.style.background = "rgba(255,255,255,0.2)"}
-                >×</button>
-              </div>
-              <div style={{ display: "flex", gap: "16px", alignItems: "center", background: "rgba(255,255,255,0.15)", padding: "16px", borderRadius: "12px", backdropFilter: "blur(10px)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: "12px", flex: "0 0 auto" }}>
-                  <label style={{ fontSize: "14px", fontWeight: "600", whiteSpace: "nowrap" }}>📅 Month:</label>
-                  <input type="month" value={historyMonth} onChange={(e) => { setHistoryMonth(e.target.value); fetchEditHistory(e.target.value); }} style={{ padding: "10px 16px", border: "none", borderRadius: "8px", fontSize: "14px", fontWeight: "500", outline: "none", background: "white", cursor: "pointer", minWidth: "160px" }} />
-                </div>
-                <div style={{ width: "1px", height: "32px", background: "rgba(255,255,255,0.3)" }}></div>
-                <div style={{ display: "flex", alignItems: "center", gap: "12px", flex: 1 }}>
-                  <label style={{ fontSize: "14px", fontWeight: "600", whiteSpace: "nowrap" }}>🔍 Search:</label>
-                  <input type="text" placeholder="Employee name or ID..." value={historySearchTerm} onChange={(e) => setHistorySearchTerm(e.target.value)} style={{ padding: "10px 16px", border: "none", borderRadius: "8px", fontSize: "14px", outline: "none", background: "white", flex: 1, maxWidth: "400px" }} />
-                </div>
-                <div style={{ padding: "10px 20px", background: "rgba(255,255,255,0.25)", borderRadius: "8px", fontWeight: "600", fontSize: "14px", whiteSpace: "nowrap" }}>{filteredEditHistory.length} Records</div>
-              </div>
-            </div>
-            
-            <div style={{ flex: 1, overflow: "auto", background: "#f8fafc" }}>
-              {loadingHistory ? (
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", flexDirection: "column", gap: "16px" }}>
-                  <div style={{ fontSize: "48px" }}>⏳</div>
-                  <div style={{ fontSize: "16px", color: "#64748b", fontWeight: "500" }}>Loading history...</div>
-                </div>
-              ) : filteredEditHistory.length === 0 ? (
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%", flexDirection: "column", gap: "16px" }}>
-                  <div style={{ fontSize: "64px", opacity: 0.3 }}>📭</div>
-                  <div style={{ fontSize: "20px", fontWeight: "600", color: "#1e293b" }}>No Records Found</div>
-                  <div style={{ fontSize: "14px", color: "#64748b" }}>{historySearchTerm ? "Try different search terms" : "No edits made this month"}</div>
-                </div>
-              ) : (
-                <div style={{ padding: "24px 32px" }}>
-                  {filteredEditHistory.map((record) => (
-                    <div key={record.id} style={{ background: "white", borderRadius: "12px", padding: "20px 24px", marginBottom: "16px", boxShadow: "0 1px 3px rgba(0,0,0,0.08)", border: "1px solid #e2e8f0", transition: "all 0.2s", display: "flex", alignItems: "center", gap: "24px", flexWrap: "wrap" }} onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.12)"; e.currentTarget.style.transform = "translateY(-2px)"; }} onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.08)"; e.currentTarget.style.transform = "translateY(0)"; }}>
-                      <div style={{ flex: "0 0 180px" }}>
-                        <div style={{ fontSize: "15px", fontWeight: "600", color: "#0f172a", marginBottom: "4px" }}>{record.employee_name}</div>
-                        <div style={{ fontSize: "12px", color: "#64748b", fontFamily: "monospace" }}>{record.employee_id}</div>
-                      </div>
-                      <div style={{ flex: "0 0 110px" }}>
-                        <div style={{ fontSize: "11px", color: "#64748b", marginBottom: "4px", textTransform: "uppercase", fontWeight: "600" }}>Date</div>
-                        <div style={{ fontSize: "14px", fontWeight: "600", color: "#334155" }}>{new Date(record.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</div>
-                      </div>
-                      <div style={{ flex: "0 0 260px", display: "flex", alignItems: "center", gap: "12px" }}>
-                        <div style={{ textAlign: "center" }}>
-                          <div style={{ fontSize: "11px", color: "#64748b", marginBottom: "6px", textTransform: "uppercase", fontWeight: "600" }}>Previous</div>
-                          <span style={{ padding: "6px 14px", borderRadius: "6px", background: "#fee2e2", color: "#991b1b", fontSize: "12px", fontWeight: "600", display: "inline-block", textTransform: "capitalize" }}>{record.previous_status?.replace('_', ' ') || "N/A"}</span>
-                        </div>
-                        <div style={{ fontSize: "18px", color: "#94a3b8" }}>→</div>
-                        <div style={{ textAlign: "center" }}>
-                          <div style={{ fontSize: "11px", color: "#64748b", marginBottom: "6px", textTransform: "uppercase", fontWeight: "600" }}>Updated</div>
-                          <span style={{ padding: "6px 14px", borderRadius: "6px", background: "#d1fae5", color: "#065f46", fontSize: "12px", fontWeight: "600", display: "inline-block", textTransform: "capitalize" }}>{record.updated_status.replace('_', ' ')}</span>
-                        </div>
-                      </div>
-                      <div style={{ flex: "0 0 150px" }}>
-                        <div style={{ fontSize: "11px", color: "#64748b", marginBottom: "6px", textTransform: "uppercase", fontWeight: "600" }}>Edited By</div>
-                        <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                          <div style={{ width: "28px", height: "28px", borderRadius: "50%", background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: "700", fontSize: "11px", color: "white" }}>{record.edited_by.split(' ').map(n => n[0]).join('').toUpperCase()}</div>
-                          <span style={{ fontSize: "13px", fontWeight: "600", color: "#334155" }}>{record.edited_by}</span>
-                        </div>
-                      </div>
-                      <div style={{ flex: 1, minWidth: "200px" }}>
-                        <div style={{ fontSize: "11px", color: "#64748b", marginBottom: "6px", textTransform: "uppercase", fontWeight: "600" }}>Reason</div>
-                        <div style={{ fontSize: "13px", color: "#475569", lineHeight: "1.5", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} title={record.edit_reason}>{record.edit_reason}</div>
-                      </div>
-                      <div style={{ flex: "0 0 90px", textAlign: "right" }}>
-                        <div style={{ fontSize: "11px", color: "#64748b", marginBottom: "6px", textTransform: "uppercase", fontWeight: "600" }}>Time</div>
-                        <div style={{ fontSize: "12px", fontWeight: "500", color: "#64748b" }}>{new Date(record.edited_at).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}</div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            
-            <div style={{ padding: "20px 24px", borderTop: "2px solid #e5e7eb", display: "flex", justifyContent: "space-between", alignItems: "center", backgroundColor: "#f9fafb" }}>
-              <div style={{ fontSize: "13px", color: "#6b7280" }}>
-                Showing {filteredEditHistory.length} of {editHistory.length} total records
-              </div>
-              <button 
-                onClick={() => {
-                  setShowEditHistoryModal(false);
-                  setHistorySearchTerm("");
-                }}
-                style={{
-                  padding: "10px 24px",
-                  backgroundColor: "#3b82f6",
-                  color: "#ffffff",
-                  border: "none",
-                  borderRadius: "8px",
-                  fontSize: "14px",
-                  fontWeight: "600",
-                  cursor: "pointer",
-                  transition: "all 0.2s ease",
-                  boxShadow: "0 1px 3px rgba(0,0,0,0.1)"
-                }}
-                onMouseEnter={(e) => {
-                  e.target.style.backgroundColor = "#2563eb";
-                  e.target.style.transform = "translateY(-1px)";
-                  e.target.style.boxShadow = "0 4px 6px rgba(0,0,0,0.15)";
-                }}
-                onMouseLeave={(e) => {
-                  e.target.style.backgroundColor = "#3b82f6";
-                  e.target.style.transform = "translateY(0)";
-                  e.target.style.boxShadow = "0 1px 3px rgba(0,0,0,0.1)";
-                }}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <EditedAttendanceModal
+        isOpen={showEditHistoryModal}
+        onClose={() => setShowEditHistoryModal(false)}
+        editHistory={editHistory}
+        loading={loadingHistory}
+        onMonthChange={fetchEditHistory}
+        currentMonth={historyMonth}
+      />
 
       {/* CALENDAR VIEW */}
       {selectedEmployee !== "ALL" && (

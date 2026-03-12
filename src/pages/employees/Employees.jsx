@@ -95,14 +95,17 @@ export default function Employees() {
   const activateEmployee = async (id) => {
     try {
       const token = localStorage.getItem('accessToken');
+
       await fetch(`http://127.0.0.1:8000/api/employees/${id}/activate/`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
+
       fetchDeactivatedEmployees();
-      fetchEmployees(page, search, department);
+      fetchEmployees(page, search, department, role);
+
     } catch (err) {
       console.error('Failed to activate employee', err);
     }
@@ -212,33 +215,25 @@ export default function Employees() {
 
   return (
     <div className="employees-page">
-      {/* Floating Background */}
-      <div className="background-blobs">
-        <div className="blob blob-1"></div>
-        <div className="blob blob-2"></div>
-        <div className="blob blob-3"></div>
-      </div>
-
       {/* HEADER */}
-      <div className="employees-header">
+      <div className="page-header">
         <div>
-          <h2>Employees</h2>
-          <p style={{ fontSize: '14px', color: '#64748b', marginTop: '4px' }}>Manage your workforce</p>
+          <h2 className="page-title">Employees</h2>
+          <p className="page-subtitle">Manage your workforce</p>
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
           <button
-            className="btn"
+            className="settings-btn"
             onClick={() => {
               setShowSettings(true);
               fetchRoles();
               fetchDepartments();
             }}
-            style={{ background: '#64748b', color: 'white' }}
           >
             ⚙️ Settings
           </button>
           <button
-            className="btn primary"
+            className="add-employee-btn"
             onClick={() => navigate("/employees/add")}
           >
             + Add Employee
@@ -247,15 +242,17 @@ export default function Employees() {
       </div>
 
       {/* SEARCH + FILTER */}
-      <div className="employees-controls">
+      <div className="filter-bar">
         <input
           type="text"
+          className="search-input"
           placeholder="Search by name, email, ID..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
 
         <select
+          className="filter-select"
           value={department}
           onChange={(e) => setDepartment(e.target.value)}
         >
@@ -266,7 +263,7 @@ export default function Employees() {
         </select>
 
         <select
-          className="role-filter-dropdown"
+          className="filter-select"
           value={role}
           onChange={(e) => setRole(e.target.value)}
         >
@@ -277,12 +274,13 @@ export default function Employees() {
         </select>
       </div>
 
+
       {/* TABLE */}
-      <div className="employees-card">
+      <div className="table-wrapper">
         {loading ? (
-          <div className="employees-empty">Loading...</div>
+          <div className="empty-state">Loading...</div>
         ) : employees.length === 0 ? (
-          <div className="employees-empty">No employees found</div>
+          <div className="empty-state">No employees found</div>
         ) : (
           <table className="employees-table">
             <thead>
@@ -291,15 +289,15 @@ export default function Employees() {
                 <th>Name</th>
                 <th>Email</th>
                 <th>Mobile</th>
-                <th>Actions</th>
+                <th style={{ textAlign: 'center' }}>Actions</th>
               </tr>
             </thead>
 
             <tbody>
-              {employees.map((emp) => (
+              {employees.map((emp, index) => (
                 <tr key={emp.id}>
-                  <td>{emp.employee_id}</td>
-                  <td>{emp.full_name}</td>
+                  <td><strong>{emp.employee_id}</strong></td>
+                  <td><strong>{emp.full_name}</strong></td>
                   <td>{emp.email}</td>
                   <td>{emp.mobile}</td>
                   <td className="actions-cell">
@@ -324,7 +322,7 @@ export default function Employees() {
       <div className="pagination">
         <button
           disabled={page === 1}
-          onClick={() => fetchEmployees(page - 1)}
+          onClick={() => fetchEmployees(page - 1, search, department, role)}
         >
           Previous
         </button>
@@ -335,7 +333,7 @@ export default function Employees() {
 
         <button
           disabled={page === totalPages}
-          onClick={() => fetchEmployees(page + 1)}
+          oonClick={() => fetchEmployees(page + 1, search, department, role)}
         >
           Next
         </button>
@@ -534,36 +532,25 @@ function ActionMenu({ onView, onEdit, onDeactivate }) {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Close when clicking outside
   useEffect(() => {
-    function handleClickOutside(e) {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target)
-      ) {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
         setOpen(false);
       }
-    }
+    };
 
-    document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener(
-        "mousedown",
-        handleClickOutside
-      );
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
-  const handleAction = (action) => {
+  const handleAction = (e, action) => {
+    e.stopPropagation();
     setOpen(false);
     action();
   };
 
   return (
-    <div
-      className="action-dropdown"
-      ref={dropdownRef}
-      onClick={(e) => e.stopPropagation()}
-    >
+    <div className="action-dropdown" ref={dropdownRef}>
       <button
         type="button"
         className="action-trigger"
@@ -577,17 +564,9 @@ function ActionMenu({ onView, onEdit, onDeactivate }) {
 
       {open && (
         <div className="dropdown-menu">
-          <button onClick={() => handleAction(onView)}>
-            View
-          </button>
-          <button onClick={() => handleAction(onEdit)}>
-            Edit
-          </button>
-          <button
-            onClick={() => handleAction(onDeactivate)}
-          >
-            Deactivate
-          </button>
+          <button onClick={(e) => handleAction(e, onView)}>👁️ View</button>
+          <button onClick={(e) => handleAction(e, onEdit)}>✏️ Edit</button>
+          <button onClick={(e) => handleAction(e, onDeactivate)}>🚫 Deactivate</button>
         </div>
       )}
     </div>
