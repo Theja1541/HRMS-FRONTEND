@@ -18,6 +18,10 @@
   border-radius: 16px;
   margin-bottom: 32px;
   box-shadow: 0 15px 40px rgba(37, 99, 235, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
 }
 
 .add-employee-header h2 {
@@ -30,6 +34,16 @@
   font-size: 14px;
   margin-top: 6px;
   opacity: 0.9;
+}
+
+.header-back-btn {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.header-back-btn:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
 }
 
 /* ================= NAME + STATUS ROW ================= */
@@ -87,6 +101,7 @@
   gap: 12px;
   margin-bottom: 28px;
   position: relative;
+  padding-bottom: 8px;
 }
 
 .step {
@@ -148,6 +163,7 @@
   margin-top: 6px;
   color: #64748b;
   font-weight: 500;
+  min-height: 28px;
 }
 
 .step.active p {
@@ -202,6 +218,22 @@
   transform: translateY(-1px);
 }
 
+.current-file-text {
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #64748b;
+}
+
+.current-file-text a {
+  color: #1d4ed8;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.current-file-text a:hover {
+  text-decoration: underline;
+}
+
 /* ================= ERROR ================= */
 
 .input-error {
@@ -214,6 +246,30 @@
   font-size: 12px;
   margin-top: 5px;
   font-weight: 500;
+}
+
+.loading-state.card-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  border: 1px solid #e2e8f0;
+}
+
+.loading-state .spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #dbeafe;
+  border-top-color: #2563eb;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
 /* ================= FILE INPUT ================= */
@@ -406,6 +462,15 @@
 }
 
 @media (max-width: 640px) {
+  .add-employee-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-back-btn {
+    width: 100%;
+  }
+
   .form-grid {
     grid-template-columns: 1fr;
   }
@@ -548,6 +613,63 @@
   font-weight: 700;
   background: #f1f5f9;
   color: #0f172a;
+}
+
+.bold-row.summary-gross td {
+  background: #eff6ff;
+}
+
+.bold-row.summary-deduction td {
+  background: #fef3c7;
+}
+
+.bold-row.summary-net td {
+  background: #dcfce7;
+}
+
+.bold-row.summary-ctc td {
+  background: #ede9fe;
+}
+
+.salary-step-wrapper {
+  grid-column: 1 / -1;
+}
+
+.payroll-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.payroll-table th {
+  background: #f8fafc;
+  padding: 10px 12px;
+  text-align: left;
+  font-size: 12px;
+  color: #334155;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+}
+
+.payroll-table td {
+  border-bottom: 1px solid #f1f5f9;
+  padding: 10px 12px;
+  font-size: 13px;
+}
+
+.payroll-table td:nth-child(2),
+.payroll-table td:nth-child(3),
+.payroll-table th:nth-child(2),
+.payroll-table th:nth-child(3) {
+  text-align: right;
+}
+
+.payroll-table input[type="number"] {
+  width: 100%;
+  text-align: right;
 }
 
 /* Extra highlight for important totals */

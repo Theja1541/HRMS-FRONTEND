@@ -70,7 +70,7 @@ export default function SalaryRevisionTable({ employeeId }) {
 
         <tbody>
 
-          {revisions.map((rev, index) => {
+          {revisions.map((rev) => {
 
             const change =
               (rev.ctc || 0) - (rev.previous_ctc || 0);
@@ -78,7 +78,7 @@ export default function SalaryRevisionTable({ employeeId }) {
             return (
               <tr key={rev.id}>
 
-                <td>{formatDate(rev.effective_date)}</td>
+                <td>{formatDate(rev.effective_from)}</td>
 
                 <td>{formatCurrency(rev.previous_ctc)}</td>
 

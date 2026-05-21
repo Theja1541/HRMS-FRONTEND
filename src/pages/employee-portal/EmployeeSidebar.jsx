@@ -1,16 +1,36 @@
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
 import { useState, useEffect } from "react";
+import { getEffectiveSystemSettings } from "../../api/superadmin";
 import "../../styles/employeeSidebar.css";
 
-export default function EmployeeSidebar() {
+export default function EmployeeSidebar({ lockoutActive = false }) {
   const { logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
+  const getBlockedStyle = (display = undefined) => {
+    const styleObj = {};
+    if (display !== undefined) {
+      styleObj.display = display;
+    }
+    if (lockoutActive) {
+      styleObj.pointerEvents = "none";
+      styleObj.opacity = 0.4;
+      styleObj.cursor = "not-allowed";
+    }
+    return styleObj;
+  };
+
   const [leaveOpen, setLeaveOpen] = useState(false);
   const [payslipOpen, setPayslipOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+  const [features, setFeatures] = useState({
+    attendance: true,
+    leave: true,
+    payroll: true,
+    assets: true,
+  });
 
   const handleLogout = () => {
     logout();
@@ -37,6 +57,29 @@ export default function EmployeeSidebar() {
 
   }, [location.pathname]);
 
+  useEffect(() => {
+    let cancelled = false;
+    getEffectiveSystemSettings()
+      .then((res) => {
+        if (!cancelled) {
+          setFeatures((prev) => ({ ...prev, ...(res.data?.features || {}) }));
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setFeatures({
+            attendance: true,
+            leave: true,
+            payroll: true,
+            assets: true,
+          });
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
 
@@ -55,24 +98,27 @@ export default function EmployeeSidebar() {
       {/* MENU */}
       <div className="sidebar-menu">
 
-        <NavLink to="/employee/dashboard" className="sidebar-item">
+        <NavLink to="/employee/dashboard" className="sidebar-item" style={getBlockedStyle()}>
           <span>🏠</span>
           {!collapsed && <span>Dashboard</span>}
         </NavLink>
 
-        <NavLink to="/employee/attendance" className="sidebar-item">
+        <NavLink to="/employee/attendance" className="sidebar-item" style={getBlockedStyle(features.attendance ? undefined : "none")}>
           <span>📅</span>
           {!collapsed && <span>My Attendance</span>}
         </NavLink>
 
         {/* LEAVES */}
-        {!collapsed && (
+        {features.leave && !collapsed && (
           <>
             <div
               className={`sidebar-item dropdown-parent ${leaveOpen ? "open" : ""}`}
+              style={getBlockedStyle()}
               onClick={() => {
-                setLeaveOpen(!leaveOpen);
-                setPayslipOpen(false);
+                if (!lockoutActive) {
+                  setLeaveOpen(!leaveOpen);
+                  setPayslipOpen(false);
+                }
               }}
             >
               <span>🍃</span>
@@ -83,15 +129,15 @@ export default function EmployeeSidebar() {
             <div className={`dropdown-wrapper ${leaveOpen ? "show" : ""}`}>
               <div>
 
-                <NavLink to="/employee/apply-leave" className="sidebar-item child">
+                <NavLink to="/employee/apply-leave" className="sidebar-item child" style={getBlockedStyle()}>
                   Apply Leave
                 </NavLink>
 
-                <NavLink to="/employee/my-leaves" className="sidebar-item child">
+                <NavLink to="/employee/my-leaves" className="sidebar-item child" style={getBlockedStyle()}>
                   My Leaves
                 </NavLink>
 
-                <NavLink to="/employee/leave-balance" className="sidebar-item child">
+                <NavLink to="/employee/leave-balance" className="sidebar-item child" style={getBlockedStyle()}>
                   Leave Balance
                 </NavLink>
 
@@ -100,20 +146,23 @@ export default function EmployeeSidebar() {
           </>
         )}
 
-        {collapsed && (
-          <NavLink to="/employee/apply-leave" className="sidebar-item">
+        {features.leave && collapsed && (
+          <NavLink to="/employee/apply-leave" className="sidebar-item" style={getBlockedStyle()}>
             <span>🍃</span>
           </NavLink>
         )}
 
         {/* PAYSLIPS */}
-        {!collapsed && (
+        {features.payroll && !collapsed && (
           <>
             <div
               className={`sidebar-item dropdown-parent ${payslipOpen ? "open" : ""}`}
+              style={getBlockedStyle()}
               onClick={() => {
-                setPayslipOpen(!payslipOpen);
-                setLeaveOpen(false);
+                if (!lockoutActive) {
+                  setPayslipOpen(!payslipOpen);
+                  setLeaveOpen(false);
+                }
               }}
             >
               <span>💰</span>
@@ -124,15 +173,15 @@ export default function EmployeeSidebar() {
             <div className={`dropdown-wrapper ${payslipOpen ? "show" : ""}`}>
               <div>
 
-                <NavLink to="/employee/my-payslips" className="sidebar-item child">
+                <NavLink to="/employee/my-payslips" className="sidebar-item child" style={getBlockedStyle()}>
                   My Payslips
                 </NavLink>
 
-                <NavLink to="/employee/my-salary" className="sidebar-item child">
+                <NavLink to="/employee/my-salary" className="sidebar-item child" style={getBlockedStyle()}>
                   My Salary
                 </NavLink>
 
-                <NavLink to="/employee/salary-timeline" className="sidebar-item child">
+                <NavLink to="/employee/salary-timeline" className="sidebar-item child" style={getBlockedStyle()}>
                   Salary Growth Timeline
                 </NavLink>
 
@@ -141,18 +190,18 @@ export default function EmployeeSidebar() {
           </>
         )}
 
-        {collapsed && (
-          <NavLink to="/employee/my-payslips" className="sidebar-item">
+        {features.payroll && collapsed && (
+          <NavLink to="/employee/my-payslips" className="sidebar-item" style={getBlockedStyle()}>
             <span>💰</span>
           </NavLink>
         )}
 
-        <NavLink to="/employee/profile" className="sidebar-item">
+        <NavLink to="/employee/profile" className="sidebar-item" style={getBlockedStyle()}>
           <span>👤</span>
           {!collapsed && <span>My Profile</span>}
         </NavLink>
 
-        <NavLink to="/employee/asset-returns" className="sidebar-item">
+        <NavLink to="/employee/asset-returns" className="sidebar-item" style={getBlockedStyle(features.assets ? undefined : "none")}>
           <span>📦</span>
           {!collapsed && <span>Asset Returns</span>}
         </NavLink>

@@ -2,7 +2,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import EmployeeStepForm from "./EmployeeStepForm";
 import "../../styles/addEmployee.css";
-import api from "../../api/axios"; // ✅ use same axios instance everywhere
+import { getEmployeeById } from "../../api/employees";
 
 export default function AddEmployee() {
   const { id } = useParams();
@@ -22,7 +22,7 @@ export default function AddEmployee() {
         setLoading(true);
         setError("");
 
-        const res = await api.get(`/employees/${id}/`);
+        const res = await getEmployeeById(id);
         setEmployeeToEdit(res.data);
 
       } catch (err) {
@@ -50,12 +50,17 @@ export default function AddEmployee() {
     <div className="add-employee-page">
       {/* ================= HEADER ================= */}
       <div className="add-employee-header">
-        <h2>{isEditMode ? "Edit Employee" : "Add New Employee"}</h2>
-        <p>
-          {isEditMode
-            ? "Update employee details"
-            : "Step-by-step employee onboarding"}
-        </p>
+        <div>
+          <h2>{isEditMode ? "Edit Employee" : "Add New Employee"}</h2>
+          <p>
+            {isEditMode
+              ? "Update employee details and documents"
+              : "Step-by-step employee onboarding"}
+          </p>
+        </div>
+        <button className="btn ghost header-back-btn" onClick={() => navigate("/employees")}>
+          Back to Employees
+        </button>
       </div>
 
       {/* ================= ERROR ================= */}
@@ -67,8 +72,9 @@ export default function AddEmployee() {
 
       {/* ================= LOADING ================= */}
       {loading ? (
-        <div className="loading-state">
-          Loading employee data...
+        <div className="loading-state card-loading">
+          <div className="spinner" />
+          <p>Loading employee data...</p>
         </div>
       ) : (
         <EmployeeStepForm employee={employeeToEdit} />

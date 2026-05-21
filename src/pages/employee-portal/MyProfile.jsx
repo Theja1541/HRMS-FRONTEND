@@ -225,6 +225,7 @@ export default function MyProfile() {
             <InfoItem label="Account Number" value={employee.bank_account_number} />
             <InfoItem label="IFSC Code" value={employee.bank_ifsc} />
             <InfoItem label="PAN Number" value={employee.pan_number} />
+            <InfoItem label="PF Number" value={employee.pf_number} />
             <InfoItem label="UAN Number" value={employee.uan_number} />
             <InfoItem label="ESI Number" value={employee.esi_number} />
           </div>

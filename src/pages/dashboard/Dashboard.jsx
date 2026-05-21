@@ -1,6 +1,7 @@
 import { useEmployees } from "../../context/EmployeesContext";
 import { useEffect, useState } from "react";
 import { getPayrollDashboardSummary } from "../../api/payroll";
+import { getLeaveRequests } from "../../api/leaves";
 import { useAuth } from "../../auth/AuthContext.jsx";
 import { getMyNotifications } from "../../api/notifications";
 import CountUp from "react-countup";
@@ -123,35 +124,33 @@ export default function Dashboard() {
   const [onLeaveToday, setOnLeaveToday] = useState(0);
 
   useEffect(() => {
+    function normalizeList(res) {
+      const data = res.data;
+      if (!data) return [];
+      return Array.isArray(data.results) ? data.results : (Array.isArray(data) ? data : []);
+    }
+
     async function fetchPendingLeaves() {
       try {
-        const res = await fetch('http://127.0.0.1:8000/api/leaves/requests/?status=PENDING', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-          }
-        });
-        const data = await res.json();
-        setPendingLeaves(data.length || 0);
+        const res = await getLeaveRequests({ status: "PENDING" });
+        const list = normalizeList(res);
+        setPendingLeaves(list.length);
       } catch (err) {
-        console.log('Failed to fetch pending leaves');
+        console.log("Failed to fetch pending leaves");
       }
     }
 
     async function fetchOnLeaveToday() {
       try {
-        const today = new Date().toISOString().split('T')[0];
-        const res = await fetch('http://127.0.0.1:8000/api/leaves/requests/?status=APPROVED', {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
-          }
-        });
-        const data = await res.json();
-        const todayLeaves = data.filter(leave => 
-          leave.start_date <= today && leave.end_date >= today
+        const res = await getLeaveRequests({ status: "APPROVED" });
+        const list = normalizeList(res);
+        const today = new Date().toISOString().split("T")[0];
+        const todayLeaves = list.filter(
+          (leave) => leave.start_date <= today && leave.end_date >= today
         );
-        setOnLeaveToday(todayLeaves.length || 0);
+        setOnLeaveToday(todayLeaves.length);
       } catch (err) {
-        console.log('Failed to fetch on leave today');
+        console.log("Failed to fetch on leave today");
       }
     }
 

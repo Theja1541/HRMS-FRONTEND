@@ -139,6 +139,7 @@ import api from "../../api/axios";
 import { getMyPayslips, downloadPayslipPDF } from "../../api/payroll";
 
 import companyLogo from "../../assets/company-logo.png";
+import { useAuth } from "../../auth/AuthContext";
 import CompensationDashboard from "../../components/payroll/CompensationDashboard";
 
 import CountUp from "react-countup";
@@ -156,6 +157,9 @@ import {
 } from "recharts";
 
 export default function MyPayslips() {
+
+  const { user } = useAuth();
+  const companyName = user?.company?.name || "HRMS";
 
   const [slips, setSlips] = useState([]);
   const [summary, setSummary] = useState(null);
@@ -547,7 +551,7 @@ export default function MyPayslips() {
               <img src={companyLogo} alt="Company Logo" />
 
               <div>
-                <h3>Genius Minds Making Code Pvt Ltd</h3>
+                <h3>{companyName}</h3>
                 <p>Official Salary Payslip</p>
               </div>
 

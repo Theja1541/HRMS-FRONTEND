@@ -1,0 +1,353 @@
+.create-user-page {
+  min-height: calc(100vh - 56px);
+  padding: 12px 16px 36px;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.create-user-shell {
+  width: min(880px, 100%);
+  margin: 0 auto;
+}
+
+.create-user-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  padding: 24px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+  margin-bottom: 20px;
+}
+
+.create-user-title {
+  margin-bottom: 8px;
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.create-user-header-actions,
+.create-user-form-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.create-user-btn {
+  border-radius: 10px;
+  height: 44px;
+  padding: 0 20px;
+  border: 1px solid transparent;
+  font-weight: 600;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.create-user-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.create-user-btn-secondary {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #334155;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.create-user-btn-secondary:hover:not(:disabled) {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.create-user-btn-primary {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.create-user-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+}
+
+.create-user-card {
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  padding: 32px;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+  background: #ffffff;
+}
+
+.create-user-section {
+  padding-bottom: 24px;
+  margin-bottom: 28px;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+.create-user-section:last-of-type {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.create-user-section-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.create-user-section-title::before {
+  content: '';
+  width: 4px;
+  height: 4px;
+  background: #2563eb;
+  border-radius: 50%;
+}
+
+.create-user-field {
+  margin-bottom: 20px;
+}
+
+.create-user-field label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 8px;
+  letter-spacing: 0.3px;
+}
+
+.create-user-search,
+.create-user-field input,
+.create-user-field select {
+  width: 100%;
+  height: 44px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 0 14px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background: #ffffff;
+  font-family: inherit;
+  color: #0f172a;
+}
+
+.create-user-search {
+  margin-bottom: 10px;
+  height: 40px;
+}
+
+.create-user-field input::placeholder,
+.create-user-field select::placeholder,
+.create-user-search::placeholder {
+  color: #94a3b8;
+}
+
+.create-user-field input:hover,
+.create-user-field select:hover,
+.create-user-search:hover {
+  background: #f8fafc;
+  border-color: #94a3b8;
+}
+
+.create-user-field input:focus,
+.create-user-field select:focus,
+.create-user-search:focus {
+  outline: none;
+  border-color: #2563eb;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12), inset 0 0 0 1px rgba(37, 99, 235, 0.2);
+}
+
+.create-user-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.create-user-hint {
+  font-size: 12.5px;
+  color: #64748b;
+  margin-top: 6px;
+  line-height: 1.5;
+}
+
+.create-user-field-error {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #b91c1c;
+  font-weight: 500;
+}
+
+.create-user-error {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1.5px solid #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.create-user-info {
+  background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
+  color: #1e3a8a;
+  border: 1.5px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 13.5px;
+  line-height: 1.6;
+  margin-bottom: 16px;
+}
+
+.create-user-form-actions {
+  justify-content: flex-end;
+  margin-top: 12px;
+}
+
+.create-user-permission-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #f0f9ff 100%);
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.create-user-permission-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 12px;
+}
+
+.create-user-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  color: #334155;
+  margin-bottom: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.create-user-checkbox:last-child {
+  margin-bottom: 0;
+}
+
+.create-user-checkbox input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #2563eb;
+}
+
+.create-user-spinner-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.create-user-spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 1024px) {
+  .create-user-shell {
+    width: min(100%, 100%);
+  }
+
+  .create-user-card {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .create-user-page {
+    padding: 8px 12px 32px;
+  }
+
+  .create-user-shell {
+    width: 100%;
+  }
+
+  .create-user-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .create-user-title {
+    font-size: 22px;
+  }
+
+  .create-user-header-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .create-user-btn {
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .create-user-card {
+    padding: 20px;
+    border-radius: 12px;
+  }
+
+  .create-user-section {
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+  }
+
+  .create-user-section-title {
+    font-size: 15px;
+    margin-bottom: 14px;
+  }
+
+  .create-user-field {
+    margin-bottom: 16px;
+  }
+
+  .create-user-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .create-user-search,
+  .create-user-field input,
+  .create-user-field select {
+    height: 42px;
+    font-size: 16px;
+    padding: 0 12px;
+  }
+}

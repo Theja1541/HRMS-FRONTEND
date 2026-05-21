@@ -1,427 +1,14 @@
-// import { useState, useEffect } from "react";
-// import { useNavigate } from "react-router-dom";
-// import { useEmployees } from "../../context/EmployeesContext";
-// import { checkEmployeeId } from "../../api/employees";
-// import "../../styles/addEmployee.css";
-
-// const steps = [
-//   "Personal Info",
-//   "Job Details",
-//   "Salary & Compliance",
-//   "Documents",
-//   "Emergency Details",
-// ];
-
-// export default function EmployeeStepForm({ employee }) {
-//   const { addEmployee, updateEmployee } = useEmployees();
-//   const navigate = useNavigate();
-
-//   const [step, setStep] = useState(0);
-//   const [direction, setDirection] = useState("forward");
-
-//   const [idChecking, setIdChecking] = useState(false);
-//   const [idExists, setIdExists] = useState(false);
-//   const [idTouched, setIdTouched] = useState(false);
-
-//   const [form, setForm] = useState({
-//     employee_id: "",
-
-//     first_name: "",
-//     last_name: "",
-//     email: "",
-//     mobile: "",
-//     dob: "",
-//     gender: "",
-//     address: "",
-//     blood_group: "",
-//     nationality: "",
-
-//     department: "",
-//     designation: "",
-//     employment_type: "Full-time",
-//     joining_date: "",
-//     work_location: "",
-//     reporting_manager: "",
-//     is_active: true,
-
-//     basic_salary: "",
-//     allowances: "",
-//     deductions: "",
-
-//     bank_name: "",
-//     account_number: "",
-//     ifsc: "",
-//     pan: "",
-
-//     pf_applicable: false,
-//     esi_applicable: false,
-//     pt_applicable: false,
-//     uan_number: "",
-//     esi_number: "",
-
-//     emergency_name: "",
-//     emergency_number: "",
-//     notes: "",
-
-//     profile_photo: null,
-//     resume: null,
-//     offer_letter: null,
-//     id_proof: null,
-//     address_proof: null,
-//     education_cert: null,
-//     experience_cert: null,
-//   });
-
-//   /* ================= LOAD EDIT DATA ================= */
-//   useEffect(() => {
-//   if (!form.employee_id || employee?.id) return;
-
-//   const delay = setTimeout(async () => {
-//     try {
-//       setIdChecking(true);
-
-//       const res = await fetch(
-//         `http://127.0.0.1:8000/api/employees/check-id/?employee_id=${form.employee_id}`
-//       );
-
-//       const data = await res.json();
-
-//       setIdExists(data.exists);
-//     } catch (error) {
-//       console.error("ID check failed", error);
-//     } finally {
-//       setIdChecking(false);
-//     }
-//   }, 500); // debounce 500ms
-
-//   return () => clearTimeout(delay);
-// }, [form.employee_id]);
-
-
-//   const update = (field, value) => {
-//     setForm((prev) => ({ ...prev, [field]: value }));
-//   };
-
-//   const handleNext = () => {
-//     setDirection("forward");
-//     setStep((prev) => prev + 1);
-//   };
-
-//   const handleBack = () => {
-//     setDirection("backward");
-//     setStep((prev) => prev - 1);
-//   };
-
-//   /* ================= SAVE ================= */
-//   const handleSave = async () => {
-//     if (!form.employee_id) {
-//       alert("Employee ID is required");
-//       return;
-//     }
-
-//     const formData = new FormData();
-
-//     const fileFields = [
-//       "profile_photo",
-//       "resume",
-//       "offer_letter",
-//       "id_proof",
-//       "address_proof",
-//       "education_cert",
-//       "experience_cert",
-//     ];
-
-//     Object.keys(form).forEach((key) => {
-//       const value = form[key];
-
-//       if (fileFields.includes(key)) {
-//         if (value instanceof File) {
-//           formData.append(key, value);
-//         }
-//       } else {
-//         if (value !== null && value !== undefined) {
-//           formData.append(key, value);
-//         }
-//       }
-//     });
-
-//     const result = employee?.id
-//       ? await updateEmployee(employee.id, formData)
-//       : await addEmployee(formData);
-
-//     if (!result?.success) {
-//       alert(result?.error || "Failed to save employee");
-//       return;
-//     }
-
-//     navigate("/employees");
-//   };
-
-//   return (
-//     <div className="step-form-card">
-//       {/* ================= STEPPER ================= */}
-//       <div className="stepper">
-//         {steps.map((label, i) => (
-//           <div key={i} className={`step ${i <= step ? "active" : ""}`}>
-//             <span>{i + 1}</span>
-//             <p>{label}</p>
-//           </div>
-//         ))}
-//       </div>
-
-//       <div className={`form-grid step-animate ${direction}`}>
-//         {/* ================= STEP 1 ================= */}
-//         {step === 0 && (
-//           <>
-//             <div className="form-field">
-//               <label>Employee ID *</label>
-//               <input
-//                 value={form.employee_id}
-//                 onChange={(e) => {
-//                   update("employee_id", e.target.value);
-//                   setIdTouched(true);
-//                 }}
-//               />
-
-//               {idChecking && <small style={{ color: "#64748b" }}>Checking...</small>}
-
-//               {!idChecking && idTouched && form.employee_id && (
-//                 idExists ? (
-//                   <small style={{ color: "red" }}>
-//                     ❌ Employee ID already exists
-//                   </small>
-//                 ) : (
-//                   <small style={{ color: "green" }}>
-//                     ✅ Employee ID available
-//                   </small>
-//                 )
-//               )}
-//             </div>
-
-//             <Input label="First Name *" value={form.first_name}
-//               onChange={(e)=>update("first_name", e.target.value)} />
-
-//             <Input label="Last Name" value={form.last_name}
-//               onChange={(e)=>update("last_name", e.target.value)} />
-
-//             <Input label="Email *" value={form.email}
-//               onChange={(e)=>update("email", e.target.value)} />
-
-//             <Input label="Mobile" value={form.mobile}
-//               onChange={(e)=>update("mobile", e.target.value)} />
-
-//             <Input type="date" label="Date of Birth"
-//               value={form.dob}
-//               onChange={(e)=>update("dob", e.target.value)} />
-
-//             <Input label="Gender"
-//               value={form.gender}
-//               onChange={(e)=>update("gender", e.target.value)} />
-
-//             <Input label="Address"
-//               value={form.address}
-//               onChange={(e)=>update("address", e.target.value)} />
-
-//             <FileUpload label="Profile Photo"
-//               accept="image/*"
-//               value={form.profile_photo}
-//               onChange={(file)=>update("profile_photo", file)} />
-//           </>
-//         )}
-
-//         {/* ================= STEP 2 ================= */}
-//         {step === 1 && (
-//           <>
-//             <Input label="Department"
-//               value={form.department}
-//               onChange={(e)=>update("department", e.target.value)} />
-
-//             <Input label="Designation"
-//               value={form.designation}
-//               onChange={(e)=>update("designation", e.target.value)} />
-
-//             <Input type="date" label="Joining Date"
-//               value={form.joining_date}
-//               onChange={(e)=>update("joining_date", e.target.value)} />
-
-//             <Input label="Work Location"
-//               value={form.work_location}
-//               onChange={(e)=>update("work_location", e.target.value)} />
-
-//             <Input label="Reporting Manager"
-//               value={form.reporting_manager}
-//               onChange={(e)=>update("reporting_manager", e.target.value)} />
-
-//             <div className="checkbox-field">
-//               <label>
-//                 <input
-//                   type="checkbox"
-//                   checked={form.is_active}
-//                   onChange={(e)=>update("is_active", e.target.checked)}
-//                 />
-//                 Active Employee
-//               </label>
-//             </div>
-//           </>
-//         )}
-
-//         {/* ================= STEP 3 ================= */}
-//         {step === 2 && (
-//           <>
-//             <Input label="Basic Salary"
-//               value={form.basic_salary}
-//               onChange={(e)=>update("basic_salary", e.target.value)} />
-
-//             <Input label="Allowances"
-//               value={form.allowances}
-//               onChange={(e)=>update("allowances", e.target.value)} />
-
-//             <Input label="Deductions"
-//               value={form.deductions}
-//               onChange={(e)=>update("deductions", e.target.value)} />
-
-//             <Input label="Bank Name"
-//               value={form.bank_name}
-//               onChange={(e)=>update("bank_name", e.target.value)} />
-
-//             <Input label="Account Number"
-//               value={form.account_number}
-//               onChange={(e)=>update("account_number", e.target.value)} />
-
-//             <Input label="IFSC Code"
-//               value={form.ifsc}
-//               onChange={(e)=>update("ifsc", e.target.value)} />
-
-//             <Input label="PAN Number"
-//               value={form.pan}
-//               onChange={(e)=>update("pan", e.target.value)} />
-
-//             <div className="checkbox-field">
-//               <label>
-//                 <input
-//                   type="checkbox"
-//                   checked={form.pf_applicable}
-//                   onChange={(e)=>update("pf_applicable", e.target.checked)}
-//                 />
-//                 PF Applicable
-//               </label>
-//             </div>
-
-//             {form.pf_applicable && (
-//               <Input label="UAN Number"
-//                 value={form.uan_number}
-//                 onChange={(e)=>update("uan_number", e.target.value)} />
-//             )}
-
-//             <div className="checkbox-field">
-//               <label>
-//                 <input
-//                   type="checkbox"
-//                   checked={form.esi_applicable}
-//                   onChange={(e)=>update("esi_applicable", e.target.checked)}
-//                 />
-//                 ESI Applicable
-//               </label>
-//             </div>
-
-//             {form.esi_applicable && (
-//               <Input label="ESI Number"
-//                 value={form.esi_number}
-//                 onChange={(e)=>update("esi_number", e.target.value)} />
-//             )}
-
-//             <div className="checkbox-field">
-//               <label>
-//                 <input
-//                   type="checkbox"
-//                   checked={form.pt_applicable}
-//                   onChange={(e)=>update("pt_applicable", e.target.checked)}
-//                 />
-//                 Professional Tax Applicable
-//               </label>
-//             </div>
-//           </>
-//         )}
-
-//         {/* ================= STEP 4 ================= */}
-//         {step === 3 && (
-//           <>
-//             <FileUpload label="Resume" accept=".pdf,.doc,.docx"
-//               value={form.resume}
-//               onChange={(file)=>update("resume", file)} />
-
-//             <FileUpload label="Offer Letter"
-//               value={form.offer_letter}
-//               onChange={(file)=>update("offer_letter", file)} />
-
-//             <FileUpload label="ID Proof"
-//               value={form.id_proof}
-//               onChange={(file)=>update("id_proof", file)} />
-
-//             <FileUpload label="Address Proof"
-//               value={form.address_proof}
-//               onChange={(file)=>update("address_proof", file)} />
-//           </>
-//         )}
-
-//         {/* ================= STEP 5 ================= */}
-//         {step === 4 && (
-//           <>
-//             <Input label="Emergency Name"
-//               value={form.emergency_name}
-//               onChange={(e)=>update("emergency_name", e.target.value)} />
-
-//             <Input label="Emergency Number"
-//               value={form.emergency_number}
-//               onChange={(e)=>update("emergency_number", e.target.value)} />
-
-//             <Input label="Blood Group"
-//               value={form.blood_group}
-//               onChange={(e)=>update("blood_group", e.target.value)} />
-
-//             <Input label="Nationality"
-//               value={form.nationality}
-//               onChange={(e)=>update("nationality", e.target.value)} />
-
-//             <textarea
-//               placeholder="Notes"
-//               value={form.notes}
-//               onChange={(e)=>update("notes", e.target.value)}
-//             />
-//           </>
-//         )}
-//       </div>
-
-//       <div className="step-actions">
-//         {step > 0 && (
-//           <button className="btn ghost" onClick={handleBack}>
-//             Back
-//           </button>
-//         )}
-
-//         {step < steps.length - 1 ? (
-//           <button className="btn primary" onClick={handleNext}>
-//             Next
-//           </button>
-//         ) : (
-//           <button className="btn primary" onClick={handleSave} disabled={idExists || idChecking}>
-//             Save Employee
-//           </button>
-//         )}
-//       </div>
-//     </div>
-//   );
-// }
-
-// /* ================= INPUT COMPONENT ================= */
-
-
-
-
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEmployees } from "../../context/EmployeesContext";
-import { checkEmployeeId } from "../../api/employees";
+import { checkEmployeeId, getEmployeeDepartments, getEmployeeRoles } from "../../api/employees";
+import { formatINR } from "../../utils/currency";
+import {
+  buildCalculatedSalaryPayload,
+  calculatePayroll,
+  toAmount,
+  yearlyAmount,
+} from "../../utils/payrollCalculations";
 import "../../styles/addEmployee.css";
 
 const steps = [
@@ -472,6 +59,7 @@ export default function EmployeeStepForm({ employee }) {
     account_number: "",
     ifsc: "",
     pan: "",
+    pf_number: "",
 
     pf_applicable: false,
     esi_applicable: false,
@@ -532,14 +120,8 @@ export default function EmployeeStepForm({ employee }) {
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        const token = localStorage.getItem('accessToken');
-        const res = await fetch('http://127.0.0.1:8000/api/employees/roles/', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        const data = await res.json();
-        setCustomRoles(data.roles || []);
+        const res = await getEmployeeRoles();
+        setCustomRoles(res.data.roles || []);
       } catch (err) {
         console.error('Failed to fetch roles', err);
       }
@@ -547,14 +129,8 @@ export default function EmployeeStepForm({ employee }) {
     
     const fetchDepartments = async () => {
       try {
-        const token = localStorage.getItem('accessToken');
-        const res = await fetch('http://127.0.0.1:8000/api/employees/departments/', {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        const data = await res.json();
-        setCustomDepartments(data.departments || []);
+        const res = await getEmployeeDepartments();
+        setCustomDepartments(res.data.departments || []);
       } catch (err) {
         console.error('Failed to fetch departments', err);
       }
@@ -625,7 +201,7 @@ export default function EmployeeStepForm({ employee }) {
     }
 
     if (currentStep === 2) {
-      if (!salary.basic || Number(salary.basic) <= 0) {
+      if (toAmount(salary.basic) <= 0) {
         newErrors.basic = "Basic salary is required";
       }
     }
@@ -633,6 +209,12 @@ export default function EmployeeStepForm({ employee }) {
     if (currentStep === 3) {
       if (form.account_number && !/^[0-9]{9,18}$/.test(form.account_number)) {
         newErrors.account_number = "Account number must be 9-18 digits";
+      }
+      if (form.pf_number && form.pf_number.trim().length > 50) {
+        newErrors.pf_number = "PF Number must be 50 characters or fewer";
+      }
+      if (form.uan_number && !/^[0-9]{12}$/.test(form.uan_number)) {
+        newErrors.uan_number = "UAN must be exactly 12 digits";
       }
       if (form.pan && !/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(form.pan)) {
         newErrors.pan = "Invalid PAN format (e.g., ABCDE1234F)";
@@ -695,7 +277,7 @@ export default function EmployeeStepForm({ employee }) {
     }
   });
 
-  formData.append("salary", JSON.stringify(salary));
+  formData.append("salary", JSON.stringify(salaryPayload));
 
   const result = employee?.id
     ? await updateEmployee(employee.id, formData)
@@ -709,31 +291,9 @@ export default function EmployeeStepForm({ employee }) {
   navigate("/employees");
 };
 
-  const gross =
-    Number(salary.basic || 0) +
-    Number(salary.da || 0) +
-    Number(salary.hra || 0) +
-    Number(salary.conveyance || 0) +
-    Number(salary.medical || 0) +
-    Number(salary.special_allowance || 0);
-
-  const totalDeductions =
-    Number(salary.employee_pf || 0) +
-    Number(salary.professional_tax || 0) +
-    Number(salary.employee_esi || 0) +
-    Number(salary.tds || 0) +
-    Number(salary.medical_insurance || 0);
-
-  const netSalary = gross - totalDeductions;
-
-  const additionalBenefits =
-    Number(salary.employer_pf || 0) +
-    Number(salary.employer_esi || 0) +
-    Number(salary.gratuity || 0);
-
-  const ctc = gross + additionalBenefits;
-
-  console.log("Current step:", step);
+  const payroll = useMemo(() => calculatePayroll(salary), [salary]);
+  const salaryPayload = useMemo(() => buildCalculatedSalaryPayload(salary), [salary]);
+  const { gross, totalDeductions, netSalary, additionalBenefits, ctc } = payroll;
 
   return (
     <div className="step-form-card">
@@ -864,7 +424,7 @@ export default function EmployeeStepForm({ employee }) {
                   <option key={index} value={dept}>{dept}</option>
                 ))}
               </select>
-              {errors.department && <small style={{ color: "red", fontSize: "12px" }}>{errors.department}</small>}
+              {errors.department && <small className="error-text">{errors.department}</small>}
             </div>
 
             <Input label="Designation *"
@@ -900,29 +460,33 @@ export default function EmployeeStepForm({ employee }) {
               </thead>
 
               <tbody>
+                <SectionRow label="Earnings (A)" />
                 <SalaryRow label="Basic" field="basic" salary={salary} setSalary={updateSalary} error={errors.basic} />
                 <SalaryRow label="DA" field="da" salary={salary} setSalary={updateSalary} />
                 <SalaryRow label="HRA" field="hra" salary={salary} setSalary={updateSalary} />
-                <SalaryRow label="Conveyance" field="conveyance" salary={salary} setSalary={updateSalary} />
-                <SalaryRow label="Medical" field="medical" salary={salary} setSalary={updateSalary} />
+                <SalaryRow label="Conveyance Allowance" field="conveyance" salary={salary} setSalary={updateSalary} />
+                <SalaryRow label="Medical Allowance" field="medical" salary={salary} setSalary={updateSalary} />
                 <SalaryRow label="Special Allowance" field="special_allowance" salary={salary} setSalary={updateSalary} />
 
-                <SummaryRow label="Gross Salary (A)" value={gross} />
+                <SummaryRow label="Gross Salary (A)" value={gross} className="summary-gross" />
 
+                <SectionRow label="Deductions (B)" />
                 <SalaryRow label="Employee PF" field="employee_pf" salary={salary} setSalary={updateSalary} />
                 <SalaryRow label="Professional Tax" field="professional_tax" salary={salary} setSalary={updateSalary} />
                 <SalaryRow label="Employee ESI" field="employee_esi" salary={salary} setSalary={updateSalary} />
                 <SalaryRow label="TDS" field="tds" salary={salary} setSalary={updateSalary} />
                 <SalaryRow label="Medical Insurance" field="medical_insurance" salary={salary} setSalary={updateSalary} />
 
-                <SummaryRow label="Total Deductions (B)" value={totalDeductions} />
-                <SummaryRow label="Net Salary (A - B)" value={netSalary} />
+                <SummaryRow label="Total Deductions (B)" value={totalDeductions} className="summary-deduction" />
+                <SummaryRow label="Net Salary (A - B)" value={netSalary} className="summary-net" />
 
+                <SectionRow label="Employer Contributions" />
                 <SalaryRow label="Employer PF" field="employer_pf" salary={salary} setSalary={updateSalary} />
                 <SalaryRow label="Employer ESI" field="employer_esi" salary={salary} setSalary={updateSalary} />
                 <SalaryRow label="Gratuity" field="gratuity" salary={salary} setSalary={updateSalary} />
 
-                <SummaryRow label="CTC (A + C)" value={ctc} />
+                <SummaryRow label="Additional Benefits (C)" value={additionalBenefits} className="summary-benefits" />
+                <SummaryRow label="CTC (A + C)" value={ctc} className="summary-ctc" />
               </tbody>
             </table>
 
@@ -932,6 +496,23 @@ export default function EmployeeStepForm({ employee }) {
         {/* ================= STEP 3 ================= */}
         {step === 3 && (
           <>
+            {/* Keep UAN visible for all employees; it remains optional unless provided. */}
+            <Input label="UAN Number"
+              value={form.uan_number || ""}
+              onChange={(e)=>update("uan_number", e.target.value.replace(/\D/g, ""))}
+              maxLength={12}
+              helperText="12-digit number issued by EPFO."
+              error={errors.uan_number}
+            />
+
+            <Input label="PF Number"
+              value={form.pf_number || ""}
+              onChange={(e)=>update("pf_number", e.target.value)}
+              maxLength={50}
+              helperText="Provident Fund membership/account number."
+              error={errors.pf_number}
+            />
+
             <Input label="Bank Name"
               value={form.bank_name}
               onChange={(e)=>update("bank_name", e.target.value)}
@@ -1066,11 +647,12 @@ export default function EmployeeStepForm({ employee }) {
   );
 }
 
-const Input = ({ label, error, ...props }) => (
+const Input = ({ label, error, helperText, ...props }) => (
   <div className="form-field">
     <label>{label}</label>
-    <input {...props} />
-    {error && <small style={{ color: "red", fontSize: "12px" }}>{error}</small>}
+    <input {...props} className={error ? "input-error" : ""} />
+    {helperText && <small style={{ color: "#64748b" }}>{helperText}</small>}
+    {error && <small className="error-text">{error}</small>}
   </div>
 );
 
@@ -1084,7 +666,7 @@ const FileField = ({ label, accept, currentFile, onChange }) => {
     <div className="form-field">
       <label>{label}</label>
       {currentFile && typeof currentFile === 'string' && (
-        <div style={{ marginBottom: '8px', fontSize: '14px', color: '#64748b' }}>
+        <div className="current-file-text">
           Current: <a href={currentFile} target="_blank" rel="noopener noreferrer">{getFileName(currentFile)}</a>
         </div>
       )}
@@ -1098,8 +680,20 @@ const FileField = ({ label, accept, currentFile, onChange }) => {
 };
 
 
-const SalaryRow = ({ label, field, salary, setSalary, error }) => {
-  const value = salary[field] || "";
+const SectionRow = ({ label }) => (
+  <tr className="bold-row">
+    <td colSpan="3">{label}</td>
+  </tr>
+);
+
+const SalaryRow = ({
+  label,
+  field,
+  salary,
+  setSalary,
+  error,
+}) => {
+  const value = salary[field] ?? "";
 
   return (
     <>
@@ -1110,17 +704,19 @@ const SalaryRow = ({ label, field, salary, setSalary, error }) => {
             type="number"
             value={value}
             onChange={(e) => setSalary(field, e.target.value)}
-            style={error ? { borderColor: "red" } : {}}
+            className={error ? "input-error" : ""}
+            step="0.01"
+            min="0"
           />
         </td>
         <td>
-          ₹ {(Number(value || 0) * 12).toLocaleString("en-IN")}
+          {formatINR(yearlyAmount(value))}
         </td>
       </tr>
       {error && (
         <tr>
           <td colSpan="3">
-            <small style={{ color: "red", fontSize: "12px" }}>{error}</small>
+            <small className="error-text">{error}</small>
           </td>
         </tr>
       )}
@@ -1128,10 +724,10 @@ const SalaryRow = ({ label, field, salary, setSalary, error }) => {
   );
 };
 
-const SummaryRow = ({ label, value }) => (
-  <tr className="bold-row">
+const SummaryRow = ({ label, value, className = "" }) => (
+  <tr className={`bold-row ${className}`}>
     <td>{label}</td>
-    <td>₹ {Number(value).toLocaleString("en-IN")}</td>
-    <td>₹ {(Number(value) * 12).toLocaleString("en-IN")}</td>
+    <td>{formatINR(value)}</td>
+    <td>{formatINR(yearlyAmount(value))}</td>
   </tr>
 );

@@ -1,7 +1,5 @@
 import { Outlet, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../../auth/AuthContext";
-import "../../styles/superadmin.css";
-
 export default function SuperAdminLayout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
@@ -21,11 +19,27 @@ export default function SuperAdminLayout() {
           Dashboard
         </NavLink>
 
-        <NavLink to="/super-admin/users">
+        <NavLink to="/super-admin/companies">
+          Companies
+        </NavLink>
+
+        <NavLink to="/super-admin/manage-users">
           Manage Users
         </NavLink>
 
-        <NavLink to="/super-admin/system">
+        <NavLink to="/super-admin/create-user">
+          Create User / Company Admin
+        </NavLink>
+
+        <NavLink to="/super-admin/audit">
+          Audit Logs
+        </NavLink>
+
+        <NavLink to="/super-admin/notifications">
+          Send Notification
+        </NavLink>
+
+        <NavLink to="/super-admin/settings">
           System Settings
         </NavLink>
 

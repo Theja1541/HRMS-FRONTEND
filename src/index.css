@@ -1,3 +1,5 @@
+@import './styles/mobile.css';
+
 /* =========================
    GLOBAL RESET
 ========================= */
@@ -123,6 +125,5 @@ td {
 
 
 /* =========================
-   MOBILE RESPONSIVENESS
+   MOBILE RESPONSIVENESS (in mobile.css, imported at top)
 ========================= */
-@import './styles/mobile.css';

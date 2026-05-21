@@ -39,6 +39,7 @@ export default function Attendance() {
   return attendance?.[today]?.[String(empId)] || null;
 };
 
+
   /* ===============================
      BULK ATTENDANCE
   =============================== */
@@ -115,14 +116,18 @@ export default function Attendance() {
 
                   <td>
                     <div className="attendance-actions">
-
                       <button
                         className={`att-btn present ${
                           status === "PRESENT" ? "active" : ""
                         }`}
-                        onClick={() =>
-                          markAttendance(today, emp.id, "PRESENT")
-                        }
+                        onClick={async () => {
+                          try {
+                            await markAttendance(today, emp.id, "PRESENT");
+                            toast.success("Marked Present");
+                          } catch {
+                            toast.error("Failed to mark attendance");
+                          }
+                        }}
                         disabled={isLocked}
                       >
                         Present
@@ -132,9 +137,15 @@ export default function Attendance() {
                         className={`att-btn leave ${
                           status === "HALF_DAY" ? "active" : ""
                         }`}
-                        onClick={() =>
-                          markAttendance(today, emp.id, "HALF_DAY")
-                        }
+                        onClick={async () => {
+                          try {
+                            await markAttendance(today, emp.id, "HALF_DAY");
+                            toast.success("Marked Half Day");
+                          } catch {
+                            toast.error("Failed to mark attendance");
+                          }
+                        }}
+                        disabled={isLocked}
                       >
                         Half Day
                       </button>
@@ -143,9 +154,15 @@ export default function Attendance() {
                         className={`att-btn leave ${
                           status === "PAID_LEAVE" ? "active" : ""
                         }`}
-                        onClick={() =>
-                          markAttendance(today, emp.id, "PAID_LEAVE")
-                        }
+                        onClick={async () => {
+                          try {
+                            await markAttendance(today, emp.id, "PAID_LEAVE");
+                            toast.success("Marked Paid Leave");
+                          } catch {
+                            toast.error("Failed to mark attendance");
+                          }
+                        }}
+                        disabled={isLocked}
                       >
                         Paid Leave
                       </button>
@@ -154,9 +171,15 @@ export default function Attendance() {
                         className={`att-btn leave ${
                           status === "UNPAID_LEAVE" ? "active" : ""
                         }`}
-                        onClick={() =>
-                          markAttendance(today, emp.id, "UNPAID_LEAVE")
-                        }
+                        onClick={async () => {
+                          try {
+                            await markAttendance(today, emp.id, "UNPAID_LEAVE");
+                            toast.success("Marked Unpaid Leave");
+                          } catch {
+                            toast.error("Failed to mark attendance");
+                          }
+                        }}
+                        disabled={isLocked}
                       >
                         Unpaid Leave
                       </button>
@@ -165,13 +188,18 @@ export default function Attendance() {
                         className={`att-btn absent ${
                           status === "ABSENT" ? "active" : ""
                         }`}
-                        onClick={() =>
-                          markAttendance(today, emp.id, "ABSENT")
-                        }
+                        onClick={async () => {
+                          try {
+                            await markAttendance(today, emp.id, "ABSENT");
+                            toast.success("Marked Absent");
+                          } catch {
+                            toast.error("Failed to mark attendance");
+                          }
+                        }}
+                        disabled={isLocked}
                       >
                         Absent
                       </button>
-
                     </div>
                   </td>
                 </tr>
