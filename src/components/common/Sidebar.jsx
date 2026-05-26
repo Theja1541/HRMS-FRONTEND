@@ -6,6 +6,7 @@ export default function Sidebar({ isOpen, onClose }) {
   const [collapsed, setCollapsed] = useState(false);
   const [openLeaves, setOpenLeaves] = useState(false);
   const [openPayroll, setOpenPayroll] = useState(false);
+  const [openDaybook, setOpenDaybook] = useState(false);
   const [openAssets, setOpenAssets] = useState(false);
 
   return (
@@ -107,6 +108,15 @@ export default function Sidebar({ isOpen, onClose }) {
         </div>
       )}
 
+        {/* DAYBOOK DROPDOWN */}
+        <div
+          className="sidebar-item dropdown"
+          onClick={() => setOpenDaybook(!openDaybook)}
+        >
+          📒 {!collapsed && "Daybook"}
+          {!collapsed && (
+            <span className="dropdown-arrow">
+              {openDaybook ? "▲" : "▼"}
         {/* ASSETS DROPDOWN */}
         <div
           className="sidebar-item dropdown"
@@ -120,6 +130,28 @@ export default function Sidebar({ isOpen, onClose }) {
           )}
         </div>
 
+        {openDaybook && !collapsed && (
+          <div className="sidebar-dropdown-menu">
+            <NavLink to="/daybook/dashboard" className="sidebar-subitem">
+              📊 Dashboard
+            </NavLink>
+            <NavLink to="/daybook/transactions" className="sidebar-subitem">
+              💳 Transactions
+            </NavLink>
+            {/* <NavLink to="/daybook/add-transaction" className="sidebar-subitem">
+              ➕ Add Transaction
+            </NavLink> */}
+            <NavLink to="/daybook/vendors" className="sidebar-subitem">
+              🏢 Vendors
+            </NavLink>
+            <NavLink to="/daybook/categories" className="sidebar-subitem">
+              📁 Categories
+            </NavLink>
+            <NavLink to="/daybook/reports" className="sidebar-subitem">
+              📈 Reports
+            </NavLink>
+          </div>
+        )}
         {openAssets && !collapsed && (
           <div className="sidebar-dropdown-menu">
             <NavLink to="/assets" className="sidebar-subitem" onClick={onClose}>

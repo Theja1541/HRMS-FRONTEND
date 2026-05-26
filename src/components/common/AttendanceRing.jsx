@@ -5,7 +5,7 @@ export default function AttendanceRing({
   size = 140,
   strokeWidth = 10,
 }) {
-
+//Hai from AnilKumar
   const [progress, setProgress] = useState(0);
   const animationRef = useRef(null);
   const previousValue = useRef(0);
