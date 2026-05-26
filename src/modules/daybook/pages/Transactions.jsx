@@ -115,6 +115,7 @@ export default function Transactions() {
                   <td>{t.from_vendor_name || t.to_vendor_name || "-"}</td>
                   <td className="actions-cell">
                     <div className="action-buttons">
+                      <button className="action-btn" style={{ backgroundColor: "#3b82f6", color: "#fff", border: "none" }} onClick={(e) => { e.preventDefault(); navigate(`/daybook/transactions/invoice/${t.id}`); }}>Invoice</button>
                       <button className="action-btn action-btn-edit" onClick={() => navigate(`/daybook/transactions/edit/${t.id}`)}>Edit</button>
                       <button className="action-btn action-btn-deactivate" onClick={() => handleDelete(t.id)}>Delete</button>
                     </div>

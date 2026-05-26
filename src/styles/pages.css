@@ -236,7 +236,7 @@
 /* Table wrapper for responsive overflow */
 .table-wrapper {
   width: 100%;
-  overflow-x: auto;
+  overflow-x: visible;
   -webkit-overflow-scrolling: touch;
   border-radius: 10px;
   border: 1px solid #e5e7eb;

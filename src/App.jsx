@@ -90,6 +90,8 @@ import DaybookTransactionForm from "./modules/daybook/pages/TransactionForm";
 import DaybookVendors from "./modules/daybook/pages/Vendors";
 import DaybookCategories from "./modules/daybook/pages/Categories";
 import DaybookReports from "./modules/daybook/pages/Reports";
+import DaybookInvoiceView from "./modules/daybook/pages/DaybookInvoiceView";
+
 function ModuleRoute({ module, children }) {
   const [allowed, setAllowed] = useState(null);
 
@@ -336,6 +338,7 @@ export default function App() {
             <Route path="daybook/transactions" element={<ModuleRoute module="daybook"><DaybookTransactions /></ModuleRoute>} />
             <Route path="daybook/transactions/add" element={<ModuleRoute module="daybook"><DaybookTransactionForm /></ModuleRoute>} />
             <Route path="daybook/transactions/edit/:id" element={<ModuleRoute module="daybook"><DaybookTransactionForm /></ModuleRoute>} />
+            <Route path="daybook/transactions/invoice/:id" element={<ModuleRoute module="daybook"><DaybookInvoiceView /></ModuleRoute>} />
             <Route path="daybook/vendors" element={<ModuleRoute module="daybook"><DaybookVendors /></ModuleRoute>} />
             <Route path="daybook/categories" element={<ModuleRoute module="daybook"><DaybookCategories /></ModuleRoute>} />
             <Route path="daybook/reports" element={<ModuleRoute module="daybook"><DaybookReports /></ModuleRoute>} />
@@ -368,7 +371,7 @@ export default function App() {
             <Route path="settings" element={<Settings />} />
           </Route>
 
-          <Route path="*" element={<Navigate to="/login" replace />} />
+          <Route path="*" element={<div style={{ padding: 40, textAlign: "center" }}><h2>404 - Page Not Found</h2><p>The page you are looking for does not exist.</p></div>} />
         </Routes>
       </AuthProvider>
     </ToastProvider>

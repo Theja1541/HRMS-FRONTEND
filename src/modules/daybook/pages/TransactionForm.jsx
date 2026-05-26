@@ -27,6 +27,8 @@ export default function TransactionForm() {
       to_vendor: null,
       gst_applicable: false,
       gst_amount: 0,
+      gst_rate: 0,
+      hsn_code: "",
       bank_name: "",
       account_number: "",
       upi_id: "",
@@ -132,14 +134,25 @@ export default function TransactionForm() {
                 {errors.category && <span style={{ color: "#ef4444", fontSize: "12px" }}>{errors.category.message}</span>}
               </div>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-              <label style={{ fontSize: "14px", fontWeight: "500", color: "#475569" }}>Details</label>
-              <Controller
-                name="details"
-                control={control}
-                render={({ field }) => <textarea rows="3" style={{ padding: "10px 12px", borderRadius: "8px", border: `1px solid ${errors.details ? '#ef4444' : '#cbd5e1'}`, outline: "none", resize: "vertical" }} placeholder="Enter transaction details..." {...field} />}
-              />
-              {errors.details && <span style={{ color: "#ef4444", fontSize: "12px" }}>{errors.details.message}</span>}
+            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: "20px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <label style={{ fontSize: "14px", fontWeight: "500", color: "#475569" }}>Production Description (Details)</label>
+                <Controller
+                  name="details"
+                  control={control}
+                  render={({ field }) => <textarea rows="3" style={{ padding: "10px 12px", borderRadius: "8px", border: `1px solid ${errors.details ? '#ef4444' : '#cbd5e1'}`, outline: "none", resize: "vertical" }} placeholder="Enter production description..." {...field} />}
+                />
+                {errors.details && <span style={{ color: "#ef4444", fontSize: "12px" }}>{errors.details.message}</span>}
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                <label style={{ fontSize: "14px", fontWeight: "500", color: "#475569" }}>HSN Code</label>
+                <Controller
+                  name="hsn_code"
+                  control={control}
+                  render={({ field }) => <input type="text" style={{ padding: "10px 12px", borderRadius: "8px", border: `1px solid ${errors.hsn_code ? '#ef4444' : '#cbd5e1'}`, outline: "none" }} placeholder="e.g. 998319" {...field} />}
+                />
+                {errors.hsn_code && <span style={{ color: "#ef4444", fontSize: "12px" }}>{errors.hsn_code.message}</span>}
+              </div>
             </div>
           </div>
 
@@ -239,18 +252,39 @@ export default function TransactionForm() {
               </div>
               
               {gstApplicable && (
-                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                  <label style={{ fontSize: "14px", fontWeight: "500", color: "#475569" }}>GST Amount</label>
-                  <div style={{ position: "relative" }}>
-                    <span style={{ position: "absolute", left: "12px", top: "10px", color: "#94a3b8" }}>₹</span>
-                    <Controller
-                      name="gst_amount"
-                      control={control}
-                      render={({ field }) => <input type="number" step="0.01" style={{ width: "100%", padding: "10px 12px 10px 30px", boxSizing: "border-box", borderRadius: "8px", border: `1px solid ${errors.gst_amount ? '#ef4444' : '#cbd5e1'}`, outline: "none" }} {...field} />}
-                    />
+                <>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                    <label style={{ fontSize: "14px", fontWeight: "500", color: "#475569" }}>GST Rate (%)</label>
+                    <div style={{ position: "relative" }}>
+                      <Controller
+                        name="gst_rate"
+                        control={control}
+                        render={({ field }) => (
+                          <select style={{ width: "100%", padding: "10px 12px", borderRadius: "8px", border: `1px solid ${errors.gst_rate ? '#ef4444' : '#cbd5e1'}`, outline: "none", background: "white" }} {...field}>
+                            <option value="0">0%</option>
+                            <option value="5">5%</option>
+                            <option value="12">12%</option>
+                            <option value="18">18%</option>
+                            <option value="28">28%</option>
+                          </select>
+                        )}
+                      />
+                    </div>
+                    {errors.gst_rate && <span style={{ color: "#ef4444", fontSize: "12px" }}>{errors.gst_rate.message}</span>}
                   </div>
-                  {errors.gst_amount && <span style={{ color: "#ef4444", fontSize: "12px" }}>{errors.gst_amount.message}</span>}
-                </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                    <label style={{ fontSize: "14px", fontWeight: "500", color: "#475569" }}>GST Amount</label>
+                    <div style={{ position: "relative" }}>
+                      <span style={{ position: "absolute", left: "12px", top: "10px", color: "#94a3b8" }}>₹</span>
+                      <Controller
+                        name="gst_amount"
+                        control={control}
+                        render={({ field }) => <input type="number" step="0.01" style={{ width: "100%", padding: "10px 12px 10px 30px", boxSizing: "border-box", borderRadius: "8px", border: `1px solid ${errors.gst_amount ? '#ef4444' : '#cbd5e1'}`, outline: "none" }} {...field} />}
+                      />
+                    </div>
+                    {errors.gst_amount && <span style={{ color: "#ef4444", fontSize: "12px" }}>{errors.gst_amount.message}</span>}
+                  </div>
+                </>
               )}
             </div>
 
