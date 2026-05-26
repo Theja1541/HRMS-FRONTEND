@@ -68,14 +68,6 @@ import AssetReturnManagement from "./pages/assets/AssetReturnManagement";
 import AssetManagement from "./pages/assets/AssetManagement";
 import MyAssetReturns from "./pages/employee-portal/MyAssetReturns";
 
-/* Daybook Pages */
-import DaybookDashboard from "./pages/daybook/DaybookDashboard";
-import Transactions from "./pages/daybook/Transactions";
-import AddTransaction from "./pages/daybook/AddTransaction";
-import Vendors from "./pages/daybook/Vendors";
-import Categories from "./pages/daybook/Categories";
-import DaybookReports from "./pages/daybook/DaybookReports";
-
 // export default function App() {
 //   return (
 //     <AuthProvider>
@@ -264,15 +256,6 @@ export default function App() {
 
             {/* Email */}
             <Route path="email-dashboard" element={<EmailDashboard />} />
-
-            {/* Daybook */}
-            <Route path="daybook/dashboard" element={<DaybookDashboard />} />
-            <Route path="daybook/transactions" element={<Transactions />} />
-            <Route path="daybook/add-transaction" element={<AddTransaction />} />
-            <Route path="daybook/edit-transaction/:id" element={<AddTransaction />} />
-            <Route path="daybook/vendors" element={<Vendors />} />
-            <Route path="daybook/categories" element={<Categories />} />
-            <Route path="daybook/reports" element={<DaybookReports />} />
             
             {/* Assets */}
             <Route path="assets" element={<AssetManagement />} />
