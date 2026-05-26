@@ -18,7 +18,7 @@ export default function Support() {
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState("");
-  const [showForm, setShowForm] = useState(false);
+  const [activeTab, setActiveTab] = useState("list"); // 'new' or 'list'
   const [form, setForm] = useState({ title: "", description: "", priority: "MEDIUM" });
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
@@ -57,7 +57,7 @@ export default function Support() {
         priority: form.priority,
       });
       setForm({ title: "", description: "", priority: "MEDIUM" });
-      setShowForm(false);
+      setActiveTab('list');
       setFetchError("");
       fetchTickets();
     } catch (err) {
@@ -78,23 +78,32 @@ export default function Support() {
             Create a support ticket or view your company&apos;s tickets.
           </p>
         </div>
-        <button
-          type="button"
-          className="btn primary"
-          onClick={() => setShowForm(!showForm)}
-        >
-          {showForm ? "Cancel" : "Create ticket"}
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button
+            type="button"
+            className={`btn ${activeTab === 'new' ? 'primary' : 'secondary'}`}
+            onClick={() => setActiveTab('new')}
+          >
+            New Ticket
+          </button>
+          <button
+            type="button"
+            className={`btn ${activeTab === 'list' ? 'primary' : 'secondary'}`}
+            onClick={() => setActiveTab('list')}
+          >
+            Your Tickets
+          </button>
+        </div>
       </div>
 
-      {showForm && (
+      {activeTab === 'new' && (
         <div className="card support-new-ticket-card" style={{ marginTop: 16, marginBottom: 24 }}>
           <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 12, marginBottom: 20 }}>
             <h3 style={{ margin: 0 }}>New ticket</h3>
             <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
               <button
                 type="button"
-                onClick={() => { setShowForm(false); setFormError(""); }}
+                onClick={() => { setActiveTab('list'); setFormError(""); }}
                 style={{
                   padding: "10px 18px",
                   borderRadius: 10,
@@ -180,7 +189,8 @@ export default function Support() {
         </div>
       )}
 
-      <div className="card" style={{ marginTop: 16 }}>
+      {activeTab === 'list' && (
+        <div className="card" style={{ marginTop: 16 }}>
         <h3 style={{ marginBottom: 16 }}>Your tickets</h3>
         {fetchError && (
           <p className="muted-text" style={{ color: "#b91c1c", padding: "12px 0", marginBottom: 8 }}>{fetchError}</p>
@@ -214,7 +224,8 @@ export default function Support() {
             )}
           </>
         )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

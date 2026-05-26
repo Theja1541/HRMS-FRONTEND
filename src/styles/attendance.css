@@ -374,3 +374,89 @@
     width: 100%;
   }
 }
+
+/* ===============================
+   HOLIDAY & SUMMARY STYLES
+================================ */
+
+.holiday-banner {
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+  color: white;
+  padding: 16px 24px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+  margin-bottom: 24px;
+}
+
+.holiday-banner-icon {
+  font-size: 24px;
+}
+
+.attendance-summary-cards {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.summary-card {
+  flex: 1;
+  min-width: 120px;
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 4px rgba(15, 23, 42, 0.04);
+}
+
+.summary-card.present h3 { color: #16a34a; }
+.summary-card.absent h3 { color: #ef4444; }
+.summary-card.holiday h3 { color: #3b82f6; }
+.summary-card.weekoff h3 { color: #a855f7; }
+.summary-card.leave h3 { color: #f59e0b; }
+
+.summary-card h3 {
+  font-size: 24px;
+  margin: 0;
+}
+
+.summary-card span {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+  text-transform: uppercase;
+}
+
+.filters-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+}
+
+.filters-bar input,
+.filters-bar select {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+  background: white;
+  flex: 1;
+  min-width: 150px;
+}
+
+.att-btn.holiday { background: #3b82f6; }
+.att-btn.weekoff { background: #a855f7; }
+.att-btn.present-holiday { background: #0d9488; }

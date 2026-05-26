@@ -44,3 +44,5 @@ export const setUserBlock = (userId, isActive) => {
 export const unlockUser = (userId) => {
   return api.post(`/accounts/users/${userId}/unlock/`);
 };
+
+

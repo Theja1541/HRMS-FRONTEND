@@ -160,7 +160,7 @@ export default function ManageUsers() {
   if (loading) return <p>Loading users...</p>;
 
   return (
-    <div>
+    <div className="manage-users-page">
       <div className="page-header">
         <h2 className="page-title">User & Role Management</h2>
       </div>
@@ -194,10 +194,20 @@ export default function ManageUsers() {
         </select>
       </div>
 
-      <div className="card" style={{ marginTop: 16, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        <div className="table-wrapper" style={{ overflowY: 'auto', overflowX: 'auto', maxHeight: 'calc(100vh - 320px)' }}>
-          <table className="table" style={{ marginBottom: 0 }}>
-            <thead style={{ position: 'sticky', top: 0, background: '#f8fafc', zIndex: 5, boxShadow: '0 1px 2px rgba(0,0,0,0.05)' }}>
+      {/* Debug panel: show counts to help diagnose missing rows */}
+      <div style={{ marginTop: 8, marginBottom: 8, fontSize: 13, color: '#475569' }}>
+        <strong>Debug:</strong> total users = {users.length}, filtered = {filteredUsers.length}, paginated = {paginatedUsers.length}
+        <div style={{ marginTop: 6 }}>
+          {users.map((u) => (
+            <div key={`dbg-${u.id}`} style={{ fontSize: 12, color: '#64748b' }}>{u.id} — {u.username} — {String(u.company_name)}</div>
+          ))}
+        </div>
+      </div>
+
+      <div className="card" style={{ marginTop: 16, display: 'flex', flexDirection: 'column', overflow: 'visible' }}>
+        <div className="table-wrapper" style={{ width: '100%' }}>
+          <table className="attendance-table" style={{ marginBottom: 0, width: '100%' }}>
+            <thead style={{ background: '#f8fafc' }}>
               <tr>
                 <th style={{ width: "20%" }}>User</th>
                 <th style={{ width: "22%" }}>Email</th>

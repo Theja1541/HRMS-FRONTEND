@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getSupportTickets, updateSupportTicket } from "../../api/support";
+import { getSupportTickets, updateSupportTicket, getSupportTicket } from "../../api/support";
 import { getCompanies } from "../../api/companies";
 import "../../styles/pages.css";
 
@@ -25,6 +25,8 @@ export default function SupportTickets() {
   const [editStatus, setEditStatus] = useState("");
   const [editPriority, setEditPriority] = useState("");
   const [saveError, setSaveError] = useState("");
+  const [viewTicket, setViewTicket] = useState(null);
+  const [viewLoading, setViewLoading] = useState(false);
 
   const fetchTickets = async () => {
     setLoading(true);
@@ -101,6 +103,21 @@ export default function SupportTickets() {
       setSaveError(typeof msg === "string" ? msg : "Failed to update ticket.");
     }
   };
+
+  const openView = async (ticketId) => {
+    setViewLoading(true);
+    setViewTicket(null);
+    try {
+      const res = await getSupportTicket(ticketId);
+      setViewTicket(res.data);
+    } catch (e) {
+      setViewTicket({ error: 'Failed to load ticket.' });
+    } finally {
+      setViewLoading(false);
+    }
+  };
+
+  const closeView = () => setViewTicket(null);
 
   return (
     <div>
@@ -217,9 +234,14 @@ export default function SupportTickets() {
                         </button>
                       </>
                     ) : (
-                      <button type="button" className="btn secondary" onClick={() => startEdit(ticket)}>
-                        Edit
-                      </button>
+                      <div style={{ display: 'flex', gap: 8 }}>
+                        <button type="button" className="btn" onClick={() => openView(ticket.id)}>
+                          View
+                        </button>
+                        <button type="button" className="btn secondary" onClick={() => startEdit(ticket)}>
+                          Edit
+                        </button>
+                      </div>
                     )}
                   </td>
                 </tr>
@@ -229,6 +251,33 @@ export default function SupportTickets() {
           {tickets.length === 0 && !fetchError && (
             <p className="muted-text" style={{ padding: 24 }}>No support tickets found.</p>
           )}
+        </div>
+      )}
+      {viewTicket && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1100 }}>
+          <div style={{ background: '#fff', borderRadius: 8, maxWidth: 800, width: '90%', padding: 20 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ margin: 0 }}>{viewTicket.title || 'Ticket'}</h3>
+              <button type="button" className="btn" onClick={closeView}>Close</button>
+            </div>
+            <div style={{ marginTop: 12 }}>
+              {viewLoading ? (
+                <p>Loading...</p>
+              ) : viewTicket.error ? (
+                <p style={{ color: '#b91c1c' }}>{viewTicket.error}</p>
+              ) : (
+                <div>
+                  <p><strong>Company:</strong> {viewTicket.company_name || '—'}</p>
+                  <p><strong>Priority:</strong> {PRIORITY_LABELS[viewTicket.priority] || viewTicket.priority}</p>
+                  <p><strong>Status:</strong> {STATUS_LABELS[viewTicket.status] || viewTicket.status}</p>
+                  <p><strong>Created:</strong> {viewTicket.created_at ? new Date(viewTicket.created_at).toLocaleString() : '—'}</p>
+                  <p><strong>Created by:</strong> {viewTicket.created_by?.email || viewTicket.created_by?.name || '—'}</p>
+                  <hr />
+                  <p style={{ whiteSpace: 'pre-wrap' }}>{viewTicket.description || 'No description provided.'}</p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
     </div>

@@ -25,11 +25,12 @@ import { useAuth } from "../../auth/AuthContext";
 import { reopenPayrollMonth } from "../../api/payroll";
 import EditedAttendanceModal from "../../components/attendance/EditedAttendanceModal";
 
-/* ===== STATUS COLORS ===== */
 const STATUS_COLORS = {
   PRESENT: "#22c55e",
   LEAVE: "#f59e0b",
   ABSENT: "#ef4444",
+  HOLIDAY: "#3b82f6",
+  WEEK_OFF: "#a855f7",
 };
 
 export default function MonthlyAttendance() {
@@ -341,6 +342,8 @@ export default function MonthlyAttendance() {
   let present = 0;
   let leave = 0;
   let absent = 0;
+  let holiday = 0;
+  let weekOff = 0;
 
   Object.keys(attendance).forEach((date) => {
     if (!date.startsWith(month)) return;
@@ -353,7 +356,7 @@ export default function MonthlyAttendance() {
         )
           return;
 
-        if (rec.status === "PRESENT") present++;
+        if (rec.status === "PRESENT" || rec.status === "PRESENT_ON_HOLIDAY" || rec.status === "WFH") present++;
 
         if (
           rec.status === "PAID_LEAVE" ||
@@ -363,18 +366,22 @@ export default function MonthlyAttendance() {
           leave++;
 
         if (rec.status === "ABSENT") absent++;
+        if (rec.status === "HOLIDAY") holiday++;
+        if (rec.status === "WEEK_OFF") weekOff++;
       }
     );
   });
 
-  return { present, leave, absent };
+  return { present, leave, absent, holiday, weekOff };
 }, [attendance, month, selectedEmployee]);
 
   const chartData = [
     { name: "PRESENT", value: summary.present },
     { name: "LEAVE", value: summary.leave },
     { name: "ABSENT", value: summary.absent },
-  ];
+    { name: "HOLIDAY", value: summary.holiday },
+    { name: "WEEK_OFF", value: summary.weekOff },
+  ].filter(d => d.value > 0);
 
   /* =======================
      JSX
@@ -433,6 +440,14 @@ export default function MonthlyAttendance() {
         <div className="summary-card absent">
           <h3>{summary.absent}</h3>
           <span>Total Absent</span>
+        </div>
+        <div className="summary-card holiday" style={{ background: '#eff6ff', border: '1px solid #bfdbfe', color: '#1e3a8a' }}>
+          <h3>{summary.holiday}</h3>
+          <span>Total Holiday</span>
+        </div>
+        <div className="summary-card weekoff" style={{ background: '#faf5ff', border: '1px solid #e9d5ff', color: '#581c87' }}>
+          <h3>{summary.weekOff}</h3>
+          <span>Total Week Off</span>
         </div>
       </div>
 

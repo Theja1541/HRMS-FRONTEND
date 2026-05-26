@@ -79,7 +79,17 @@ import MyAssetReturns from "./pages/employee-portal/MyAssetReturns";
 import Support from "./pages/support/Support";
 import CompanyUsers from "./pages/CompanyUsers";
 import Notifications from "./pages/notifications/Notifications";
+import HolidayList from "./pages/holidays/HolidayList";
+import HolidayCalendar from "./pages/holidays/HolidayCalendar";
+import HolidayCreate from "./pages/holidays/HolidayCreate";
 
+/* Daybook / Finance */
+import DaybookDashboard from "./modules/daybook/pages/Dashboard";
+import DaybookTransactions from "./modules/daybook/pages/Transactions";
+import DaybookTransactionForm from "./modules/daybook/pages/TransactionForm";
+import DaybookVendors from "./modules/daybook/pages/Vendors";
+import DaybookCategories from "./modules/daybook/pages/Categories";
+import DaybookReports from "./modules/daybook/pages/Reports";
 function ModuleRoute({ module, children }) {
   const [allowed, setAllowed] = useState(null);
 
@@ -252,11 +262,11 @@ export default function App() {
             <Route path="support" element={<SupportTickets />} />
           </Route>
 
-          {/* ADMIN / HR */}
+          {/* ADMIN / HR / FINANCE */}
           <Route
             path="/"
             element={
-              <ProtectedRoute allowedRoles={["ADMIN","HR"]}>
+              <ProtectedRoute allowedRoles={["ADMIN","HR","FINANCE_ADMIN"]}>
                 <EmployeesProvider>
                   <PayrollProvider>
                     <ErrorBoundary>
@@ -313,6 +323,22 @@ export default function App() {
 
             {/* Notifications */}
             <Route path="notifications" element={<ModuleRoute module="notifications"><Notifications /></ModuleRoute>} />
+
+            {/* Holidays */}
+            <Route path="holidays" element={<HolidayList />} />
+            <Route path="holidays/calendar" element={<HolidayCalendar />} />
+            <Route path="holidays/new" element={<HolidayCreate />} />
+            <Route path="holidays/:id" element={<HolidayCreate />} />
+
+            {/* Daybook / Finance */}
+            <Route path="daybook" element={<Navigate to="dashboard" replace />} />
+            <Route path="daybook/dashboard" element={<ModuleRoute module="daybook"><DaybookDashboard /></ModuleRoute>} />
+            <Route path="daybook/transactions" element={<ModuleRoute module="daybook"><DaybookTransactions /></ModuleRoute>} />
+            <Route path="daybook/transactions/add" element={<ModuleRoute module="daybook"><DaybookTransactionForm /></ModuleRoute>} />
+            <Route path="daybook/transactions/edit/:id" element={<ModuleRoute module="daybook"><DaybookTransactionForm /></ModuleRoute>} />
+            <Route path="daybook/vendors" element={<ModuleRoute module="daybook"><DaybookVendors /></ModuleRoute>} />
+            <Route path="daybook/categories" element={<ModuleRoute module="daybook"><DaybookCategories /></ModuleRoute>} />
+            <Route path="daybook/reports" element={<ModuleRoute module="daybook"><DaybookReports /></ModuleRoute>} />
 
             {/* Settings */}
             <Route path="settings" element={<Settings />} />

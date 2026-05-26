@@ -9,11 +9,9 @@ const CATEGORY_META = {
     desc: "Outgoing mail server (SMTP) — required for MFA codes, notifications & payslips" },
   security: { label: "Security",   icon: "🔐", color: "#7c3aed",
     desc: "Authentication, session management and password policies" },
-  features: { label: "Features",   icon: "🧩", color: "#16a34a",
-    desc: "Enable or disable individual modules for all tenants" },
 };
 
-const TABS = ["general", "email", "security", "features"];
+const TABS = ["general", "email", "security"];
 
 /* ─── Inline card style (avoids pages.css overflow:hidden on .card) ─── */
 const CARD = {
@@ -382,22 +380,6 @@ export default function SystemSettings() {
                       <li><strong>Password Expiry = 0</strong> — Disables forced password rotation</li>
                       <li><strong>Max Login Attempts</strong> — Set to 0 to disable account locking</li>
                     </ul>
-                  </div>
-                )}
-
-                {/* Features context hints */}
-                {activeTab === "features" && (
-                  <div style={{
-                    marginTop: 20, padding: "14px 18px", borderRadius: 10,
-                    background: "#f0fdf4", border: "1.5px solid #86efac",
-                  }}>
-                    <p style={{ margin: "0 0 6px", fontWeight: 700, fontSize: 13, color: "#15803d" }}>
-                      🧩 Module Notes
-                    </p>
-                    <p style={{ margin: 0, fontSize: 12.5, color: "#166534", lineHeight: 1.7 }}>
-                      Disabling a module hides it from <strong>all tenants</strong>. Existing data is preserved —
-                      the module can be re-enabled at any time. Changes take effect immediately after saving.
-                    </p>
                   </div>
                 )}
               </div>

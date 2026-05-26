@@ -76,45 +76,7 @@ export default function Layout({ sidebarVariant = "admin" }) {
       />
 
       <main className="layout-main">
-        {/* Sleek top bar with notification bell and profile badge */}
-        <div className="layout-topbar" style={{ display: "flex", gap: 16 }}>
-          <NotificationCenter />
-          {user && (
-            <div style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              background: "#ffffff",
-              padding: "4px 12px 4px 4px",
-              borderRadius: "9999px",
-              border: "1.5px solid #e2e8f0",
-              boxShadow: "0 1px 3px rgba(0,0,0,0.05)"
-            }}>
-              <div style={{
-                width: "28px",
-                height: "28px",
-                borderRadius: "50%",
-                background: user.role === "SUPER_ADMIN" ? "#6366f1" : "#0284c7",
-                color: "#ffffff",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontWeight: "700",
-                fontSize: "12px"
-              }}>
-                {getInitials(user.username || user.email)}
-              </div>
-              <div style={{ display: "flex", flexDirection: "column" }}>
-                <span style={{ fontSize: "12.5px", fontWeight: "600", color: "#0f172a", lineHeight: 1.1 }}>
-                  {user.username || user.email?.split("@")[0]}
-                </span>
-                <span style={{ fontSize: "10.5px", fontWeight: "500", color: "#64748b" }}>
-                  {getRoleLabel(user.role)}
-                </span>
-              </div>
-            </div>
-          )}
-        </div>
+
         <div className="layout-content">
           {lockoutActive && !isExemptPage ? (
             <div style={{

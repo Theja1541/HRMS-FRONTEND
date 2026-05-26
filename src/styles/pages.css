@@ -438,4 +438,18 @@
   padding: 0 12px;
 }
 
+/* Manage Users page fixes: ensure table rows aren't clipped by global card/table rules */
+.manage-users-page .card {
+  overflow: visible !important;
+}
+.manage-users-page .table-wrapper {
+  overflow-y: visible !important;
+}
+.manage-users-page .attendance-table,
+.manage-users-page .attendance-table tbody,
+.manage-users-page .attendance-table tr {
+  display: table !important;
+  width: 100%;
+}
+
 

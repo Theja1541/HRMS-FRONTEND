@@ -43,7 +43,7 @@ export default function Billing() {
   });
   const [assignModal, setAssignModal] = useState(false);
   const [assignCompanyId, setAssignCompanyId] = useState(null);
-  const [assignForm, setAssignForm] = useState({ pricing_plan_id: "", subscription_period_end: "" });
+  const [assignForm, setAssignForm] = useState({ pricing_plan_id: "", subscription_period_start: new Date().toISOString().slice(0,10), subscription_period_end: "" });
   const [paymentModal, setPaymentModal] = useState(false);
   const [paymentForm, setPaymentForm] = useState({
     company: "",
@@ -152,7 +152,7 @@ export default function Billing() {
 
   const openAssignModal = (companyId) => {
     setAssignCompanyId(companyId);
-    setAssignForm({ pricing_plan_id: "", subscription_period_end: "" });
+    setAssignForm({ pricing_plan_id: "", subscription_period_start: new Date().toISOString().slice(0,10), subscription_period_end: "" });
     setAssignModal(true);
   };
 
@@ -162,6 +162,7 @@ export default function Billing() {
     try {
       await assignPlanToCompany(assignCompanyId, {
         pricing_plan_id: parseInt(assignForm.pricing_plan_id, 10),
+        subscription_period_start: assignForm.subscription_period_start || null,
         subscription_period_end: assignForm.subscription_period_end || null,
       });
       setAssignModal(false);
@@ -568,8 +569,10 @@ export default function Billing() {
                   <option key={p.id} value={p.id}>{p.name} – {formatCurrency(p.price_monthly)}/mo</option>
                 ))}
               </select>
-              <label>Subscription period end (optional)</label>
-              <input type="date" value={assignForm.subscription_period_end} onChange={(e) => setAssignForm({ ...assignForm, subscription_period_end: e.target.value })} />
+                <label>Subscription period start</label>
+                <input type="date" value={assignForm.subscription_period_start} onChange={(e) => setAssignForm({ ...assignForm, subscription_period_start: e.target.value })} />
+                <label>Subscription period end (optional)</label>
+                <input type="date" value={assignForm.subscription_period_end} onChange={(e) => setAssignForm({ ...assignForm, subscription_period_end: e.target.value })} />
               <div className="modal-actions">
                 <button type="submit" className="btn primary">Assign</button>
                 <button type="button" className="btn-cancel" onClick={() => setAssignModal(false)}>Cancel</button>

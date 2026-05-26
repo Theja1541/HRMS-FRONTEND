@@ -34,6 +34,7 @@ export default function Sidebar({ variant = "admin", isOpen, onClose, lockoutAct
   const [openLeaves, setOpenLeaves] = useState(false);
   const [openPayroll, setOpenPayroll] = useState(false);
   const [openAssets, setOpenAssets] = useState(false);
+  const [openDaybook, setOpenDaybook] = useState(false);
 
   const getBlockedStyle = (display = undefined) => {
     const styleObj = {};
@@ -55,6 +56,8 @@ export default function Sidebar({ variant = "admin", isOpen, onClose, lockoutAct
     assets: true,
     support: true,
     billing: true,
+    holidays: true,
+    daybook: true,
   });
   const [logoImageLoaded, setLogoImageLoaded] = useState(false);
   const [logoImageError, setLogoImageError] = useState(false);
@@ -112,6 +115,8 @@ export default function Sidebar({ variant = "admin", isOpen, onClose, lockoutAct
             support: true,
             notifications: true,
             billing: true,
+            holidays: true,
+            daybook: true,
           });
         }
       });
@@ -239,6 +244,9 @@ export default function Sidebar({ variant = "admin", isOpen, onClose, lockoutAct
             <NavLink to="/monthly" className="sidebar-item" style={getBlockedStyle(features.attendance ? undefined : "none")} onClick={onClose}>
               📊 {!collapsed && "Monthly"}
             </NavLink>
+            <NavLink to="/holidays" className="sidebar-item" style={getBlockedStyle(features.holidays ? undefined : "none")} onClick={onClose}>
+              🏖️ {!collapsed && "Holidays"}
+            </NavLink>
             <div
               className="sidebar-item dropdown"
               style={getBlockedStyle(features.leave ? undefined : "none")}
@@ -311,6 +319,36 @@ export default function Sidebar({ variant = "admin", isOpen, onClose, lockoutAct
                 </NavLink>
                 <NavLink to="/asset-returns" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
                   🔄 Asset Returns
+                </NavLink>
+              </div>
+            )}
+            
+            <div
+              className="sidebar-item dropdown"
+              style={getBlockedStyle(features.daybook ? undefined : "none")}
+              onClick={() => !lockoutActive && setOpenDaybook(!openDaybook)}
+            >
+              📘 {!collapsed && "Day Book"}
+              {!collapsed && (
+                <span className="dropdown-arrow">{openDaybook ? "▲" : "▼"}</span>
+              )}
+            </div>
+            {openDaybook && !collapsed && (
+              <div className="sidebar-dropdown-menu">
+                <NavLink to="/daybook/dashboard" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                  📊 Dashboard
+                </NavLink>
+                <NavLink to="/daybook/transactions" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                  💸 Transactions
+                </NavLink>
+                <NavLink to="/daybook/vendors" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                  🏢 Vendors
+                </NavLink>
+                <NavLink to="/daybook/categories" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                  📂 Categories
+                </NavLink>
+                <NavLink to="/daybook/reports" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                  📈 Reports
                 </NavLink>
               </div>
             )}
