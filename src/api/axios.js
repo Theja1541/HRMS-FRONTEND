@@ -150,8 +150,12 @@ api.interceptors.response.use(
         );
 
         const newAccess = res.data.access;
+        const newRefresh = res.data.refresh;
 
         localStorage.setItem("accessToken", newAccess);
+        if (newRefresh) {
+          localStorage.setItem("refreshToken", newRefresh);
+        }
 
         originalRequest.headers.Authorization =
           `Bearer ${newAccess}`;

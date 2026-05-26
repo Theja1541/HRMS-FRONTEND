@@ -1,4 +1,5 @@
 import { formatINR } from "../../utils/currency";
+import { calculatePayroll } from "../../utils/payrollCalculations";
 import "../../styles/salaryComparison.css";
 
 export default function SalaryComparison({ oldSalary = {}, newSalary = {} }) {
@@ -36,24 +37,12 @@ export default function SalaryComparison({ oldSalary = {}, newSalary = {} }) {
 
   /* ================= TOTALS ================= */
 
-  const calculateGross = (salary) =>
-    getValue(salary, "basic") +
-    getValue(salary, "da") +
-    getValue(salary, "hra") +
-    getValue(salary, "conveyance") +
-    getValue(salary, "medical") +
-    getValue(salary, "special_allowance");
-
-  const calculateEmployerBenefits = (salary) =>
-    getValue(salary, "employer_pf") +
-    getValue(salary, "employer_esi") +
-    getValue(salary, "gratuity");
-
-  const oldGross = calculateGross(oldSalary);
-  const newGross = calculateGross(newSalary);
-
-  const oldCTC = oldGross + calculateEmployerBenefits(oldSalary);
-  const newCTC = newGross + calculateEmployerBenefits(newSalary);
+  const oldPayroll = calculatePayroll(oldSalary);
+  const newPayroll = calculatePayroll(newSalary);
+  const oldGross = oldPayroll.gross;
+  const newGross = newPayroll.gross;
+  const oldCTC = oldPayroll.ctc;
+  const newCTC = newPayroll.ctc;
 
   return (
     <div className="salary-comparison">

@@ -24,11 +24,11 @@ export default function SalaryGrowthChart({ employeeId }) {
         const res = await api.get(`/payroll/salary-revisions/employee/${employeeId}/`);
 
         const formatted = res.data.map((rev) => ({
-          month: new Date(rev.effective_date).toLocaleDateString("en-US", {
+          month: new Date(rev.effective_from).toLocaleDateString("en-US", {
             month: "short",
             year: "numeric"
           }),
-          salary: Number(rev.ctc || 0)
+          salary: Number(rev.ctc || rev.gross_salary || 0)
         }));
 
         setData(formatted);

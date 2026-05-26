@@ -19,6 +19,15 @@ export const getMyLeaveBalance = async () => {
 
 
 /* ===============================
+   LEAVE REQUESTS (with optional filters)
+   Used by Dashboard, LeaveDashboard, etc.
+   Supports both res.data and res.data.results response shapes.
+=============================== */
+
+export const getLeaveRequests = (filters = {}) =>
+  api.get("/leaves/requests/", { params: filters });
+
+/* ===============================
    HR – GET ALL LEAVE REQUESTS
 =============================== */
 

@@ -5,11 +5,12 @@
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15, 23, 42, 0.55);
+  background: rgba(15, 23, 42, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 9999;
+  backdrop-filter: blur(2px);
 }
 
 /* ===============================
@@ -21,9 +22,26 @@
   width: 420px;
   max-width: 90%;
   border-radius: 14px;
-  padding: 24px;
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.2);
-  animation: fadeInScale 0.2s ease;
+  padding: 28px;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25);
+  animation: fadeInScale 0.3s ease;
+  border: 1px solid #e5e7eb;
+}
+
+.modal-card h3 {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: #0f172a;
+}
+
+.modal-card h4 {
+  font-size: 15px;
+  font-weight: 700;
+  margin-top: 20px;
+  margin-bottom: 8px;
+  color: #334155;
+  letter-spacing: 0.3px;
 }
 
 @keyframes fadeInScale {
@@ -43,14 +61,14 @@
 
 .modal-title {
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 700;
   margin-bottom: 8px;
   color: #0f172a;
 }
 
 .modal-message {
   font-size: 14px;
-  color: #475569;
+  color: #64748b;
   margin-bottom: 24px;
   line-height: 1.6;
 }
@@ -63,33 +81,67 @@
   display: flex;
   justify-content: flex-end;
   gap: 12px;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
 }
 
 .btn-cancel {
-  background: #e5e7eb;
-  color: #111827;
-  padding: 8px 16px;
+  background: #f1f5f9;
+  color: #334155;
+  padding: 10px 18px;
   border-radius: 8px;
-  border: none;
+  border: 1.5px solid #cbd5e1;
   font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .btn-cancel:hover {
-  background: #d1d5db;
+  background: #e2e8f0;
+  border-color: #94a3b8;
 }
 
 .btn-delete {
   background: #ef4444;
   color: #ffffff;
-  padding: 8px 18px;
+  padding: 10px 18px;
   border-radius: 8px;
   border: none;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
 }
 
 .btn-delete:hover {
   background: #dc2626;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+.modal-card input,
+.modal-card textarea,
+.modal-card select {
+  border: 1.5px solid #cbd5e1;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.modal-card input:hover,
+.modal-card textarea:hover,
+.modal-card select:hover {
+  border-color: #94a3b8;
+  background: #f8fafc;
+}
+
+.modal-card input:focus,
+.modal-card textarea:focus,
+.modal-card select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }

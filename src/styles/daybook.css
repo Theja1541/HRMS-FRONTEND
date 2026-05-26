@@ -1,0 +1,574 @@
+/* ================= PAGE ================= */
+
+.daybooks-page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ================= HEADER ================= */
+
+.page-header {
+  background: linear-gradient(135deg, #020617, #2563eb);
+  color: white;
+  padding: 24px 28px;
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  animation: fadeSlideIn 0.4s ease-out;
+}
+
+.page-title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.page-subtitle {
+  font-size: 14px;
+  color: #cbd5e1;
+  margin-top: 4px;
+}
+
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.settings-btn {
+  background: #64748b;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.settings-btn:hover {
+  background: #475569;
+}
+
+.deactivated-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.deactivated-btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.add-daybook-btn {
+  background: #2563eb;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-daybook-btn:hover {
+  background: #1d4ed8;
+}
+
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ================= FILTER BAR ================= */
+
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  background: #f8fafc;
+  padding: 14px 18px;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  flex-wrap: wrap;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 240px;
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+  background: white;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.filter-select {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+  background: white;
+  cursor: pointer;
+  min-width: 150px;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+/* ================= TABLE WRAPPER ================= */
+
+.table-wrapper {
+  background: white;
+  border-radius: 16px;
+  overflow-x: auto;
+  overflow-y: visible;
+  position: relative;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05);
+}
+
+/* ================= TABLE ================= */
+
+.daybooks-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.daybooks-table th {
+  background: #f8fafc;
+  color: #1e293b;
+  text-align: left;
+  padding: 14px;
+  font-size: 14px;
+  font-weight: 600;
+  border-bottom: 1px solid #e2e8f0;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.daybooks-table td {
+  padding: 14px;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: middle;
+  color: #0f172a;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.daybooks-table tbody tr:hover {
+  background: #f1f5f9;
+}
+
+/* ================= EMPTY STATE ================= */
+
+.empty-state {
+  padding: 60px 40px;
+  text-align: center;
+  color: #64748b;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* ================= ACTION BUTTONS ================= */
+
+.actions-cell {
+  text-align: center;
+  position: relative;
+  min-width: 220px;
+  white-space: nowrap;
+}
+
+.daybook-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.daybook-avatar,
+.daybook-avatar-img {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.daybook-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1d4ed8, #2563eb);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.daybook-avatar-img {
+  object-fit: cover;
+  border: 1px solid #dbeafe;
+}
+
+.daybook-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.daybook-meta-sub {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-btn {
+  padding: 8px 14px;
+  border-radius: 8px;
+  border: none;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.action-btn-view {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.action-btn-view:hover {
+  background: #2563eb;
+  color: white;
+}
+
+.action-btn-edit {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.action-btn-edit:hover {
+  background: #f59e0b;
+  color: white;
+}
+
+.action-btn-deactivate {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.action-btn-deactivate:hover {
+  background: #dc2626;
+  color: white;
+}
+
+/* ================= PAGINATION ================= */
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.page-summary {
+  font-size: 14px;
+  color: #475569;
+  font-weight: 600;
+  padding: 0 12px;
+}
+
+.page-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  color: #475569;
+  font-size: 14px;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: #f8fafc;
+}
+
+.page-btn.active {
+  background: #1d4ed8;
+  color: white;
+  border-color: #1d4ed8;
+}
+
+.page-number-group {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+/* ================= MODAL OVERLAY ================= */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.modal-card {
+  background: white;
+  border-radius: 16px;
+  padding: 28px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  animation: modalSlideUp 0.3s ease;
+}
+
+.modal-card.wide {
+  max-width: 900px;
+  width: 90%;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modal-header h3 {
+  margin: 0;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #334155;
+}
+
+.modal-table-scroll {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+@keyframes modalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.btn {
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn.primary {
+  background: #2563eb;
+  color: white;
+}
+
+.btn.primary:hover {
+  background: #1d4ed8;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .filter-bar {
+    flex-direction: column;
+  }
+
+  .search-input,
+  .filter-select {
+    width: 100%;
+  }
+
+  .daybooks-table {
+    font-size: 13px;
+  }
+
+  .daybooks-table th,
+  .daybooks-table td {
+    padding: 12px;
+  }
+
+  .action-buttons {
+    gap: 6px;
+  }
+
+  .action-btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .daybook-avatar,
+  .daybook-avatar-img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .daybook-meta-sub {
+    font-size: 11px;
+  }
+
+  .page-summary {
+    width: 100%;
+    text-align: center;
+    padding: 4px 0;
+  }
+}
+
+.daybook-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
+  gap: 16px;
+}
+
+.stat-card {
+  background: white;
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  border: 1px solid #e2e8f0;
+}
+
+.stat-card h4 {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 6px;
+}
+
+.stat-card p {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.table-wrapper {
+  margin-top: 20px;
+}
+
+/* ================= FORM STYLES ================= */
+.daybook-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-section-title {
+  font-size: 16px;
+  color: #2563eb;
+  margin: 10px 0 0 0;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 8px;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 250px;
+}
+
+.form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.form-input {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+  background: white;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+.form-input.error {
+  border-color: #ef4444;
+}
+
+.error-text {
+  color: #ef4444;
+  font-size: 12px;
+  margin-top: 2px;
+}

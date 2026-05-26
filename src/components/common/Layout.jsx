@@ -1,34 +1,191 @@
-import { Outlet } from "react-router-dom";
-import { useState } from "react";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
 import Sidebar from "./Sidebar";
+import NotificationCenter from "./NotificationCenter";
+import { useAuth } from "../../auth/AuthContext";
+import { getCompanyBranding } from "../../api/companies";
 import "../../styles/layout.css";
 
-export default function Layout() {
+/**
+ * Shared layout for Admin and SuperAdmin. Same CSS (layout.css, sidebar.css).
+ * sidebarVariant: "admin" | "superadmin" to switch menu.
+ */
+export default function Layout({ sidebarVariant = "admin" }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { user, logout } = useAuth() || {};
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [lockoutActive, setLockoutActive] = useState(false);
+
+  useEffect(() => {
+    if (!user || user.role === "SUPER_ADMIN") {
+      setLockoutActive(false);
+      return;
+    }
+
+    getCompanyBranding()
+      .then((res) => {
+        if (res.data?.billing_action_stopped) {
+          setLockoutActive(true);
+        } else {
+          setLockoutActive(false);
+        }
+      })
+      .catch(() => {});
+  }, [user, location.pathname]);
+
+  // Formatted Role helper
+  const getRoleLabel = (role) => {
+    if (role === "SUPER_ADMIN") return "Super Admin";
+    if (role === "ADMIN") return "Admin";
+    if (role === "HR") return "HR Manager";
+    if (role === "EMPLOYEE") return "Employee";
+    return role || "User";
+  };
+
+  // Initials helper
+  const getInitials = (name) => {
+    if (!name) return "U";
+    return name.slice(0, 2).toUpperCase();
+  };
+
+  const isExemptPage =
+    location.pathname === "/support" ||
+    (location.pathname === "/settings" && new URLSearchParams(location.search).get("tab") === "subscription-plan");
 
   return (
     <div className="layout-root">
-      {/* Mobile Menu Toggle */}
-      <button 
+      <button
         className="mobile-menu-btn"
         onClick={() => setSidebarOpen(!sidebarOpen)}
       >
         ☰
       </button>
 
-      {/* Overlay */}
       {sidebarOpen && (
-        <div 
+        <div
           className="sidebar-overlay"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      
+      <Sidebar
+        variant={sidebarVariant}
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
+
       <main className="layout-main">
+
         <div className="layout-content">
-          <Outlet />
+          {lockoutActive && !isExemptPage ? (
+            <div style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              minHeight: "calc(100vh - 120px)",
+              background: "rgba(255, 251, 235, 0.45)",
+              backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)",
+              borderRadius: "16px",
+              border: "1px solid rgba(253, 230, 138, 0.6)",
+              padding: "48px 32px",
+              textAlign: "center",
+              boxShadow: "0 10px 40px -10px rgba(217, 119, 6, 0.12)",
+              margin: "24px",
+            }}>
+              <div style={{ maxWidth: "480px" }}>
+                <div style={{
+                  width: "72px",
+                  height: "72px",
+                  borderRadius: "50%",
+                  background: "#fef3c7",
+                  border: "2px solid #fde68a",
+                  color: "#d97706",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: "32px",
+                  margin: "0 auto 20px auto",
+                  boxShadow: "0 4px 12px rgba(217, 119, 6, 0.15)",
+                }}>
+                  ⚠️
+                </div>
+                <h2 style={{ fontSize: "24px", fontWeight: "800", color: "#78350f", marginBottom: "12px", letterSpacing: "-0.5px" }}>
+                  Subscription Expired
+                </h2>
+                <p style={{ fontSize: "15px", color: "#92400e", lineHeight: "1.6", marginBottom: "28px", fontWeight: "500" }}>
+                  Your company's subscription has expired and actions have been suspended. Please renew your plan or contact support to restore access.
+                </p>
+                <div style={{ display: "flex", justifyContent: "center", gap: "12px", flexWrap: "wrap" }}>
+                  <button
+                    onClick={() => navigate("/settings?tab=subscription-plan")}
+                    style={{
+                      padding: "10px 20px",
+                      borderRadius: "8px",
+                      background: "linear-gradient(135deg, #d97706 0%, #b45309 100%)",
+                      color: "#ffffff",
+                      fontWeight: "600",
+                      fontSize: "14px",
+                      border: "none",
+                      boxShadow: "0 4px 12px rgba(217, 119, 6, 0.3)",
+                      cursor: "pointer",
+                      transition: "transform 0.15s, box-shadow 0.15s"
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.transform = "translateY(-1px)";
+                      e.currentTarget.style.boxShadow = "0 6px 16px rgba(217, 119, 6, 0.4)";
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.transform = "none";
+                      e.currentTarget.style.boxShadow = "0 4px 12px rgba(217, 119, 6, 0.3)";
+                    }}
+                  >
+                    💳 View Billing Plan
+                  </button>
+                  <button
+                    onClick={() => navigate("/support")}
+                    style={{
+                      padding: "10px 20px",
+                      borderRadius: "8px",
+                      background: "#ffffff",
+                      color: "#78350f",
+                      fontWeight: "600",
+                      fontSize: "14px",
+                      border: "1.5px solid #fde68a",
+                      cursor: "pointer",
+                      boxShadow: "0 2px 4px rgba(0,0,0,0.02)",
+                      transition: "background 0.15s"
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.background = "#fffbeb"}
+                    onMouseOut={(e) => e.currentTarget.style.background = "#ffffff"}
+                  >
+                    💬 Contact Support
+                  </button>
+                  <button
+                    onClick={logout}
+                    style={{
+                      padding: "10px 20px",
+                      borderRadius: "8px",
+                      background: "#fee2e2",
+                      color: "#991b1b",
+                      fontWeight: "600",
+                      fontSize: "14px",
+                      border: "none",
+                      cursor: "pointer",
+                      transition: "background 0.15s"
+                    }}
+                    onMouseOver={(e) => e.currentTarget.style.background = "#fecaca"}
+                    onMouseOut={(e) => e.currentTarget.style.background = "#fee2e2"}
+                  >
+                    Logout
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <Outlet />
+          )}
         </div>
       </main>
     </div>

@@ -6,7 +6,7 @@ import "../../styles/login.css";
 
 export default function ChangePassword() {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { user: authUser } = useAuth();
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -16,6 +16,12 @@ export default function ChangePassword() {
   /* =========================================
      OPTIONAL: Prevent direct access
   ========================================= */
+
+  useEffect(() => {
+    if (!localStorage.getItem("accessToken")) {
+      navigate("/login", { replace: true });
+    }
+  }, [navigate]);
 
   const handleSubmit = async (e) => {
   e.preventDefault();
@@ -34,15 +40,23 @@ export default function ChangePassword() {
   try {
     setLoading(true);
 
-    const res = await api.post("/accounts/change-password/", {
+    await api.post("/accounts/change-password/", {
       new_password: newPassword,
     });
 
-    alert("Password changed successfully ✅");
+    alert("Password changed successfully. Taking you to your dashboard.");
 
-    // After password change → go back to login
-    localStorage.clear();
-    navigate("/login", { replace: true });
+    // Redirect to role-based dashboard (keep session; no re-login)
+    const role = (authUser?.role || "").toUpperCase();
+    if (role === "SUPER_ADMIN") {
+      navigate("/super-admin/dashboard", { replace: true });
+    } else if (role === "ADMIN" || role === "HR") {
+      navigate("/dashboard", { replace: true });
+    } else if (role === "EMPLOYEE") {
+      navigate("/employee/dashboard", { replace: true });
+    } else {
+      navigate("/dashboard", { replace: true });
+    }
 
   } catch (err) {
     setError(

@@ -14,3 +14,11 @@ The React Compiler is not enabled on this template because of its impact on dev 
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+## Company Logo On Payslips
+
+1. Login as Company Admin/HR and open `Settings` -> `Company Branding`.
+2. Upload a logo (PNG/JPG/JPEG/WebP/SVG, max 2MB).
+3. Generate or download an employee payslip.
+4. Verify the uploaded company logo appears in the payslip header.
+5. If no logo is uploaded (or file is unreadable), payslip falls back to text-only company header.

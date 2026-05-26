@@ -481,10 +481,9 @@
 // }
 
 
-import { useState, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import confetti from "canvas-confetti";
-import api from "../../api/axios";
 
 import {
   generatePayslip,
@@ -512,7 +511,6 @@ export default function Payroll() {
   const [payrollData, setPayrollData] = useState([]);
   const [loadingId, setLoadingId] = useState(null);
   const [loadingBulkEmail, setLoadingBulkEmail] = useState(false);
-  const [summary, setSummary] = useState(null);
   const [showFNFModal, setShowFNFModal] = useState(false);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [fnfData, setFnfData] = useState({
@@ -544,32 +542,19 @@ export default function Payroll() {
      Fetch Payroll Status
   ============================================ */
 
-  useEffect(() => {
-    fetchStatus();
-  }, [month, filterStatus]);
-
-  const [payrollStatus, setPayrollStatus] = useState("OPEN");
-
-  const fetchStatus = async () => {
+  const fetchStatus = useCallback(async () => {
     try {
       const res = await getPayrollStatus(month, filterStatus);
-
-      setPayrollStatus(res.data.payroll_status);   // NEW
       setPayrollData(res.data.employees);          // UPDATED
 
     } catch {
       toast.error("Failed to load payroll data");
     }
-  };
+  }, [month, filterStatus]);
 
   useEffect(() => {
-  const fetchSummary = async () => {
-    const res = await api.get(`/payroll/summary/?month=${month}`);
-    setSummary(res.data);
-  };
-
-  fetchSummary();
-}, [month]);
+    fetchStatus();
+  }, [fetchStatus]);
 
   /* ============================================
      Generate Single Payslip
@@ -681,7 +666,7 @@ export default function Payroll() {
       const res = await bulkApprovePayslips(month);
 
       toast.success(
-        `Approved ${res.data.approved_count} payslips`
+        `Approved ${res.data.approved_count ?? res.data.approved_now ?? 0} payslips`
       );
 
       fetchStatus();
@@ -1190,20 +1175,6 @@ export default function Payroll() {
         </div>
       )}
 
-      {/* ================= PAYROLL SUMMARY ================= */}
-      {summary && (
-        <div className="payroll-summary">
-          <div className="card">
-            <h4>Total Monthly Payroll</h4>
-            <p>₹ {summary?.total_monthly_ctc?.toLocaleString("en-IN")}</p>
-          </div>
-
-          <div className="card">
-            <h4>Total Yearly Payroll Liability</h4>
-            <p>₹ {summary?.total_yearly_ctc?.toLocaleString("en-IN")}</p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

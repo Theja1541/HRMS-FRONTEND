@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import api from "../../api/axios";
 import { formatINR } from "../../utils/currency";
+import { yearlyAmount } from "../../utils/payrollCalculations";
 import "../../styles/payrollSummary.css";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 
@@ -14,18 +15,16 @@ export default function PayrollSummary() {
 
   /* ================= FETCH SUMMARY ================= */
 
-  useEffect(() => {
-    fetchSummary();
-  }, [year, month]);
-
-  const fetchSummary = async () => {
+  const fetchSummary = useCallback(async () => {
     try {
       setLoading(true);
       const res = await api.get(`/payroll/summary/?year=${year}&month=${month}`);
       const data = res.data;
       
       // Calculate additional metrics
-      const totalYearlyCTC = (data.total_monthly_ctc || 0) * 12;
+      const totalYearlyCTC = yearlyAmount(
+        data.total_monthly_gross || data.total_monthly_ctc || 0
+      );
       
       setSummary({
         ...data,
@@ -36,7 +35,11 @@ export default function PayrollSummary() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [year, month]);
+
+  useEffect(() => {
+    fetchSummary();
+  }, [fetchSummary]);
 
   /* ================= DOWNLOAD FILE ================= */
 
@@ -111,14 +114,14 @@ export default function PayrollSummary() {
   const monthlyData = [
     {
       name: new Date(year, month - 1).toLocaleString('default', { month: 'short' }),
-      "Gross Salary": summary.total_monthly_ctc || 0,
+      "Gross Salary": summary.total_monthly_gross || summary.total_monthly_ctc || 0,
       "Net Pay": summary.total_net_pay || 0,
     },
   ];
 
   const distributionData = [
     { name: "Net Pay", value: summary.total_net_pay || 0, color: "#16a34a" },
-    { name: "Deductions", value: (summary.total_monthly_ctc || 0) - (summary.total_net_pay || 0), color: "#ef4444" },
+    { name: "Deductions", value: (summary.total_monthly_gross || summary.total_monthly_ctc || 0) - (summary.total_net_pay || 0), color: "#ef4444" },
   ];
 
   /* ================= UI ================= */
@@ -184,8 +187,8 @@ export default function PayrollSummary() {
             <span>💰</span>
           </div>
           <div className="card-content">
-            <h4>Total Monthly Payroll</h4>
-            <p className="value">{formatINR(summary.total_monthly_ctc)}</p>
+            <h4>Total Monthly Gross Payroll</h4>
+            <p className="value">{formatINR(summary.total_monthly_gross || summary.total_monthly_ctc)}</p>
             <span className="subtitle">Gross Salary</span>
           </div>
         </div>
@@ -217,8 +220,8 @@ export default function PayrollSummary() {
             <span>📊</span>
           </div>
           <div className="card-content">
-            <h4>Average Monthly CTC</h4>
-            <p className="value">{formatINR(summary.average_monthly_ctc)}</p>
+            <h4>Average Monthly Gross</h4>
+            <p className="value">{formatINR(summary.average_monthly_gross || summary.average_monthly_ctc)}</p>
             <span className="subtitle">Per Employee</span>
           </div>
         </div>
@@ -228,9 +231,9 @@ export default function PayrollSummary() {
             <span>📈</span>
           </div>
           <div className="card-content">
-            <h4>Projected Yearly Cost</h4>
+            <h4>Projected Yearly Gross</h4>
             <p className="value">{formatINR(summary.total_yearly_ctc)}</p>
-            <span className="subtitle">Annual Projection</span>
+            <span className="subtitle">Annual Gross Projection</span>
           </div>
         </div>
 
@@ -240,7 +243,7 @@ export default function PayrollSummary() {
           </div>
           <div className="card-content">
             <h4>Total Deductions</h4>
-            <p className="value">{formatINR((summary.total_monthly_ctc || 0) - (summary.total_net_pay || 0))}</p>
+            <p className="value">{formatINR((summary.total_monthly_gross || summary.total_monthly_ctc || 0) - (summary.total_net_pay || 0))}</p>
             <span className="subtitle">PF, ESI, Tax, etc.</span>
           </div>
         </div>
@@ -311,8 +314,8 @@ export default function PayrollSummary() {
           <div className="info-row">
             <span>Deduction Rate:</span>
             <strong>
-              {summary.total_monthly_ctc > 0 
-                ? (((summary.total_monthly_ctc - summary.total_net_pay) / summary.total_monthly_ctc) * 100).toFixed(1)
+              {(summary.total_monthly_gross || summary.total_monthly_ctc || 0) > 0 
+                ? ((((summary.total_monthly_gross || summary.total_monthly_ctc || 0) - summary.total_net_pay) / (summary.total_monthly_gross || summary.total_monthly_ctc || 1)) * 100).toFixed(1)
                 : 0}%
             </strong>
           </div>

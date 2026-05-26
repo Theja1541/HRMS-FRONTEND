@@ -1,6 +1,16 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEmployees } from "../../context/EmployeesContext";
+import {
+  activateEmployeeById,
+  addEmployeeDepartment,
+  addEmployeeRole,
+  deleteEmployeeDepartment,
+  deleteEmployeeRole,
+  getEmployeeDepartments,
+  getEmployees,
+  getEmployeeRoles,
+} from "../../api/employees";
 import "../../styles/employees.css";
 
 export default function Employees() {
@@ -33,6 +43,18 @@ export default function Employees() {
   const [availableDepartments, setAvailableDepartments] = useState([]);
 
   const totalPages = Math.ceil(count / 10);
+  const pageNumbers = Array.from({ length: Math.min(totalPages, 5) }, (_, idx) => {
+    const start = Math.max(1, page - 2);
+    return start + idx <= totalPages ? start + idx : null;
+  }).filter(Boolean);
+
+  const getInitials = (emp) => {
+    const fullName = (emp.full_name || "").trim();
+    if (!fullName) return "NA";
+    const parts = fullName.split(" ").filter(Boolean);
+    if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+    return `${parts[0][0] || ""}${parts[1][0] || ""}`.toUpperCase();
+  };
 
   useEffect(() => {
     fetchEmployees(1, search, department, role);
@@ -45,14 +67,8 @@ export default function Employees() {
 
   const fetchAvailableRoles = async () => {
     try {
-      const token = localStorage.getItem('accessToken');
-      const res = await fetch('http://127.0.0.1:8000/api/employees/roles/', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      const data = await res.json();
-      setAvailableRoles(data.roles || []);
+      const res = await getEmployeeRoles();
+      setAvailableRoles(res.data.roles || []);
     } catch (err) {
       console.error('Failed to fetch available roles', err);
     }
@@ -60,14 +76,8 @@ export default function Employees() {
 
   const fetchAvailableDepartments = async () => {
     try {
-      const token = localStorage.getItem('accessToken');
-      const res = await fetch('http://127.0.0.1:8000/api/employees/departments/', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      const data = await res.json();
-      setAvailableDepartments(data.departments || []);
+      const res = await getEmployeeDepartments();
+      setAvailableDepartments(res.data.departments || []);
     } catch (err) {
       console.error('Failed to fetch available departments', err);
     }
@@ -76,14 +86,8 @@ export default function Employees() {
   const fetchDeactivatedEmployees = async () => {
     try {
       setLoadingDeactivated(true);
-      const token = localStorage.getItem('accessToken');
-      const res = await fetch('http://127.0.0.1:8000/api/employees/?is_active=false', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      const data = await res.json();
-      setDeactivatedEmployees(data.results || []);
+      const res = await getEmployees({ is_active: false });
+      setDeactivatedEmployees(res.data.results || []);
       setShowDeactivated(true);
     } catch (err) {
       console.error('Failed to fetch deactivated employees', err);
@@ -94,15 +98,7 @@ export default function Employees() {
 
   const activateEmployee = async (id) => {
     try {
-      const token = localStorage.getItem('accessToken');
-
-      await fetch(`http://127.0.0.1:8000/api/employees/${id}/activate/`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-
+      await activateEmployeeById(id);
       fetchDeactivatedEmployees();
       fetchEmployees(page, search, department, role);
 
@@ -113,14 +109,8 @@ export default function Employees() {
 
   const fetchRoles = async () => {
     try {
-      const token = localStorage.getItem('accessToken');
-      const res = await fetch('http://127.0.0.1:8000/api/employees/roles/', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      const data = await res.json();
-      setRoles(data.roles || []);
+      const res = await getEmployeeRoles();
+      setRoles(res.data.roles || []);
     } catch (err) {
       console.error('Failed to fetch roles', err);
     }
@@ -128,14 +118,8 @@ export default function Employees() {
 
   const fetchDepartments = async () => {
     try {
-      const token = localStorage.getItem('accessToken');
-      const res = await fetch('http://127.0.0.1:8000/api/employees/departments/', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      const data = await res.json();
-      setDepartments(data.departments || []);
+      const res = await getEmployeeDepartments();
+      setDepartments(res.data.departments || []);
     } catch (err) {
       console.error('Failed to fetch departments', err);
     }
@@ -144,15 +128,7 @@ export default function Employees() {
   const addRole = async () => {
     if (!newRole.trim()) return;
     try {
-      const token = localStorage.getItem('accessToken');
-      await fetch('http://127.0.0.1:8000/api/employees/roles/', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ role: newRole })
-      });
+      await addEmployeeRole(newRole);
       setNewRole("");
       fetchRoles();
       fetchAvailableRoles();
@@ -164,15 +140,7 @@ export default function Employees() {
   const addDepartment = async () => {
     if (!newDepartment.trim()) return;
     try {
-      const token = localStorage.getItem('accessToken');
-      await fetch('http://127.0.0.1:8000/api/employees/departments/', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ department: newDepartment })
-      });
+      await addEmployeeDepartment(newDepartment);
       setNewDepartment("");
       fetchDepartments();
       fetchAvailableDepartments();
@@ -183,13 +151,7 @@ export default function Employees() {
 
   const deleteRole = async (role) => {
     try {
-      const token = localStorage.getItem('accessToken');
-      await fetch(`http://127.0.0.1:8000/api/employees/roles/${role}/`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      await deleteEmployeeRole(role);
       fetchRoles();
       fetchAvailableRoles();
     } catch (err) {
@@ -199,13 +161,7 @@ export default function Employees() {
 
   const deleteDepartment = async (dept) => {
     try {
-      const token = localStorage.getItem('accessToken');
-      await fetch(`http://127.0.0.1:8000/api/employees/departments/${dept}/`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      await deleteEmployeeDepartment(dept);
       fetchDepartments();
       fetchAvailableDepartments();
     } catch (err) {
@@ -221,7 +177,7 @@ export default function Employees() {
           <h2 className="page-title">Employees</h2>
           <p className="page-subtitle">Manage your workforce</p>
         </div>
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div className="header-actions">
           <button
             className="settings-btn"
             onClick={() => {
@@ -231,6 +187,15 @@ export default function Employees() {
             }}
           >
             ⚙️ Settings
+          </button>
+          <button
+            className="deactivated-btn"
+            onClick={() => {
+              setShowSettings(false);
+              fetchDeactivatedEmployees();
+            }}
+          >
+            View Deactivated
           </button>
           <button
             className="add-employee-btn"
@@ -286,7 +251,7 @@ export default function Employees() {
             <thead>
               <tr>
                 <th>Employee ID</th>
-                <th>Name</th>
+                <th>Employee</th>
                 <th>Email</th>
                 <th>Mobile</th>
                 <th style={{ textAlign: 'center' }}>Actions</th>
@@ -294,22 +259,55 @@ export default function Employees() {
             </thead>
 
             <tbody>
-              {employees.map((emp, index) => (
+              {employees.map((emp) => (
                 <tr key={emp.id}>
                   <td><strong>{emp.employee_id}</strong></td>
-                  <td><strong>{emp.full_name}</strong></td>
+                  <td>
+                    <div className="employee-cell">
+                      {emp.profile_photo ? (
+                        <img src={emp.profile_photo} alt={emp.full_name} className="employee-avatar-img" />
+                      ) : (
+                        <span className="employee-avatar">{getInitials(emp)}</span>
+                      )}
+                      <div className="employee-meta">
+                        <strong>{emp.full_name}</strong>
+                        <span className="employee-meta-sub">{emp.department || "N/A"}</span>
+                      </div>
+                    </div>
+                  </td>
                   <td>{emp.email}</td>
                   <td>{emp.mobile}</td>
                   <td className="actions-cell">
-                    <ActionMenu
-                      onView={() => navigate(`/employees/${emp.id}`)}
-                      onEdit={() => navigate(`/employees/edit/${emp.id}`)}
-                      onDeactivate={() => {
-                        if (window.confirm("Deactivate this employee?")) {
-                          deactivateEmployee(emp.id);
-                        }
-                      }}
-                    />
+                    <div className="action-buttons">
+                      <button
+                        type="button"
+                        className="action-btn action-btn-view"
+                        onClick={() => navigate(`/employees/${emp.id}`)}
+                        title="View profile"
+                      >
+                        View
+                      </button>
+                      <button
+                        type="button"
+                        className="action-btn action-btn-edit"
+                        onClick={() => navigate(`/employees/edit/${emp.id}`)}
+                        title="Edit employee"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        className="action-btn action-btn-deactivate"
+                        onClick={() => {
+                          if (window.confirm("Deactivate this employee?")) {
+                            deactivateEmployee(emp.id);
+                          }
+                        }}
+                        title="Deactivate employee"
+                      >
+                        Deactivate
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -319,35 +317,46 @@ export default function Employees() {
       </div>
 
       {/* PAGINATION */}
-      <div className="pagination">
-        <button
-          disabled={page === 1}
-          onClick={() => fetchEmployees(page - 1, search, department, role)}
-        >
-          Previous
-        </button>
-
-        <span>
-          Page {page} of {totalPages}
-        </span>
-
-        <button
-          disabled={page === totalPages}
-          oonClick={() => fetchEmployees(page + 1, search, department, role)}
-        >
-          Next
-        </button>
-      </div>
+      {count > 0 && (
+        <div className="pagination">
+          <button
+            className="page-btn"
+            disabled={page === 1}
+            onClick={() => fetchEmployees(page - 1, search, department, role)}
+          >
+            Previous
+          </button>
+          <div className="page-number-group">
+            {pageNumbers.map((pg) => (
+              <button
+                key={pg}
+                className={`page-btn ${pg === page ? "active" : ""}`}
+                onClick={() => fetchEmployees(pg, search, department, role)}
+              >
+                {pg}
+              </button>
+            ))}
+          </div>
+          <span className="page-summary">Page {page} of {totalPages || 1}</span>
+          <button
+            className="page-btn"
+            disabled={page >= totalPages}
+            onClick={() => fetchEmployees(page + 1, search, department, role)}
+          >
+            Next
+          </button>
+        </div>
+      )}
 
       {/* DEACTIVATED EMPLOYEES MODAL */}
       {showDeactivated && (
         <div className="modal-overlay" onClick={() => setShowDeactivated(false)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '900px', width: '90%' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h3 style={{ margin: 0 }}>Deactivated Employees</h3>
+          <div className="modal-card wide" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Deactivated Employees</h3>
               <button 
                 onClick={() => setShowDeactivated(false)}
-                style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer' }}
+                className="modal-close"
               >
                 ×
               </button>
@@ -358,7 +367,7 @@ export default function Employees() {
             ) : deactivatedEmployees.length === 0 ? (
               <div style={{ textAlign: 'center', padding: '40px', color: '#64748b' }}>No deactivated employees</div>
             ) : (
-              <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
+              <div className="modal-table-scroll">
                 <table className="employees-table">
                   <thead>
                     <tr>
@@ -403,11 +412,11 @@ export default function Employees() {
       {showSettings && (
         <div className="modal-overlay" onClick={() => setShowSettings(false)}>
           <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px', width: '90%' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h3 style={{ margin: 0 }}>Employee Settings</h3>
+            <div className="modal-header">
+              <h3>Employee Settings</h3>
               <button 
                 onClick={() => setShowSettings(false)}
-                style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer' }}
+                className="modal-close"
               >
                 ×
               </button>
@@ -520,53 +529,6 @@ export default function Employees() {
               </div>
             </div>
           </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ================= ACTION MENU ================= */
-
-function ActionMenu({ onView, onEdit, onDeactivate }) {
-  const [open, setOpen] = useState(false);
-  const dropdownRef = useRef(null);
-
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setOpen(false);
-      }
-    };
-
-    document.addEventListener("click", handleClickOutside);
-    return () => document.removeEventListener("click", handleClickOutside);
-  }, []);
-
-  const handleAction = (e, action) => {
-    e.stopPropagation();
-    setOpen(false);
-    action();
-  };
-
-  return (
-    <div className="action-dropdown" ref={dropdownRef}>
-      <button
-        type="button"
-        className="action-trigger"
-        onClick={(e) => {
-          e.stopPropagation();
-          setOpen((prev) => !prev);
-        }}
-      >
-        ⋮
-      </button>
-
-      {open && (
-        <div className="dropdown-menu">
-          <button onClick={(e) => handleAction(e, onView)}>👁️ View</button>
-          <button onClick={(e) => handleAction(e, onEdit)}>✏️ Edit</button>
-          <button onClick={(e) => handleAction(e, onDeactivate)}>🚫 Deactivate</button>
         </div>
       )}
     </div>

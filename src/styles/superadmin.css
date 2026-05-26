@@ -203,3 +203,141 @@ select {
   border-radius: 14px;
   box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05);
 }
+
+.superadmin-dashboard h2,
+.superadmin-page h2 {
+  margin-bottom: 20px;
+}
+
+.superadmin-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: white;
+  padding: 20px 24px;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  min-width: 120px;
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.superadmin-page .super-table {
+  margin-top: 16px;
+}
+
+.btn-primary {
+  padding: 10px 20px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+}
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  max-width: 480px;
+  width: 90%;
+}
+
+.modal-content label {
+  display: block;
+  margin-top: 12px;
+  margin-bottom: 4px;
+}
+
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+}
+
+.modal-actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 12px;
+}
+
+.audit-filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.pagination {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.notification-form label {
+  display: block;
+  margin-top: 12px;
+  margin-bottom: 4px;
+}
+
+.notification-form input,
+.notification-form textarea,
+.notification-form select {
+  width: 100%;
+  max-width: 400px;
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+}
+
+.user-checkboxes {
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #e5e7eb;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+.user-checkboxes label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.notification-result {
+  margin-top: 12px;
+  color: #16a34a;
+}

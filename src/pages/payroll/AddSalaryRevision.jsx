@@ -1,9 +1,14 @@
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../../api/axios";
 import { formatINR } from "../../utils/currency";
 import toast from "react-hot-toast";
 import SalaryComparison from "./SalaryComparison";
+import {
+  buildCalculatedSalaryPayload,
+  calculatePayroll,
+  yearlyAmount,
+} from "../../utils/payrollCalculations";
 import "../../styles/addSalaryRevision.css";
 
 export default function AddSalaryRevision() {
@@ -45,7 +50,7 @@ export default function AddSalaryRevision() {
 
       try {
 
-        const res = await api.get(`/payroll/salary/employee/${id}/`);
+        const res = await api.get(`/employees/${id}/salary/`);
 
         setCurrentSalary(res.data || {});
         setSalary(res.data || {});
@@ -70,29 +75,13 @@ export default function AddSalaryRevision() {
 
   /* ================= CALCULATIONS ================= */
 
-  const gross =
-    Number(salary.basic || 0) +
-    Number(salary.da || 0) +
-    Number(salary.hra || 0) +
-    Number(salary.conveyance || 0) +
-    Number(salary.medical || 0) +
-    Number(salary.special_allowance || 0);
-
-  const deductions =
-    Number(salary.employee_pf || 0) +
-    Number(salary.professional_tax || 0) +
-    Number(salary.employee_esi || 0) +
-    Number(salary.tds || 0) +
-    Number(salary.medical_insurance || 0);
-
-  const netSalary = gross - deductions;
-
-  const employerBenefits =
-    Number(salary.employer_pf || 0) +
-    Number(salary.employer_esi || 0) +
-    Number(salary.gratuity || 0);
-
-  const ctc = gross + employerBenefits;
+  const payroll = useMemo(() => calculatePayroll(salary), [salary]);
+  const salaryPayload = useMemo(() => buildCalculatedSalaryPayload(salary), [salary]);
+  const gross = payroll.gross;
+  const deductions = payroll.totalDeductions;
+  const netSalary = payroll.netSalary;
+  const additionalBenefits = payroll.additionalBenefits;
+  const ctc = payroll.ctc;
 
   /* ================= SAVE ================= */
 
@@ -112,7 +101,7 @@ export default function AddSalaryRevision() {
         effective_from: form.effective_from,
         reason: form.reason,
         notes: form.notes,
-        ...salary,
+        ...salaryPayload,
       });
 
       toast.success("Salary revision added");
@@ -194,30 +183,34 @@ export default function AddSalaryRevision() {
           </thead>
 
           <tbody>
+            <SectionRow label="Earnings (A)" />
 
             <SalaryRow label="Basic" field="basic" salary={salary} setSalary={updateSalary} />
             <SalaryRow label="DA" field="da" salary={salary} setSalary={updateSalary} />
             <SalaryRow label="HRA" field="hra" salary={salary} setSalary={updateSalary} />
-            <SalaryRow label="Conveyance" field="conveyance" salary={salary} setSalary={updateSalary} />
-            <SalaryRow label="Medical" field="medical" salary={salary} setSalary={updateSalary} />
+            <SalaryRow label="Conveyance Allowance" field="conveyance" salary={salary} setSalary={updateSalary} />
+            <SalaryRow label="Medical Allowance" field="medical" salary={salary} setSalary={updateSalary} />
             <SalaryRow label="Special Allowance" field="special_allowance" salary={salary} setSalary={updateSalary} />
 
-            <SummaryRow label="Gross Salary" value={gross} />
+            <SummaryRow label="Gross Salary (A)" value={gross} />
 
+            <SectionRow label="Deductions (B)" />
             <SalaryRow label="Employee PF" field="employee_pf" salary={salary} setSalary={updateSalary} />
             <SalaryRow label="Professional Tax" field="professional_tax" salary={salary} setSalary={updateSalary} />
             <SalaryRow label="Employee ESI" field="employee_esi" salary={salary} setSalary={updateSalary} />
             <SalaryRow label="TDS" field="tds" salary={salary} setSalary={updateSalary} />
             <SalaryRow label="Medical Insurance" field="medical_insurance" salary={salary} setSalary={updateSalary} />
 
-            <SummaryRow label="Total Deductions" value={deductions} />
-            <SummaryRow label="Net Salary" value={netSalary} />
+            <SummaryRow label="Total Deductions (B)" value={deductions} />
+            <SummaryRow label="Net Salary (A - B)" value={netSalary} />
 
+            <SectionRow label="Employer Contributions" />
             <SalaryRow label="Employer PF" field="employer_pf" salary={salary} setSalary={updateSalary} />
             <SalaryRow label="Employer ESI" field="employer_esi" salary={salary} setSalary={updateSalary} />
             <SalaryRow label="Gratuity" field="gratuity" salary={salary} setSalary={updateSalary} />
 
-            <SummaryRow label="CTC" value={ctc} />
+            <SummaryRow label="Additional Benefits (C)" value={additionalBenefits} />
+            <SummaryRow label="CTC (A + C)" value={ctc} />
 
           </tbody>
 
@@ -253,9 +246,19 @@ const Input = ({ label, ...props }) => (
   </div>
 );
 
-const SalaryRow = ({ label, field, salary, setSalary }) => {
+const SectionRow = ({ label }) => (
+  <tr className="summary-row">
+    <td colSpan="3"><strong>{label}</strong></td>
+  </tr>
+);
 
-  const value = salary[field] || "";
+const SalaryRow = ({
+  label,
+  field,
+  salary,
+  setSalary,
+}) => {
+  const value = salary[field] ?? "";
 
   return (
     <tr>
@@ -267,10 +270,12 @@ const SalaryRow = ({ label, field, salary, setSalary }) => {
           type="number"
           value={value}
           onChange={(e) => setSalary(field, e.target.value)}
+          step="0.01"
+          min="0"
         />
       </td>
 
-      <td>{formatINR(Number(value || 0) * 12)}</td>
+      <td>{formatINR(yearlyAmount(value))}</td>
 
     </tr>
   );
@@ -284,7 +289,7 @@ const SummaryRow = ({ label, value }) => (
 
     <td>{formatINR(value)}</td>
 
-    <td>{formatINR(value * 12)}</td>
+    <td>{formatINR(yearlyAmount(value))}</td>
 
   </tr>
 

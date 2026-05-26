@@ -1,38 +1,40 @@
 import { useEffect, useState } from "react";
 import api from "../../api/axios";
 import toast from "react-hot-toast";
-import useInView from "../../hooks/useInView";
-import useCountUp from "../../hooks/useCountUp";
 import "../../styles/myLeaves.css";
 
 export default function MyLeaves() {
   const [leaves, setLeaves] = useState([]);
+  const [balances, setBalances] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("ALL");
   const [viewModal, setViewModal] = useState(null);
   const [cancelModal, setCancelModal] = useState(null);
-  const [actionDropdown, setActionDropdown] = useState(null);
 
   useEffect(() => {
     fetchMyLeaves();
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (!e.target.closest('.action-dropdown-wrapper')) {
-        setActionDropdown(null);
-      }
-    };
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, []);
-
   const fetchMyLeaves = async () => {
     try {
-      const res = await api.get("/leaves/me/");
-      setLeaves(res.data);
-    } catch {
-      toast.error("Failed to fetch leaves");
+      const [leavesRes, balancesRes] = await Promise.allSettled([
+        api.get("/leaves/me/"),
+        api.get("/leaves/my-balance/"),
+      ]);
+
+      if (leavesRes.status === "fulfilled") {
+        setLeaves(leavesRes.value.data || []);
+      } else {
+        setLeaves([]);
+        toast.error("Failed to fetch leave requests");
+      }
+
+      if (balancesRes.status === "fulfilled") {
+        setBalances(balancesRes.value.data || []);
+      } else {
+        setBalances([]);
+        toast.error("Failed to fetch leave balances");
+      }
     } finally {
       setLoading(false);
     }
@@ -60,7 +62,7 @@ export default function MyLeaves() {
       ? leaves
       : leaves.filter((leave) => leave.status === filter);
 
-  const summary = {
+  const requestSummary = {
     total: leaves.length,
     pending: leaves.filter((l) => l.status === "PENDING").length,
     approved: leaves.filter((l) => l.status === "APPROVED").length,
@@ -68,13 +70,46 @@ export default function MyLeaves() {
     cancelled: leaves.filter((l) => l.status === "CANCELLED").length,
   };
 
-  const [summaryRef, isVisible] = useInView();
+  const balanceSummary = {
+    leaveTypes: balances.length,
+    allocated: balances.reduce(
+      (total, item) => total + Number(item.total_allocated || 0),
+      0
+    ),
+    used: balances.reduce((total, item) => total + Number(item.used || 0), 0),
+    remaining: balances.reduce(
+      (total, item) => total + Number(item.remaining || 0),
+      0
+    ),
+  };
 
-  const animatedTotal = useCountUp(isVisible ? summary.total : 0);
-  const animatedPending = useCountUp(isVisible ? summary.pending : 0);
-  const animatedApproved = useCountUp(isVisible ? summary.approved : 0);
-  const animatedRejected = useCountUp(isVisible ? summary.rejected : 0);
-  const animatedCancelled = useCountUp(isVisible ? summary.cancelled : 0);
+  const kpiCards = [
+    {
+      label: "Leave Types",
+      value: balanceSummary.leaveTypes,
+      className: "kpi-blue",
+    },
+    {
+      label: "Allocated",
+      value: balanceSummary.allocated,
+      className: "kpi-green",
+    },
+    {
+      label: "Used",
+      value: balanceSummary.used,
+      className: "kpi-amber",
+    },
+    {
+      label: "Remaining",
+      value: balanceSummary.remaining,
+      className: "kpi-indigo",
+    },
+    {
+      label: "Requests",
+      value: requestSummary.total,
+      className: "kpi-rose",
+    },
+  ];
 
   if (loading) {
     return <p style={{ padding: 20 }}>Loading leaves...</p>;
@@ -89,42 +124,14 @@ export default function MyLeaves() {
         </div>
       </div>
 
-      {/* Summary Cards */}
-      <div className="leave-summary" ref={summaryRef}>
-        <div
-          className={`summary-card ${isVisible ? "show" : ""}`}
-          style={{ transitionDelay: "0ms" }}
-        >
-          Total <br /> {animatedTotal}
-        </div>
-
-        <div
-          className={`summary-card pending ${isVisible ? "show" : ""}`}
-          style={{ transitionDelay: "100ms" }}
-        >
-          Pending <br /> {animatedPending}
-        </div>
-
-        <div
-          className={`summary-card approved ${isVisible ? "show" : ""}`}
-          style={{ transitionDelay: "200ms" }}
-        >
-          Approved <br /> {animatedApproved}
-        </div>
-
-        <div
-          className={`summary-card rejected ${isVisible ? "show" : ""}`}
-          style={{ transitionDelay: "300ms" }}
-        >
-          Rejected <br /> {animatedRejected}
-        </div>
-
-        <div
-          className={`summary-card cancelled ${isVisible ? "show" : ""}`}
-          style={{ transitionDelay: "400ms" }}
-        >
-          Cancelled <br /> {animatedCancelled}
-        </div>
+      {/* KPI Cards */}
+      <div className="kpi-grid">
+        {kpiCards.map((card) => (
+          <div key={card.label} className={`kpi-card ${card.className}`}>
+            <span className="kpi-label">{card.label}</span>
+            <span className="kpi-value">{card.value}</span>
+          </div>
+        ))}
       </div>
 
       {leaves.length === 0 ? (
@@ -191,20 +198,23 @@ export default function MyLeaves() {
                     </td>
                     <td className="reason">{leave.reason}</td>
                     <td className="action-cell">
-                      <div className="action-dropdown-wrapper">
+                      <div className="leave-action-buttons">
                         <button
-                          className="action-btn"
-                          onClick={() => setActionDropdown(actionDropdown === leave.id ? null : leave.id)}
+                          type="button"
+                          className="table-action-btn action-view"
+                          onClick={() => setViewModal(leave)}
                         >
-                          ⋮
+                          View
                         </button>
-                        {actionDropdown === leave.id && (
-                          <div className="action-dropdown">
-                            <button onClick={() => { setViewModal(leave); setActionDropdown(null); }}>👁️ View</button>
-                            {(leave.status === "PENDING" || leave.status === "APPROVED") && (
-                              <button onClick={() => { setCancelModal(leave.id); setActionDropdown(null); }}>❌ Cancel</button>
-                            )}
-                          </div>
+                        {(leave.status === "PENDING" ||
+                          leave.status === "APPROVED") && (
+                          <button
+                            type="button"
+                            className="table-action-btn action-cancel"
+                            onClick={() => setCancelModal(leave.id)}
+                          >
+                            Cancel
+                          </button>
                         )}
                       </div>
                     </td>

@@ -2,21 +2,6 @@
   width: 100%;
 }
 
-/* ===============================
-   STAGGER ANIMATION
-================================= */
-
-.summary-card {
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.6s ease;
-}
-
-.summary-card.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
 /* ================= HEADER ================= */
 
 .page-header {
@@ -53,12 +38,15 @@
   background: white;
   border-radius: 16px;
   overflow-x: auto;
+  overflow-y: visible;
+  position: relative;
 }
 
 .leaves-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 14px;
+  overflow: visible;
 }
 
 .leaves-table th {
@@ -112,47 +100,57 @@
 
 
 /* ===============================
-   SUMMARY SECTION
+  KPI SECTION
 ================================= */
 
-.leave-summary {
+.kpi-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 16px;
   margin: 20px 0;
 }
 
-.summary-card {
+.kpi-card {
   background: #ffffff;
   padding: 18px;
   border-radius: 14px;
-  font-weight: 600;
-  text-align: center;
-  font-size: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #e5e7eb;
 }
 
-.summary-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.1);
+.kpi-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748b;
 }
 
-/* Status Colors */
-.summary-card.pending {
-  border-left: 5px solid #f59e0b;
+.kpi-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #0f172a;
 }
 
-.summary-card.approved {
-  border-left: 5px solid #22c55e;
+.kpi-blue {
+  border-top: 4px solid #2563eb;
 }
 
-.summary-card.rejected {
-  border-left: 5px solid #ef4444;
+.kpi-green {
+  border-top: 4px solid #16a34a;
 }
 
-.summary-card.cancelled {
-  border-left: 5px solid #6b7280;
+.kpi-amber {
+  border-top: 4px solid #f59e0b;
+}
+
+.kpi-indigo {
+  border-top: 4px solid #4f46e5;
+}
+
+.kpi-rose {
+  border-top: 4px solid #e11d48;
 }
 
 
@@ -194,6 +192,7 @@
 
 .leaves-table-wrapper {
   overflow-x: auto;
+  overflow-y: visible;
 }
 
 .leaves-table {
@@ -201,7 +200,7 @@
   border-collapse: collapse;
   background: #ffffff;
   border-radius: 14px;
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
 }
 
@@ -256,65 +255,49 @@
 }
 
 /* ===============================
-   ACTION DROPDOWN
+  ACTION BUTTONS
 ================================= */
 
 .action-cell {
   position: relative;
+  min-width: 150px;
 }
 
-.action-dropdown-wrapper {
-  position: relative;
-  display: inline-block;
+.leave-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
-.action-btn {
-  background: #f3f4f6;
+.table-action-btn {
   border: none;
-  padding: 6px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 18px;
-  font-weight: bold;
-  transition: background 0.2s ease;
-}
-
-.action-btn:hover {
-  background: #e5e7eb;
-}
-
-.action-dropdown {
-  position: absolute;
-  right: 0;
-  top: 100%;
-  margin-top: 4px;
-  background: white;
-  border: 1px solid #e5e7eb;
+  padding: 7px 12px;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 100;
-  min-width: 120px;
-  overflow: hidden;
-}
-
-.action-dropdown button {
-  display: block;
-  width: 100%;
-  padding: 10px 16px;
-  border: none;
-  background: white;
-  text-align: left;
   cursor: pointer;
-  font-size: 14px;
-  transition: background 0.2s ease;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s ease;
 }
 
-.action-dropdown button:hover {
-  background: #f3f4f6;
+.action-view {
+  background: #dbeafe;
+  color: #1d4ed8;
 }
 
-.action-dropdown button:not(:last-child) {
-  border-bottom: 1px solid #f3f4f6;
+.action-view:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.action-cancel {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.action-cancel:hover {
+  background: #dc2626;
+  color: #ffffff;
 }
 
 
@@ -524,7 +507,7 @@
 ================================= */
 
 @media (max-width: 768px) {
-  .leave-summary {
+  .kpi-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 
@@ -549,5 +532,10 @@
 
   .detail-row .value {
     text-align: left;
+  }
+
+  .leave-action-buttons {
+    flex-direction: column;
+    align-items: stretch;
   }
 }

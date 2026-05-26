@@ -1,6 +1,10 @@
 import jsPDF from "jspdf";
 
-export function generatePayslip({ employee, month, payroll }) {
+/**
+ * Generate a client-side payslip PDF.
+ * `companyName` should be passed from the logged-in user's company (authUser.company.name).
+ */
+export function generatePayslip({ employee, month, payroll, companyName = "HRMS" }) {
   const doc = new jsPDF();
 
   /* ================= COMPANY HEADER ================= */
@@ -8,7 +12,7 @@ export function generatePayslip({ employee, month, payroll }) {
   // Company Name
   doc.setFontSize(16);
   doc.setFont("helvetica", "bold");
-  doc.text("Genius Minds Making Code Pvt Ltd", 105, 18, {
+  doc.text(companyName, 105, 18, {
     align: "center",
   });
 

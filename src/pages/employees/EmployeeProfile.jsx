@@ -2,7 +2,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEmployees } from "../../context/EmployeesContext";
 import { useState, useEffect } from "react";
 import { formatINR } from "../../utils/currency";
+import { yearlyAmount } from "../../utils/payrollCalculations";
 import api from "../../api/axios";
+import { getEmployeeById, patchEmployeeById } from "../../api/employees";
 import SalaryTimeline from "../payroll/SalaryTimeline";
 import "../../styles/employeeProfile.css";
 
@@ -30,7 +32,7 @@ export default function EmployeeProfile() {
 
         setLoading(true);
 
-        const res = await api.get(`/employees/${id}/`);
+        const res = await getEmployeeById(id);
         setEmployee(res.data);
 
       } catch (error) {
@@ -68,14 +70,25 @@ export default function EmployeeProfile() {
 
   }, [id]);
 
-  if (loading) return <p style={{ padding: 24 }}>Loading employee...</p>;
-  if (!employee) return <p style={{ padding: 24 }}>Employee not found</p>;
+  if (loading) {
+    return (
+      <div className="loading-state">
+        <div className="spinner" />
+        <p>Loading employee profile...</p>
+      </div>
+    );
+  }
+  if (!employee) return <p className="profile-empty">Employee not found</p>;
 
   const firstName = employee.first_name || "";
   const lastName = employee.last_name || "";
+  const initials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() || "NA";
   const status = (employee.status || "Inactive").toLowerCase();
 
   const salary = employee.salary || {};
+  const yearlyGross = salary.yearly_gross ?? yearlyAmount(salary.gross_salary);
+  const yearlyNet = salary.yearly_net ?? yearlyAmount(salary.net_salary);
+  const yearlyCTC = salary.yearly_ctc ?? yearlyAmount(salary.ctc);
 
   /* ================= PROFILE IMAGE ================= */
 
@@ -99,7 +112,7 @@ export default function EmployeeProfile() {
 
     try {
 
-      await api.patch(`/employees/${employee.id}/`, formData, {
+      await patchEmployeeById(employee.id, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
@@ -112,7 +125,7 @@ export default function EmployeeProfile() {
 
     try {
 
-      await api.patch(`/employees/${employee.id}/`, {
+      await patchEmployeeById(employee.id, {
         profile_photo: null,
       });
 
@@ -178,8 +191,7 @@ export default function EmployeeProfile() {
               <img src={imageUrl} alt="Profile" className="avatar-image" />
             ) : (
               <div className="avatar-circle">
-                {firstName.charAt(0)}
-                {lastName.charAt(0)}
+                {initials}
               </div>
             )}
 
@@ -224,6 +236,7 @@ export default function EmployeeProfile() {
             </div>
 
             <p>Employee ID: {employee.employee_id}</p>
+            <p className="profile-meta-line">{employee.designation || "-"} • {employee.department || "-"}</p>
 
           </div>
 
@@ -250,6 +263,7 @@ export default function EmployeeProfile() {
       {/* JOB */}
 
       <Section title="Job Details">
+        <Field label="Role" value={employee.role} />
         <Field label="Department" value={employee.department} />
         <Field label="Designation" value={employee.designation} />
         <Field label="Employment Type" value={employee.employment_type} />
@@ -260,15 +274,15 @@ export default function EmployeeProfile() {
 
       {/* SALARY SUMMARY */}
 
-      <Section title="Salary Summary">
+      <Section title="Salary Summary" variant="salary">
 
         <Field label="Monthly Gross" value={formatINR(salary.gross_salary || 0)} />
         <Field label="Monthly Net" value={formatINR(salary.net_salary || 0)} />
         <Field label="Monthly CTC" value={formatINR(salary.ctc || 0)} />
 
-        <Field label="Yearly Gross" value={formatINR(salary.yearly_gross || 0)} />
-        <Field label="Yearly Net" value={formatINR(salary.yearly_net || 0)} />
-        <Field label="Yearly CTC" value={formatINR(salary.yearly_ctc || 0)} />
+        <Field label="Yearly Gross" value={formatINR(yearlyGross)} />
+        <Field label="Yearly Net" value={formatINR(yearlyNet)} />
+        <Field label="Yearly CTC" value={formatINR(yearlyCTC)} />
 
       </Section>
 
@@ -292,7 +306,7 @@ export default function EmployeeProfile() {
         {!salaryHistory || salaryHistory.length === 0 ? (
           <p style={{ marginTop: 10 }}>No salary revisions found.</p>
         ) : (
-          <SalaryTimeline history={salaryHistory} />
+          <SalaryTimeline employeeId={employee.id} />
         )}
 
       </div>
@@ -307,6 +321,7 @@ export default function EmployeeProfile() {
         <Field label="PAN" value={employee.pan} />
 
         <Field label="PF Applicable" value={employee.pf_applicable ? "Yes" : "No"} />
+        <Field label="PF Number" value={employee.pf_number} />
 
         {employee.pf_applicable && (
           <Field label="UAN Number" value={employee.uan_number} />
@@ -325,6 +340,12 @@ export default function EmployeeProfile() {
 
       </Section>
 
+      <Section title="Emergency Details">
+        <Field label="Emergency Contact Name" value={employee.emergency_name} />
+        <Field label="Emergency Contact Number" value={employee.emergency_number} />
+        <Field label="Notes" value={employee.notes} />
+      </Section>
+
       {/* DOCUMENTS */}
 
       <div className="profile-section">
@@ -335,7 +356,8 @@ export default function EmployeeProfile() {
 
           {renderDocument("Resume", employee.resume)}
           {renderDocument("Offer Letter", employee.offer_letter)}
-          {renderDocument("ID Proof", employee.id_proof)}
+          {renderDocument("Aadhar Card", employee.aadhar_card)}
+          {renderDocument("PAN Card", employee.pan_card)}
           {renderDocument("Address Proof", employee.address_proof)}
           {renderDocument("Education Certificate", employee.education_cert)}
           {renderDocument("Experience Certificate", employee.experience_cert)}
@@ -350,15 +372,15 @@ export default function EmployeeProfile() {
 
 /* ================= REUSABLE COMPONENTS ================= */
 
-const Section = ({ title, children }) => (
-  <div className="profile-section">
+const Section = ({ title, children, variant = "" }) => (
+  <div className={`profile-section ${variant}`}>
     <h3>{title}</h3>
     <div className="profile-grid">{children}</div>
   </div>
 );
 
 const Field = ({ label, value }) => (
-  <div>
+  <div className="profile-field">
     <label>{label}</label>
     <p>{value || "-"}</p>
   </div>

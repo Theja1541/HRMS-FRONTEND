@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { getPayrollDashboardSummary } from "../api/payroll";
 import { useAuth } from "../auth/AuthContext";
 
@@ -11,18 +11,19 @@ export const PayrollProvider = ({ children }) => {
     new Date().toISOString().slice(0, 7)
   );
 
-  useEffect(() => {
-    fetchStatus();
-  }, [month]);
-
-  const fetchStatus = async () => {
+  const fetchStatus = useCallback(async () => {
     try {
       const res = await getPayrollDashboardSummary(month);
       setPayrollStatus(res.data.status);
     } catch {
       setPayrollStatus("OPEN");
     }
-  };
+  }, [month]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    fetchStatus();
+  }, [fetchStatus]);
 
   const isLocked =
     payrollStatus === "CLOSED" &&
@@ -43,4 +44,5 @@ export const PayrollProvider = ({ children }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const usePayroll = () => useContext(PayrollContext);

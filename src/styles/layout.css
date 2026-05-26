@@ -21,13 +21,32 @@
 
 .layout-main {
   flex: 1;
+  min-height: 0;        /* allow flex child to shrink and scroll */
   background: #f6f8fc;
-  overflow-x: hidden;   /* ✅ Important */
+  overflow-x: hidden;
+  overflow-y: auto;    /* scroll when content (e.g. Create User form) is taller than viewport */
 }
 
 .layout-content {
   padding: 28px;
   max-width: 100%;
+  min-height: min-content;
+}
+
+.layout-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  min-height: 56px;
+  padding: 10px 28px 0;
+  background: linear-gradient(180deg, #f6f8fc 72%, rgba(246, 248, 252, 0));
+}
+
+.layout-topbar + .layout-content {
+  padding-top: 12px;
 }
 
 
@@ -39,6 +58,10 @@
 
   .layout-content {
     padding: 16px;
+  }
+
+  .layout-topbar {
+    padding: 10px 16px 0 76px;
   }
 }
 

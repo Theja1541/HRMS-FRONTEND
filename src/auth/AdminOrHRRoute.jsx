@@ -3,12 +3,13 @@ import { useAuth } from "./AuthContext";
 
 export default function AdminOrHRRoute({ children }) {
   const { user } = useAuth();
+  const currentRole = (user?.role || "").toUpperCase().trim();
 
-  if (!user || !user.isAuthenticated) {
+  if (!user || !currentRole) {
     return <Navigate to="/login" replace />;
   }
 
-  if (user.role !== "admin" && user.role !== "hr") {
+  if (!["ADMIN", "HR", "SUPER_ADMIN"].includes(currentRole)) {
     return <Navigate to="/employee/dashboard" replace />;
   }
 

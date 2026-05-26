@@ -1,8 +1,45 @@
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 import api from "../api/axios";
+import {
+  createEmployee,
+  deactivateEmployeeById,
+  getEmployees,
+  updateEmployeeById,
+} from "../api/employees";
 import { useAuth } from "../auth/AuthContext";
 
 const EmployeesContext = createContext(null);
+
+function getErrorMessage(error, fallbackMessage) {
+  const data = error?.response?.data;
+  if (!data) return fallbackMessage;
+
+  const candidates = [
+    data.message,
+    data.error,
+    data.detail,
+  ];
+
+  for (const candidate of candidates) {
+    if (typeof candidate === "string" && candidate.trim()) {
+      return candidate;
+    }
+    if (Array.isArray(candidate) && candidate.length > 0) {
+      return String(candidate[0]);
+    }
+  }
+
+  for (const value of Object.values(data)) {
+    if (typeof value === "string" && value.trim()) {
+      return value;
+    }
+    if (Array.isArray(value) && value.length > 0) {
+      return String(value[0]);
+    }
+  }
+
+  return fallbackMessage;
+}
 
 export function EmployeesProvider({ children }) {
   const { user } = useAuth() || {};
@@ -30,7 +67,7 @@ export function EmployeesProvider({ children }) {
         if (dept) params.department = dept;
         if (roleFilter) params.role = roleFilter;
 
-        const res = await api.get("/employees/", { params });
+        const res = await getEmployees(params);
 
         setEmployees(res.data.results || []);
         setCount(res.data.count || 0);
@@ -70,11 +107,12 @@ export function EmployeesProvider({ children }) {
         employee_id: employeeId,
         status,
       });
-
-      await refreshAttendance(); 
+      await refreshAttendance();
       await fetchAttendance();
+      return { success: true };
     } catch (error) {
       console.error("Mark attendance failed:", error.response?.data);
+      throw error;
     }
   };
 
@@ -119,27 +157,33 @@ export function EmployeesProvider({ children }) {
         refreshEmployees,
         addEmployee: async (formData) => {
           try {
-            await api.post("/employees/", formData);
+            await createEmployee(formData);
             await refreshEmployees();
             return { success: true };
           } catch (error) {
             console.error("Add employee failed:", error.response?.data);
-            return { success: false, error: error.response?.data?.message || "Failed to add employee" };
+            return {
+              success: false,
+              error: getErrorMessage(error, "Failed to add employee"),
+            };
           }
         },
         updateEmployee: async (id, formData) => {
           try {
-            await api.put(`/employees/${id}/`, formData);
+            await updateEmployeeById(id, formData);
             await refreshEmployees();
             return { success: true };
           } catch (error) {
             console.error("Update employee failed:", error.response?.data);
-            return { success: false, error: error.response?.data?.message || "Failed to update employee" };
+            return {
+              success: false,
+              error: getErrorMessage(error, "Failed to update employee"),
+            };
           }
         },
         deactivateEmployee: async (id) => {
           try {
-            await api.delete(`/employees/${id}/`);
+            await deactivateEmployeeById(id);
             await refreshEmployees();
           } catch (error) {
             console.error("Deactivate failed:", error.response?.data);

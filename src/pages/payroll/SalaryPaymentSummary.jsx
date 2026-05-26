@@ -69,11 +69,14 @@ export default function SalaryPaymentSummary() {
     if (filters.status !== "ALL") filtered = filtered.filter((e) => e.status === filters.status);
     if (filters.search) {
       const search = filters.search.toLowerCase();
-      filtered = filtered.filter((e) => e.employee_name.toLowerCase().includes(search) || e.employee_id.toLowerCase().includes(search));
+      filtered = filtered.filter((e) => e.employee_name.toLowerCase().includes(search) || String(e.employee_id).toLowerCase().includes(search));
     }
-    setCurrentPage(1);
     return filtered;
   }, [data, filters]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filters]);
 
   const stats = useMemo(() => {
     const paid = filteredData.filter((e) => e.status === "PAID").length;
@@ -87,10 +90,31 @@ export default function SalaryPaymentSummary() {
     return filteredData.slice(start, start + itemsPerPage);
   }, [filteredData, currentPage]);
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage) || 1;
   const [year, monthNum] = month.split("-");
   const transactionDate = new Date(year, monthNum - 1, 28).toLocaleDateString("en-GB");
   const reference = `Salary${new Date(year, monthNum - 1).toLocaleString("en-US", { month: "short" })}${year}`;
+
+  const getPageNumbers = () => {
+    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    const pages = [];
+    if (currentPage <= 4) {
+      for (let i = 1; i <= 5; i++) pages.push(i);
+      pages.push("…", totalPages);
+    } else if (currentPage >= totalPages - 3) {
+      pages.push(1, "…");
+      for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
+    } else {
+      pages.push(1, "…", currentPage - 1, currentPage, currentPage + 1, "…", totalPages);
+    }
+    return pages;
+  };
+
+  const formatAccount = (acc) => {
+    if (!acc || acc === "N/A") return "—";
+    if (acc.length <= 8) return acc;
+    return `${acc.slice(0, 4)}••••${acc.slice(-4)}`;
+  };
 
   const handleMarkPaid = async () => {
     try {
@@ -204,85 +228,147 @@ export default function SalaryPaymentSummary() {
         <button onClick={exportToExcel} className="btn-export">📥 Export Excel</button>
       </div>
 
-      <div className="table-container">
-        <table className="payment-table">
-          <thead>
-            <tr>
-              <th>Employee</th>
-              <th>Amount</th>
-              <th>Account Details</th>
-              <th>Date</th>
-              <th>Reference</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              [...Array(5)].map((_, i) => (
-                <tr key={i} className="skeleton-row">
-                  {[...Array(7)].map((_, j) => (
-                    <td key={j}><div className="skeleton" /></td>
-                  ))}
+      <div className="table-wrapper" role="region" aria-label="Salary payment table">
+        <div className="table-container">
+          <table className="payment-table">
+            <thead>
+              <tr>
+                <th className="th-employee">Employee</th>
+                <th className="th-amount">Net Pay</th>
+                <th className="th-account">Bank Account</th>
+                <th className="th-date">Payment Date</th>
+                <th className="th-ref">Reference</th>
+                <th className="th-status">Status</th>
+                <th className="th-actions">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                [...Array(6)].map((_, i) => (
+                  <tr key={i} className="skeleton-row">
+                    <td><div className="skeleton skeleton-name" /></td>
+                    <td><div className="skeleton skeleton-amount" /></td>
+                    <td><div className="skeleton skeleton-account" /></td>
+                    <td><div className="skeleton skeleton-date" /></td>
+                    <td><div className="skeleton skeleton-ref" /></td>
+                    <td><div className="skeleton skeleton-status" /></td>
+                    <td><div className="skeleton skeleton-actions" /></td>
+                  </tr>
+                ))
+              ) : paginatedData.length === 0 ? (
+                <tr>
+                  <td colSpan="7" className="no-data">
+                    <div className="no-data-content">
+                      <span className="no-data-icon" aria-hidden>📋</span>
+                      <p>No salary records for this month</p>
+                      <span className="no-data-hint">Select another month or generate payslips first.</span>
+                    </div>
+                  </td>
                 </tr>
-              ))
-            ) : paginatedData.length === 0 ? (
-              <tr><td colSpan="7" className="no-data">No salary data found</td></tr>
-            ) : (
-              paginatedData.map((emp) => (
-                <tr key={emp.employee_id}>
-                  <td>
-                    <div className="employee-info">
-                      <div className="name">{emp.employee_name}</div>
-                      <div className="code-cell">{emp.employee_id}</div>
-                    </div>
-                  </td>
-                  <td className="amount">₹ {parseFloat(emp.net_pay).toLocaleString("en-IN")}</td>
-                  <td>
-                    <div className="account-info">
-                      <div className="account-cell">{emp.account_number !== "N/A" ? `${emp.account_number.slice(0, 4)}...${emp.account_number.slice(-4)}` : "N/A"}</div>
-                      <div className="ifsc-cell">{emp.ifsc}</div>
-                    </div>
-                  </td>
-                  <td>{transactionDate}</td>
-                  <td className="ref-cell">{reference}</td>
-                  <td><span className={`status-badge ${emp.status?.toLowerCase().replace(" ", "-")}`}>{emp.status}</span></td>
-                  <td className="actions">
-                    <button className="btn-action view" onClick={() => handleViewPayslip(emp.payslip_id)} title="View Payslip">
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                        <circle cx="12" cy="12" r="3"/>
-                      </svg>
-                    </button>
-                    {emp.status === "APPROVED" && (
-                      <button className="btn-action paid" onClick={() => setConfirmModal({ isOpen: true, payslipId: emp.payslip_id, employeeName: emp.employee_name })} title="Mark as Paid">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <polyline points="20 6 9 17 4 12"/>
+              ) : (
+                paginatedData.map((emp) => (
+                  <tr key={emp.payslip_id ?? emp.employee_id}>
+                    <td className="cell-employee">
+                      <div className="employee-info">
+                        <span className="employee-avatar" aria-hidden>
+                          {(emp.employee_name || "?").charAt(0).toUpperCase()}
+                        </span>
+                        <div className="employee-meta">
+                          <span className="name">{emp.employee_name}</span>
+                          <span className="code-cell">ID: {emp.employee_id}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="cell-amount amount">
+                      <span className="amount-value">₹ {parseFloat(emp.net_pay).toLocaleString("en-IN")}</span>
+                    </td>
+                    <td className="cell-account">
+                      <div className="account-info">
+                        <span className="account-cell">{formatAccount(emp.account_number)}</span>
+                        <span className="ifsc-cell">{emp.ifsc && emp.ifsc !== "N/A" ? emp.ifsc : "—"}</span>
+                      </div>
+                    </td>
+                    <td className="cell-date">{transactionDate}</td>
+                    <td className="cell-ref ref-cell">{reference}</td>
+                    <td className="cell-status">
+                      <span className={`status-badge status-${(emp.status || "").toLowerCase().replace(/\s+/g, "-")}`} role="status">
+                        {emp.status}
+                      </span>
+                    </td>
+                    <td className="cell-actions actions">
+                      <button
+                        type="button"
+                        className="btn-action view"
+                        onClick={() => handleViewPayslip(emp.payslip_id)}
+                        title="View payslip"
+                        aria-label={`View payslip for ${emp.employee_name}`}
+                      >
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                          <circle cx="12" cy="12" r="3" />
                         </svg>
                       </button>
-                    )}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {totalPages > 1 && (
-        <div className="pagination">
-          <button onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1}>‹ Previous</button>
-          <div className="page-numbers">
-            {[...Array(Math.min(5, totalPages))].map((_, i) => {
-              const page = i + 1;
-              return <button key={page} onClick={() => goToPage(page)} className={currentPage === page ? "active" : ""}>{page}</button>;
-            })}
-            {totalPages > 5 && <span>...</span>}
-            {totalPages > 5 && <button onClick={() => goToPage(totalPages)} className={currentPage === totalPages ? "active" : ""}>{totalPages}</button>}
-          </div>
-          <button onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages}>Next ›</button>
+                      {emp.status === "APPROVED" && (
+                        <button
+                          type="button"
+                          className="btn-action paid"
+                          onClick={() => setConfirmModal({ isOpen: true, payslipId: emp.payslip_id, employeeName: emp.employee_name })}
+                          title="Mark as paid"
+                          aria-label={`Mark ${emp.employee_name} as paid`}
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
         </div>
-      )}
+        {totalPages > 1 && (
+          <div className="pagination" role="navigation" aria-label="Table pagination">
+            <button
+              type="button"
+              className="pagination-btn pagination-prev"
+              onClick={() => goToPage(currentPage - 1)}
+              disabled={currentPage === 1}
+              aria-label="Previous page"
+            >
+              Previous
+            </button>
+            <div className="page-numbers">
+              {getPageNumbers().map((page, idx) =>
+                page === "…" ? (
+                  <span key={`ellipsis-${idx}`} className="page-ellipsis" aria-hidden>…</span>
+                ) : (
+                  <button
+                    key={page}
+                    type="button"
+                    className={`pagination-btn page-num ${currentPage === page ? "active" : ""}`}
+                    onClick={() => goToPage(page)}
+                    aria-label={`Page ${page}`}
+                    aria-current={currentPage === page ? "page" : undefined}
+                  >
+                    {page}
+                  </button>
+                )
+              )}
+            </div>
+            <button
+              type="button"
+              className="pagination-btn pagination-next"
+              onClick={() => goToPage(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              aria-label="Next page"
+            >
+              Next
+            </button>
+          </div>
+        )}
+      </div>
 
       <ConfirmModal
         isOpen={confirmModal.isOpen}
