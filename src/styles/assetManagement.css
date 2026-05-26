@@ -1,0 +1,257 @@
+/* ===============================
+   ASSET MANAGEMENT PAGE
+================================ */
+
+.asset-management-page {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* ===============================
+   ASSETS GRID
+================================ */
+
+.assets-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.asset-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 12px 35px rgba(15, 23, 42, 0.08);
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.asset-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 45px rgba(15, 23, 42, 0.12);
+}
+
+.asset-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+.asset-card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.asset-type {
+  display: inline-block;
+  background: #e0e7ff;
+  color: #1e40af;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+.asset-serial {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.asset-date {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 16px;
+}
+
+.delete-btn {
+  background: #ef4444;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.delete-btn:hover {
+  background: #dc2626;
+}
+
+/* ===============================
+   ADD ASSET BUTTON
+================================ */
+
+.add-asset-btn {
+  background: #2563eb;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-asset-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+/* ===============================
+   MODAL
+================================ */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+  background: white;
+  width: 500px;
+  max-width: 90%;
+  border-radius: 16px;
+  padding: 28px;
+  animation: slideUp 0.3s ease;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.modal-header h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #64748b;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.modal-close:hover {
+  color: #0f172a;
+}
+
+/* ===============================
+   FORM
+================================ */
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #0f172a;
+  margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.submit-btn {
+  width: 100%;
+  background: #2563eb;
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.submit-btn:hover {
+  background: #1d4ed8;
+}
+
+.submit-btn:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+/* ===============================
+   NO DATA
+================================ */
+
+.no-data, .loading-text {
+  text-align: center;
+  color: #64748b;
+  padding: 40px;
+  font-size: 14px;
+  grid-column: 1 / -1;
+}
+
+/* ===============================
+   ANIMATIONS
+================================ */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+
+@media (max-width: 768px) {
+  .assets-grid {
+    grid-template-columns: 1fr;
+  }
+}

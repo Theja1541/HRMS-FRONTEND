@@ -1,6 +1,9 @@
 import "../../styles/header.css";
+import { useAuth } from "../../auth/AuthContext";
 
 export default function Header({ onToggleSidebar }) {
+  const { user } = useAuth();
+
   return (
     <header className="app-header">
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
@@ -18,8 +21,8 @@ export default function Header({ onToggleSidebar }) {
         <span className="notification">🔔</span>
 
         <div className="user-info">
-          <div className="avatar">A</div>
-          <span className="username">Admin</span>
+          <div className="avatar">{user?.role?.charAt(0) || "A"}</div>
+          <span className="username">{user?.role || "Admin"}</span>
         </div>
 
         <button className="logout-btn">Logout</button>

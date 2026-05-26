@@ -1,0 +1,280 @@
+.settings-page {
+  padding: 30px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.settings-header {
+  margin-bottom: 30px;
+}
+
+.settings-header h2 {
+  font-size: 28px;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.settings-header p {
+  color: #64748b;
+  font-size: 14px;
+}
+
+.settings-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.settings-tabs .tab {
+  padding: 12px 24px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #64748b;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.settings-tabs .tab:hover {
+  color: #2563eb;
+}
+
+.settings-tabs .tab.active {
+  color: #2563eb;
+  border-bottom-color: #2563eb;
+}
+
+.settings-content {
+  animation: fadeIn 0.3s;
+}
+
+.settings-card {
+  background: white;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+}
+
+.settings-card h3 {
+  font-size: 20px;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.card-subtitle {
+  color: #64748b;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.form-field {
+  margin-bottom: 20px;
+}
+
+.form-field label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: #334155;
+  margin-bottom: 8px;
+}
+
+.form-field input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.form-field input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.alert {
+  padding: 14px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.alert-error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.alert-success {
+  background: #f0fdf4;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-primary {
+  background: #2563eb;
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.btn-primary:disabled {
+  background: #94a3b8;
+  cursor: not-allowed;
+}
+
+.info-box {
+  margin-top: 24px;
+  padding: 16px;
+  background: #f1f5f9;
+  border-radius: 8px;
+  border-left: 4px solid #2563eb;
+}
+
+.info-box p {
+  margin: 0;
+  color: #475569;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.form-field input:hover {
+  border-color: #cbd5f5;
+}
+
+.settings-tabs .tab {
+  position: relative;
+}
+
+.settings-tabs .tab::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 0;
+  height: 3px;
+  background: #2563eb;
+  transition: width 0.3s;
+}
+
+.settings-tabs .tab.active::after {
+  width: 100%;
+}
+
+.settings-page {
+  padding: 30px;
+  max-width: 800px;
+  margin: 0 auto;
+  background: #f8fafc;
+  min-height: 100vh;
+}
+
+.info-box {
+  margin-top: 24px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border-left: 4px solid #2563eb;
+  font-size: 14px;
+}
+
+.btn:disabled {
+  opacity: 0.7;
+}
+
+.settings-card h3 {
+  font-size: 20px;
+  color: #0f172a;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+@media (max-width: 768px) {
+  .settings-page {
+    padding: 20px 16px;
+  }
+
+  .settings-card {
+    padding: 20px;
+  }
+
+  .settings-tabs {
+    flex-direction: column;
+    border-bottom: none;
+  }
+
+  .settings-tabs .tab {
+    border-bottom: none;
+    border-left: 3px solid transparent;
+    text-align: left;
+  }
+
+  .settings-tabs .tab.active {
+    border-left-color: #2563eb;
+  }
+}
+
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .settings-page {
+    padding: 16px;
+  }
+
+  .settings-card {
+    padding: 20px;
+  }
+
+  .settings-tabs {
+    overflow-x: auto;
+  }
+
+  .settings-tabs .tab {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-header h2 {
+    font-size: 22px;
+  }
+
+  .settings-card {
+    padding: 16px;
+  }
+}

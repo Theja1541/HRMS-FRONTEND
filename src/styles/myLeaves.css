@@ -255,6 +255,68 @@
   color: #374151;
 }
 
+/* ===============================
+   ACTION DROPDOWN
+================================= */
+
+.action-cell {
+  position: relative;
+}
+
+.action-dropdown-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.action-btn {
+  background: #f3f4f6;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: bold;
+  transition: background 0.2s ease;
+}
+
+.action-btn:hover {
+  background: #e5e7eb;
+}
+
+.action-dropdown {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 4px;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  min-width: 120px;
+  overflow: hidden;
+}
+
+.action-dropdown button {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  background: white;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s ease;
+}
+
+.action-dropdown button:hover {
+  background: #f3f4f6;
+}
+
+.action-dropdown button:not(:last-child) {
+  border-bottom: 1px solid #f3f4f6;
+}
+
 
 /* ===============================
    BUTTONS
@@ -278,6 +340,171 @@
   background: #dc2626;
 }
 
+/* ===============================
+   MODAL STYLES
+================================= */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  color: #64748b;
+  line-height: 1;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.close-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-row .label {
+  font-weight: 600;
+  color: #475569;
+  font-size: 14px;
+}
+
+.detail-row .value {
+  color: #0f172a;
+  font-size: 14px;
+  text-align: right;
+}
+
+.confirm-modal {
+  max-width: 400px;
+}
+
+.confirm-modal .modal-body {
+  text-align: center;
+  padding: 32px 24px;
+}
+
+.confirm-modal .modal-body p {
+  font-size: 16px;
+  color: #475569;
+  margin: 0;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.btn-secondary {
+  padding: 10px 20px;
+  border: 1px solid #e5e7eb;
+  background: white;
+  color: #475569;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+.btn-danger {
+  padding: 10px 20px;
+  border: none;
+  background: #ef4444;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s ease;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}
+
 
 /* ===============================
    EMPTY STATE
@@ -290,4 +517,37 @@
   border-radius: 14px;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
   color: #6b7280;
+}
+
+/* ===============================
+   RESPONSIVE DESIGN
+================================= */
+
+@media (max-width: 768px) {
+  .leave-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .leaves-table {
+    font-size: 12px;
+  }
+
+  .leaves-table th,
+  .leaves-table td {
+    padding: 10px 8px;
+  }
+
+  .modal-content {
+    width: 95%;
+    max-width: none;
+  }
+
+  .detail-row {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .detail-row .value {
+    text-align: left;
+  }
 }

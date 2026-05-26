@@ -13,6 +13,7 @@ export function EmployeesProvider({ children }) {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [department, setDepartment] = useState("");
+  const [role, setRole] = useState("");
   const [loading, setLoading] = useState(false);
 
   /* ================= ATTENDANCE STATE ================= */
@@ -20,13 +21,14 @@ export function EmployeesProvider({ children }) {
 
   /* ================= FETCH EMPLOYEES ================= */
   const fetchEmployees = useCallback(
-    async (pageNumber = 1, searchQuery = search, dept = department) => {
+    async (pageNumber = 1, searchQuery = search, dept = department, roleFilter = role) => {
       try {
         setLoading(true);
 
         const params = { page: pageNumber };
         if (searchQuery) params.search = searchQuery;
         if (dept) params.department = dept;
+        if (roleFilter) params.role = roleFilter;
 
         const res = await api.get("/employees/", { params });
 
@@ -39,11 +41,11 @@ export function EmployeesProvider({ children }) {
         setLoading(false);
       }
     },
-    [search, department]
+    [search, department, role]
   );
 
   const refreshEmployees = async () => {
-    await fetchEmployees(page, search, department);
+    await fetchEmployees(page, search, department, role);
   };
 
   /* ================= FETCH ATTENDANCE ================= */
@@ -108,9 +110,11 @@ export function EmployeesProvider({ children }) {
         page,
         search,
         department,
+        role,
         loading,
         setSearch,
         setDepartment,
+        setRole,
         fetchEmployees,
         refreshEmployees,
         addEmployee: async (formData) => {

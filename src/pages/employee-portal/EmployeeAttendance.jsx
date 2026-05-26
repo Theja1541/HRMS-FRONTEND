@@ -180,9 +180,21 @@ export default function EmployeeAttendance() {
       {/* TODAY STATUS */}
       <div className="attendance-status-card">
         <h3>Today's Status</h3>
-
-        <div className={`status-pill ${todayStatus.toLowerCase().replace(/\s+/g, '-')}`}>
-          {todayStatus}
+        <div className="status-display">
+          <div className={`status-pill ${todayStatus.toLowerCase().replace(/\s+/g, '-')}`}>
+            <span className="status-icon">
+              {todayStatus === 'Present' && '✓'}
+              {todayStatus === 'Absent' && '✗'}
+              {todayStatus === 'Half Day' && '◐'}
+              {(todayStatus === 'Paid Leave' || todayStatus === 'Paid_Leave') && '🏖'}
+              {(todayStatus === 'Unpaid Leave' || todayStatus === 'Unpaid_Leave') && '📅'}
+              {todayStatus === 'Not Marked' && '⏳'}
+            </span>
+            <span className="status-text">{todayStatus}</span>
+          </div>
+          <div className="status-time">
+            {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
+          </div>
         </div>
       </div>
 

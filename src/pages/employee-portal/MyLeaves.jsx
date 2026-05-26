@@ -9,9 +9,22 @@ export default function MyLeaves() {
   const [leaves, setLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState("ALL");
+  const [viewModal, setViewModal] = useState(null);
+  const [cancelModal, setCancelModal] = useState(null);
+  const [actionDropdown, setActionDropdown] = useState(null);
 
   useEffect(() => {
     fetchMyLeaves();
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (!e.target.closest('.action-dropdown-wrapper')) {
+        setActionDropdown(null);
+      }
+    };
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
   }, []);
 
   const fetchMyLeaves = async () => {
@@ -25,10 +38,11 @@ export default function MyLeaves() {
     }
   };
 
-  const cancelLeave = async (id) => {
+  const handleCancelConfirm = async () => {
     try {
-      await api.post(`/leaves/${id}/cancel/`);
+      await api.post(`/leaves/cancel/${cancelModal}/`);
       toast.success("Leave cancelled successfully");
+      setCancelModal(null);
       fetchMyLeaves();
     } catch {
       toast.error("Failed to cancel leave");
@@ -176,15 +190,23 @@ export default function MyLeaves() {
                       </span>
                     </td>
                     <td className="reason">{leave.reason}</td>
-                    <td>
-                      {leave.status === "PENDING" && (
+                    <td className="action-cell">
+                      <div className="action-dropdown-wrapper">
                         <button
-                          className="btn small danger"
-                          onClick={() => cancelLeave(leave.id)}
+                          className="action-btn"
+                          onClick={() => setActionDropdown(actionDropdown === leave.id ? null : leave.id)}
                         >
-                          Cancel
+                          ⋮
                         </button>
-                      )}
+                        {actionDropdown === leave.id && (
+                          <div className="action-dropdown">
+                            <button onClick={() => { setViewModal(leave); setActionDropdown(null); }}>👁️ View</button>
+                            {(leave.status === "PENDING" || leave.status === "APPROVED") && (
+                              <button onClick={() => { setCancelModal(leave.id); setActionDropdown(null); }}>❌ Cancel</button>
+                            )}
+                          </div>
+                        )}
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -192,6 +214,75 @@ export default function MyLeaves() {
             </table>
           </div>
         </>
+      )}
+
+      {/* View Modal */}
+      {viewModal && (
+        <div className="modal-overlay" onClick={() => setViewModal(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Leave Details</h3>
+              <button className="close-btn" onClick={() => setViewModal(null)}>×</button>
+            </div>
+            <div className="modal-body">
+              <div className="detail-row">
+                <span className="label">Employee Name:</span>
+                <span className="value">{viewModal.employee_name}</span>
+              </div>
+              <div className="detail-row">
+                <span className="label">Leave Type:</span>
+                <span className="value">{viewModal.leave_type_name}</span>
+              </div>
+              <div className="detail-row">
+                <span className="label">Start Date:</span>
+                <span className="value">{new Date(viewModal.start_date).toLocaleDateString()}</span>
+              </div>
+              <div className="detail-row">
+                <span className="label">End Date:</span>
+                <span className="value">{new Date(viewModal.end_date).toLocaleDateString()}</span>
+              </div>
+              <div className="detail-row">
+                <span className="label">Number of Days:</span>
+                <span className="value">{calculateDays(viewModal.start_date, viewModal.end_date)}</span>
+              </div>
+              <div className="detail-row">
+                <span className="label">Reason:</span>
+                <span className="value">{viewModal.reason}</span>
+              </div>
+              <div className="detail-row">
+                <span className="label">Status:</span>
+                <span className={`status-badge ${viewModal.status?.toLowerCase()}`}>
+                  {viewModal.status === "PENDING" && "🟡 Pending"}
+                  {viewModal.status === "APPROVED" && "🟢 Approved"}
+                  {viewModal.status === "REJECTED" && "🔴 Rejected"}
+                  {viewModal.status === "CANCELLED" && "⚫ Cancelled"}
+                </span>
+              </div>
+              <div className="detail-row">
+                <span className="label">Applied Date:</span>
+                <span className="value">{new Date(viewModal.applied_on).toLocaleDateString()}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel Confirmation Modal */}
+      {cancelModal && (
+        <div className="modal-overlay" onClick={() => setCancelModal(null)}>
+          <div className="modal-content confirm-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Cancel Leave</h3>
+            </div>
+            <div className="modal-body">
+              <p>Are you sure you want to cancel this leave?</p>
+            </div>
+            <div className="modal-footer">
+              <button className="btn-secondary" onClick={() => setCancelModal(null)}>No</button>
+              <button className="btn-danger" onClick={handleCancelConfirm}>Yes</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

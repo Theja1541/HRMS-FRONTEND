@@ -27,6 +27,7 @@ import Leaves from "./pages/leaves/Leaves";
 import LeaveApproval from "./pages/leaves/LeavesApprovals";
 import LeaveRejected from "./pages/leaves/LeaveRejected";
 import LeaveHistory from "./pages/leaves/LeaveHistory";
+import LeaveSettings from "./pages/leaves/LeaveSettings";
 import Payroll from "./pages/payroll/Payroll";
 import EmailDashboard from "./pages/payroll/EmailDashboard";
 import SalaryEditor from "./pages/payroll/SalaryEditor";
@@ -43,6 +44,8 @@ import MyDocuments from "./pages/employee-portal/MyDocuments";
 import MyPayslips from "./pages/employee-portal/MyPayslips";
 import MyLeaveBalance from "./pages/employee-portal/MyLeaveBalance";
 import SalaryGrowthTimeline from "./pages/employee-portal/SalaryGrowthTimeline";
+import MySalary from "./pages/employee-portal/MySalary";
+import Settings from "./pages/auth/Settings";
 
 /* Super Admin */
 import SuperAdminLayout from "./components/superadmin/SuperAdminLayout";
@@ -58,6 +61,12 @@ import { ToastProvider } from "./context/ToastContext";
 
 import PayrollSummary from "./pages/payroll/PayrollSummary";
 import AddSalaryRevision from "./pages/payroll/AddSalaryRevision";
+import SalaryPaymentSummary from "./pages/payroll/SalaryPaymentSummary";
+import LeaveDashboard from "./pages/leaves/LeaveDashboard";
+import LeaveCalendar from "./pages/leaves/LeaveCalendar";
+import AssetReturnManagement from "./pages/assets/AssetReturnManagement";
+import AssetManagement from "./pages/assets/AssetManagement";
+import MyAssetReturns from "./pages/employee-portal/MyAssetReturns";
 
 /* Daybook Pages */
 import DaybookDashboard from "./pages/daybook/DaybookDashboard";
@@ -236,16 +245,20 @@ export default function App() {
             <Route path="monthly" element={<MonthlyAttendance />} />
 
             {/* Leaves */}
+            <Route path="leave-dashboard" element={<LeaveDashboard />} />
+            <Route path="leave-calendar" element={<LeaveCalendar />} />
             <Route path="leaves" element={<Leaves />} />
             <Route path="approvals" element={<LeaveApproval />} />
             <Route path="rejected" element={<LeaveRejected />} />
             <Route path="history" element={<LeaveHistory />} />
+            <Route path="leave-settings" element={<LeaveSettings />} />
 
             {/* Payroll */}
             <Route path="payroll" element={<Payroll />} />
             {/* <Route path="payroll/salary-structure" element={<SalaryStructure />} /> */}
             {/* <Route path="salary" element={<SalaryStructure />} /> */}
             <Route path="payroll-summary" element={<PayrollSummary />} />
+            <Route path="salary-payment-summary" element={<SalaryPaymentSummary />} />
             <Route path="payroll/full-final" element={<Payroll />} />
             <Route path="employees/:id/salary-revision" element={<AddSalaryRevision />}/>
 
@@ -260,6 +273,13 @@ export default function App() {
             <Route path="daybook/vendors" element={<Vendors />} />
             <Route path="daybook/categories" element={<Categories />} />
             <Route path="daybook/reports" element={<DaybookReports />} />
+            
+            {/* Assets */}
+            <Route path="assets" element={<AssetManagement />} />
+            <Route path="asset-returns" element={<AssetReturnManagement />} />
+            
+            {/* Settings */}
+            <Route path="settings" element={<Settings />} />
           </Route>
 
           {/* EMPLOYEE PORTAL */}
@@ -278,9 +298,12 @@ export default function App() {
             <Route path="my-leaves" element={<MyLeaves />} />
             <Route path="leave-balance" element={<MyLeaveBalance />} />
             <Route path="my-payslips" element={<MyPayslips />} />
+            <Route path="my-salary" element={<MySalary />} />
             <Route path="/employee/salary-timeline" element={<SalaryGrowthTimeline />} />
             <Route path="profile" element={<MyProfile />} />
             <Route path="my-documents" element={<MyDocuments />} />
+            <Route path="asset-returns" element={<MyAssetReturns />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/login" replace />} />

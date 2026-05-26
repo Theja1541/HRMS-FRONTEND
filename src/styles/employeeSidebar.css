@@ -1,6 +1,6 @@
-/* ===============================
+/* ==================================================
    EMPLOYEE SIDEBAR
-================================ */
+================================================== */
 
 .sidebar {
   width: 260px;
@@ -10,14 +10,24 @@
   display: flex;
   flex-direction: column;
   padding: 20px 16px;
+  transition: width 0.3s ease;
 }
 
-/* ===============================
+/* COLLAPSED */
+
+.sidebar.collapsed {
+  width: 80px;
+}
+
+/* ==================================================
    HEADER
-================================ */
+================================================== */
 
 .sidebar-header {
   margin-bottom: 28px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .sidebar-logo {
@@ -26,9 +36,17 @@
   letter-spacing: 0.5px;
 }
 
-/* ===============================
+.collapse-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* ==================================================
    MENU
-================================ */
+================================================== */
 
 .sidebar-menu {
   display: flex;
@@ -36,7 +54,7 @@
   gap: 6px;
 }
 
-/* Main Items */
+/* MAIN ITEMS */
 
 .sidebar-item {
   display: flex;
@@ -52,55 +70,69 @@
   cursor: pointer;
 }
 
+/* HOVER */
+
 .sidebar-item:hover {
   background: rgba(255, 255, 255, 0.08);
 }
 
-/* Active */
+/* ACTIVE */
 
 .sidebar-item.active {
   background: #2563eb;
   color: #ffffff;
 }
 
-/* ===============================
+/* ==================================================
    DROPDOWN
-================================ */
+================================================== */
 
-/* DROPDOWN FIXED VERSION */
+.dropdown-parent {
+  position: relative;
+  justify-content: space-between;
+}
+
+/* ARROW */
+
+.dropdown-arrow {
+  margin-left: auto;
+  font-size: 10px;
+  transition: transform 0.25s ease;
+}
+
+.dropdown-parent.open .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+/* DROPDOWN WRAPPER */
 
 .dropdown-wrapper {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  max-height: 0;
-  transition: max-height 0.3s ease;
-  margin-left: 20px;
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease;
 }
+
+/* SHOW DROPDOWN */
 
 .dropdown-wrapper.show {
-  max-height: 200px; /* enough to fit children */
+  grid-template-rows: 1fr;
 }
+
+/* INNER WRAPPER */
+
+.dropdown-wrapper > * {
+  overflow: hidden;
+}
+
+/* CHILD ITEMS */
 
 .sidebar-item.child {
   font-size: 13px;
   padding: 8px 12px;
   border-radius: 8px;
   opacity: 0.85;
-}
-
-.sidebar-item.child:hover {
-  background: rgba(255, 255, 255, 0.06);
-  opacity: 1;
-}
-
-/* Child Items */
-
-.sidebar-item.child {
-  font-size: 13px;
-  padding: 8px 12px;
-  border-radius: 8px;
-  opacity: 0.85;
+  margin-left: 28px;
+  margin-top: 4px;
 }
 
 .sidebar-item.child:hover {
@@ -113,9 +145,9 @@
   color: #ffffff;
 }
 
-/* ===============================
+/* ==================================================
    FOOTER
-================================ */
+================================================== */
 
 .sidebar-footer {
   margin-top: auto;
@@ -131,58 +163,10 @@
   background: rgba(239, 68, 68, 0.15);
 }
 
-/* ===============================
-   ANIMATION
-================================ */
+/* ==================================================
+   COLLAPSED MODE
+================================================== */
 
-@keyframes fadeSlideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ===============================
-   RESPONSIVE
-================================ */
-
-@media (max-width: 1024px) {
-  .sidebar {
-    width: 220px;
-  }
-}
-
-
-/* Collapse Mode */
-.sidebar {
-  width: 260px;
-  transition: width 0.3s ease;
-}
-
-.sidebar.collapsed {
-  width: 80px;
-}
-
-/* Header Layout */
-.sidebar-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.collapse-btn {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 14px;
-  cursor: pointer;
-}
-
-/* Hide text smoothly */
 .sidebar.collapsed .sidebar-logo {
   display: none;
 }
@@ -191,7 +175,20 @@
   display: none;
 }
 
-/* Center icons when collapsed */
 .sidebar.collapsed .sidebar-item {
   justify-content: center;
+}
+
+.sidebar.collapsed .dropdown-wrapper {
+  display: none;
+}
+
+/* ==================================================
+   RESPONSIVE
+================================================== */
+
+@media (max-width: 1024px) {
+  .sidebar {
+    width: 220px;
+  }
 }
