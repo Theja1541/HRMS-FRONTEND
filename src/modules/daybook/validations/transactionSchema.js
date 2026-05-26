@@ -13,11 +13,17 @@ export const transactionSchema = yup.object().shape({
   to_vendor: yup.number().nullable(),
   
   gst_applicable: yup.boolean(),
+  gst_rate: yup.number().when('gst_applicable', {
+    is: true,
+    then: () => yup.number().required("GST Rate is required").min(0, "GST Rate cannot be negative"),
+    otherwise: () => yup.number().nullable(),
+  }),
   gst_amount: yup.number().when('gst_applicable', {
     is: true,
     then: () => yup.number().required("GST Amount is required").min(0.01, "GST must be greater than 0"),
     otherwise: () => yup.number().nullable(),
   }),
+  hsn_code: yup.string().nullable(),
 
   bank_name: yup.string().when('payment_mode', {
     is: 'BANK',

@@ -25,6 +25,8 @@ export default function Billing() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [tab, setTab] = useState("Plans");
   const [plans, setPlans] = useState([]);
+  const [plansPage, setPlansPage] = useState(1);
+  const itemsPerPage = 5;
   const [payments, setPayments] = useState([]);
   const [invoices, setInvoices] = useState([]);
   const [alerts, setAlerts] = useState([]);
@@ -248,14 +250,19 @@ export default function Billing() {
             key={t}
             type="button"
             className={tab === t ? "btn primary" : "btn"}
-            onClick={() => setTab(t)}
+            onClick={() => { setTab(t); setPlansPage(1); }}
           >
             {t}
           </button>
         ))}
       </div>
 
-      {tab === "Plans" && (
+      {tab === "Plans" && (() => {
+        const totalPages = Math.ceil(plans.length / itemsPerPage);
+        const startIndex = (plansPage - 1) * itemsPerPage;
+        const paginatedPlans = plans.slice(startIndex, startIndex + itemsPerPage);
+
+        return (
         <div className="card" style={{ overflow: "visible" }}>
           <div style={{
             background: "linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%)",
@@ -285,7 +292,7 @@ export default function Billing() {
               <button type="button" className="btn primary" onClick={() => openPlanModal()}>Create First Plan</button>
             </div>
           ) : (
-            <div className="table-wrapper" style={{ margin: "0 -24px -24px -24px" }}>
+            <div className="table-wrapper" style={{ margin: "0 -24px -24px -24px", overflowX: 'visible' }}>
               <table className="table">
                 <thead>
                   <tr>
@@ -297,7 +304,7 @@ export default function Billing() {
                   </tr>
                 </thead>
                 <tbody>
-                  {plans.map((p) => (
+                  {paginatedPlans.map((p) => (
                     <tr key={p.id}>
                       <td>
                         <strong style={{ fontSize: "14px", color: "#0f172a" }}>{p.name}</strong>
@@ -340,10 +347,64 @@ export default function Billing() {
                   ))}
                 </tbody>
               </table>
+              
+              {plans.length > 0 && (
+                <div className="pagination" style={{ 
+                  marginTop: 0, 
+                  padding: '16px 24px', 
+                  background: '#f8fafc', 
+                  borderTop: '1px solid #e2e8f0',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <span className="page-summary" style={{ color: '#64748b', fontSize: '14px', fontWeight: '500', margin: 0 }}>
+                    Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, plans.length)} of {plans.length} plans
+                  </span>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <button
+                      style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #e2e8f0', background: plansPage === 1 ? '#f1f5f9' : '#fff', color: plansPage === 1 ? '#94a3b8' : '#334155', cursor: plansPage === 1 ? 'not-allowed' : 'pointer', fontWeight: '500', fontSize: '14px', transition: 'all 0.2s' }}
+                      disabled={plansPage === 1}
+                      onClick={() => setPlansPage(plansPage - 1)}
+                      onMouseEnter={(e) => { if (plansPage !== 1) { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#cbd5e1'; } }}
+                      onMouseLeave={(e) => { if (plansPage !== 1) { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e2e8f0'; } }}
+                    >
+                      Previous
+                    </button>
+                    
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      {Array.from({ length: Math.min(totalPages, 5) }, (_, idx) => {
+                        const start = Math.max(1, plansPage - 2);
+                        return start + idx <= totalPages ? start + idx : null;
+                      }).filter(Boolean).map((pg) => (
+                        <button
+                          key={pg}
+                          style={{ width: '36px', height: '36px', borderRadius: '8px', border: pg === plansPage ? 'none' : '1px solid #e2e8f0', background: pg === plansPage ? 'linear-gradient(135deg, #3b82f6, #2563eb)' : '#fff', color: pg === plansPage ? '#fff' : '#334155', cursor: 'pointer', fontWeight: pg === plansPage ? '600' : '500', fontSize: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: pg === plansPage ? '0 2px 4px rgba(37,99,235,0.2)' : 'none', transition: 'all 0.2s' }}
+                          onClick={() => setPlansPage(pg)}
+                          onMouseEnter={(e) => { if (pg !== plansPage) { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#cbd5e1'; } }}
+                          onMouseLeave={(e) => { if (pg !== plansPage) { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e2e8f0'; } }}
+                        >
+                          {pg}
+                        </button>
+                      ))}
+                    </div>
+
+                    <button
+                      style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #e2e8f0', background: plansPage >= totalPages ? '#f1f5f9' : '#fff', color: plansPage >= totalPages ? '#94a3b8' : '#334155', cursor: plansPage >= totalPages ? 'not-allowed' : 'pointer', fontWeight: '500', fontSize: '14px', transition: 'all 0.2s' }}
+                      disabled={plansPage >= totalPages}
+                      onClick={() => setPlansPage(plansPage + 1)}
+                      onMouseEnter={(e) => { if (plansPage < totalPages) { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#cbd5e1'; } }}
+                      onMouseLeave={(e) => { if (plansPage < totalPages) { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e2e8f0'; } }}
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
-      )}
+      );})()}
 
       {tab === "Payments" && (
         <div className="card" style={{ overflow: "visible" }}>

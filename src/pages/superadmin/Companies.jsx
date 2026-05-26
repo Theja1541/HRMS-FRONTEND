@@ -373,151 +373,152 @@ export default function Companies() {
         </button>
       </div>
 
-      {/* Debug Info */}
-      <pre style={{background: '#f1f5f9', padding: 8, fontSize: 10, maxHeight: 150, overflow: 'auto'}}>
-        {JSON.stringify(companies.map(c => ({id: c.id, name: c.name})), null, 2)}
-      </pre>
-      <div style={{ marginTop: 16, background: 'white', padding: 16 }}>
-        <div style={{ overflowX: 'auto' }}>
-          <table className="table" border="1">
-            <thead>
+      <div className="card" style={{ marginTop: 24, display: 'flex', flexDirection: 'column', overflow: 'visible', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', background: '#fff', border: '1px solid #f1f5f9', padding: 0 }}>
+        <div className="table-wrapper" style={{ width: '100%', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', overflow: 'visible' }}>
+          <table style={{ borderCollapse: 'collapse', width: '100%', textAlign: 'left' }}>
+            <thead style={{ background: 'linear-gradient(90deg, #f8fafc, #f1f5f9)', borderBottom: '2px solid #e2e8f0' }}>
               <tr>
-                <th style={{ width: "35%" }}>Company</th>
-                <th style={{ width: "15%" }}>Employees</th>
-                <th style={{ width: "15%" }}>Plan</th>
-                <th style={{ width: "15%" }}>Status</th>
-                <th style={{ width: "20%", textAlign: "center" }}>Action</th>
+                <th style={{ width: "35%", padding: "16px 24px", color: "#475569", fontWeight: "600", fontSize: "14px", textTransform: 'uppercase', letterSpacing: '0.05em' }}>Company</th>
+                <th style={{ width: "15%", padding: "16px", color: "#475569", fontWeight: "600", fontSize: "14px", textTransform: 'uppercase', letterSpacing: '0.05em', textAlign: "center" }}>Employees</th>
+                <th style={{ width: "15%", padding: "16px", color: "#475569", fontWeight: "600", fontSize: "14px", textTransform: 'uppercase', letterSpacing: '0.05em' }}>Plan</th>
+                <th style={{ width: "15%", padding: "16px", color: "#475569", fontWeight: "600", fontSize: "14px", textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</th>
+                <th style={{ width: "20%", padding: "16px 24px", textAlign: "center", color: "#475569", fontWeight: "600", fontSize: "14px", textTransform: 'uppercase', letterSpacing: '0.05em' }}>Action</th>
               </tr>
             </thead>
             <tbody>
               {paginatedCompanies.map((c, index) => (
-                <tr key={`${c.id}-${index}`}>
-                  <td>
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
-                      <strong style={{ fontSize: "14px", color: "#0f172a" }}>{c.name}</strong>
-                      {c.subscription_period_end && new Date(c.subscription_period_end) < new Date() && (
-                        <span
-                          style={{
-                            padding: "2px 6px",
-                            borderRadius: 4,
-                            fontSize: 10,
-                            fontWeight: 700,
-                            background: "#fee2e2",
-                            color: "#ef4444",
-                            border: "1px solid #fecaca",
-                            textTransform: "uppercase",
-                            display: "inline-block",
-                          }}
-                        >
-                          Expired
-                        </span>
-                      )}
-                      {c.billing_action_stopped && (
-                        <span
-                          style={{
-                            padding: "2px 6px",
-                            borderRadius: 4,
-                            fontSize: 10,
-                            fontWeight: 700,
-                            background: "#fef3c7",
-                            color: "#d97706",
-                            border: "1px solid #fde68a",
-                            textTransform: "uppercase",
-                            display: "inline-block",
-                          }}
-                        >
-                          Blocked
-                        </span>
-                      )}
+                <tr 
+                  key={`${c.id}-${index}`}
+                  style={{ borderBottom: '1px solid #f1f5f9', transition: 'background-color 0.2s ease' }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
+                  <td style={{ padding: "16px 24px" }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, #3b82f6, #2563eb)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '14px', boxShadow: '0 2px 4px rgba(37,99,235,0.2)' }}>
+                        {c.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <div style={{ display: "flex", alignItems: "center", gap: "8px", flexWrap: "wrap" }}>
+                          <strong style={{ color: '#1e293b', fontSize: '15px' }}>{c.name}</strong>
+                          {c.subscription_period_end && new Date(c.subscription_period_end) < new Date() && (
+                            <span style={{ padding: "2px 6px", borderRadius: 4, fontSize: 10, fontWeight: 700, background: "#fee2e2", color: "#ef4444", border: "1px solid #fecaca", textTransform: "uppercase" }}>Expired</span>
+                          )}
+                          {c.billing_action_stopped && (
+                            <span style={{ padding: "2px 6px", borderRadius: 4, fontSize: 10, fontWeight: 700, background: "#fef3c7", color: "#d97706", border: "1px solid #fde68a", textTransform: "uppercase" }}>Blocked</span>
+                          )}
+                        </div>
+                        {c.company_code && (
+                          <span style={{ display: "block", fontSize: 13, marginTop: 4, color: '#64748b' }}>{c.company_code}</span>
+                        )}
+                      </div>
                     </div>
-                    {c.company_code && (
-                      <span className="muted-text" style={{ display: "block", fontSize: 12, marginTop: 4 }}>
-                        {c.company_code}
-                      </span>
-                    )}
                   </td>
-                  <td style={{ textAlign: "center", fontSize: "14px", fontWeight: "600" }}>
+                  <td style={{ padding: "16px", textAlign: "center", fontSize: "15px", fontWeight: "600", color: '#475569' }}>
                     {c.employee_count ?? 0}
                   </td>
-                  <td>
-                    <span style={{ fontSize: "13px", fontWeight: "600" }}>
+                  <td style={{ padding: "16px", color: '#475569' }}>
+                    <span style={{ background: '#f1f5f9', padding: '6px 12px', borderRadius: '20px', fontSize: '13px', fontWeight: '500' }}>
                       {(() => {
-                        // If API already provided pricing_plan_name, prefer it
-                        if (c.pricing_plan_name) {
-                          return `${c.pricing_plan_name} - ₹${parseFloat(c.pricing_plan_price || 0).toLocaleString("en-IN")}/mo`;
-                        }
-                        // If company has pricing_plan id, look it up in pricingPlans
+                        if (c.pricing_plan_name) return `${c.pricing_plan_name} - ₹${parseFloat(c.pricing_plan_price || 0).toLocaleString("en-IN")}/mo`;
                         const planId = c.pricing_plan ?? c.pricing_plan_id ?? null;
                         if (planId && pricingPlans && pricingPlans.length > 0) {
                           const plan = pricingPlans.find((p) => Number(p.id) === Number(planId));
                           if (plan) return `${plan.name} - ₹${parseFloat(plan.price_monthly || plan.price || 0).toLocaleString('en-IN')}/mo`;
                         }
-                        // Fallback to legacy plan field
                         return PLAN_LABELS[c.plan] ?? c.plan ?? "—";
                       })()}
                     </span>
                   </td>
-                  <td>
-                    <span
-                      style={{
-                        padding: "6px 12px",
-                        borderRadius: 8,
-                        fontSize: 12,
-                        fontWeight: 600,
-                        background: c.is_active ? "#dcfce7" : "#fee2e2",
-                        color: c.is_active ? "#166534" : "#991b1b",
-                        display: "inline-block",
-                      }}
-                    >
-                      {c.is_active ? "✓ Active" : "⊘ Suspended"}
-                    </span>
+                  <td style={{ padding: "16px" }}>
+                    {c.is_active ? (
+                      <span style={{ background: "#f0fdf4", color: "#16a34a", padding: "6px 12px", borderRadius: "20px", fontSize: "13px", fontWeight: "600", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#16a34a' }}></span> Active
+                      </span>
+                    ) : (
+                      <span style={{ background: "#fef2f2", color: "#dc2626", padding: "6px 12px", borderRadius: "20px", fontSize: "13px", fontWeight: "600", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                        <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#dc2626' }}></span> Suspended
+                      </span>
+                    )}
                   </td>
-                  <td style={{ textAlign: "center" }}>
+                  <td style={{ padding: "16px 24px", textAlign: "center" }}>
                     <button
                       type="button"
-                      className="btn primary"
-                      style={{ padding: "6px 14px", fontSize: 13, whiteSpace: "nowrap" }}
                       onClick={(e) => toggleMenu(c.id, e.currentTarget)}
+                      style={{ padding: "8px", fontSize: 18, lineHeight: 1, borderRadius: '8px', background: 'transparent', border: 'none', cursor: 'pointer', color: '#64748b', transition: 'all 0.2s' }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = '#f1f5f9'; e.currentTarget.style.color = '#0f172a'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#64748b'; }}
                     >
-                      Manage
+                      ⋮
                     </button>
                   </td>
                 </tr>
               ))}
+              {paginatedCompanies.length === 0 && (
+                <tr>
+                  <td colSpan="5" style={{ textAlign: "center", padding: "48px 24px" }}>
+                    <div style={{ color: '#94a3b8', fontSize: '16px', marginBottom: '8px' }}>No companies found.</div>
+                    <div style={{ color: '#cbd5e1', fontSize: '14px' }}>Click "Create Company" to add one.</div>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
         
-        {companies.length > itemsPerPage && (
-          <div className="pagination" style={{ marginTop: 24, marginBottom: 0 }}>
-            <span className="pagination-info">
-              Showing {startIndex + 1}–{Math.min(startIndex + itemsPerPage, companies.length)} of {companies.length} companies
+        {companies.length > 0 && (
+          <div className="pagination" style={{ 
+            marginTop: 0, 
+            padding: '16px 24px', 
+            background: '#f8fafc', 
+            borderTop: '1px solid #e2e8f0',
+            borderBottomLeftRadius: '16px',
+            borderBottomRightRadius: '16px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <span className="page-summary" style={{ color: '#64748b', fontSize: '14px', fontWeight: '500', margin: 0 }}>
+              Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, companies.length)} of {companies.length} companies
             </span>
-            <button
-              type="button"
-              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-              disabled={currentPage === 1}
-            >
-              ← Prev
-            </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
               <button
-                key={page}
-                type="button"
-                onClick={() => setCurrentPage(page)}
-                className={currentPage === page ? "active" : ""}
-                style={{ minWidth: "36px" }}
+                style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #e2e8f0', background: currentPage === 1 ? '#f1f5f9' : '#fff', color: currentPage === 1 ? '#94a3b8' : '#334155', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', fontWeight: '500', fontSize: '14px', transition: 'all 0.2s' }}
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(currentPage - 1)}
+                onMouseEnter={(e) => { if (currentPage !== 1) { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#cbd5e1'; } }}
+                onMouseLeave={(e) => { if (currentPage !== 1) { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e2e8f0'; } }}
               >
-                {page}
+                Previous
               </button>
-            ))}
-            <button
-              type="button"
-              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-              disabled={currentPage === totalPages}
-            >
-              Next →
-            </button>
+              
+              <div style={{ display: 'flex', gap: '4px' }}>
+                {Array.from({ length: Math.min(totalPages, 5) }, (_, idx) => {
+                  const start = Math.max(1, currentPage - 2);
+                  return start + idx <= totalPages ? start + idx : null;
+                }).filter(Boolean).map((pg) => (
+                  <button
+                    key={pg}
+                    style={{ width: '36px', height: '36px', borderRadius: '8px', border: pg === currentPage ? 'none' : '1px solid #e2e8f0', background: pg === currentPage ? 'linear-gradient(135deg, #3b82f6, #2563eb)' : '#fff', color: pg === currentPage ? '#fff' : '#334155', cursor: 'pointer', fontWeight: pg === currentPage ? '600' : '500', fontSize: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: pg === currentPage ? '0 2px 4px rgba(37,99,235,0.2)' : 'none', transition: 'all 0.2s' }}
+                    onClick={() => setCurrentPage(pg)}
+                    onMouseEnter={(e) => { if (pg !== currentPage) { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#cbd5e1'; } }}
+                    onMouseLeave={(e) => { if (pg !== currentPage) { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e2e8f0'; } }}
+                  >
+                    {pg}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #e2e8f0', background: currentPage >= totalPages ? '#f1f5f9' : '#fff', color: currentPage >= totalPages ? '#94a3b8' : '#334155', cursor: currentPage >= totalPages ? 'not-allowed' : 'pointer', fontWeight: '500', fontSize: '14px', transition: 'all 0.2s' }}
+                disabled={currentPage >= totalPages}
+                onClick={() => setCurrentPage(currentPage + 1)}
+                onMouseEnter={(e) => { if (currentPage < totalPages) { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#cbd5e1'; } }}
+                onMouseLeave={(e) => { if (currentPage < totalPages) { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e2e8f0'; } }}
+              >
+                Next
+              </button>
+            </div>
           </div>
         )}
       </div>

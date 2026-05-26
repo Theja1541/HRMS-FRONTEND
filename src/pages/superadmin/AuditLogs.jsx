@@ -101,53 +101,94 @@ export default function AuditLogs() {
         <p>Loading...</p>
       ) : (
         <>
-          <div className="card" style={{ marginTop: 16 }}>
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Action</th>
-                  <th>Date</th>
-                  <th>IP address</th>
-                  <th>Company</th>
-                  <th>Description</th>
-                </tr>
-              </thead>
-              <tbody>
-                {logs.map((log) => (
-                  <tr key={log.id}>
-                    <td>{log.username || "—"}</td>
-                    <td>{ACTION_LABELS[log.action] ?? log.action}</td>
-                    <td>{log.timestamp ? new Date(log.timestamp).toLocaleString() : "—"}</td>
-                    <td>{log.ip_address || "—"}</td>
-                    <td>{log.company_name ?? "—"}</td>
-                    <td style={{ maxWidth: 320 }}>
-                      {log.description || (log.model_name ? `[${log.model_name}]` : "—")}
-                    </td>
+          <div className="card" style={{ marginTop: 24, display: 'flex', flexDirection: 'column', overflow: 'visible', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', background: '#fff', border: '1px solid #f1f5f9', padding: 0 }}>
+            <div className="table-wrapper" style={{ width: '100%', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', overflow: 'visible' }}>
+              <table style={{ borderCollapse: 'collapse', width: '100%', textAlign: 'left' }}>
+                <thead style={{ background: 'linear-gradient(90deg, #f8fafc, #f1f5f9)', borderBottom: '2px solid #e2e8f0' }}>
+                  <tr>
+                    <th style={{ width: "20%", padding: "16px 24px", color: "#475569", fontWeight: "600", fontSize: "14px", textTransform: 'uppercase', letterSpacing: '0.05em' }}>User</th>
+                    <th style={{ width: "15%", padding: "16px", color: "#475569", fontWeight: "600", fontSize: "14px", textTransform: 'uppercase', letterSpacing: '0.05em' }}>Action</th>
+                    <th style={{ width: "15%", padding: "16px", color: "#475569", fontWeight: "600", fontSize: "14px", textTransform: 'uppercase', letterSpacing: '0.05em' }}>Date</th>
+                    <th style={{ width: "10%", padding: "16px", color: "#475569", fontWeight: "600", fontSize: "14px", textTransform: 'uppercase', letterSpacing: '0.05em' }}>IP Address</th>
+                    <th style={{ width: "15%", padding: "16px", color: "#475569", fontWeight: "600", fontSize: "14px", textTransform: 'uppercase', letterSpacing: '0.05em' }}>Company</th>
+                    <th style={{ width: "25%", padding: "16px 24px", color: "#475569", fontWeight: "600", fontSize: "14px", textTransform: 'uppercase', letterSpacing: '0.05em' }}>Description</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-            {logs.length === 0 && (
-              <p className="muted-text" style={{ padding: 24 }}>No audit logs match the filters.</p>
+                </thead>
+                <tbody>
+                  {logs.map((log, index) => (
+                    <tr 
+                      key={log.id}
+                      style={{ borderBottom: '1px solid #f1f5f9', transition: 'background-color 0.2s ease' }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      <td style={{ padding: "16px 24px", color: '#1e293b', fontWeight: '500' }}>{log.username || "—"}</td>
+                      <td style={{ padding: "16px" }}>
+                        <span style={{ background: '#f1f5f9', padding: '6px 12px', borderRadius: '20px', fontSize: '13px', fontWeight: '500', color: '#475569' }}>
+                          {ACTION_LABELS[log.action] ?? log.action}
+                        </span>
+                      </td>
+                      <td style={{ padding: "16px", color: '#64748b', fontSize: '14px' }}>{log.timestamp ? new Date(log.timestamp).toLocaleString() : "—"}</td>
+                      <td style={{ padding: "16px" }}>
+                        <code style={{ fontSize: '12px', background: '#f1f5f9', padding: '4px 8px', borderRadius: '6px', color: '#475569' }}>{log.ip_address || "—"}</code>
+                      </td>
+                      <td style={{ padding: "16px", color: '#475569', fontWeight: '500' }}>{log.company_name ?? "—"}</td>
+                      <td style={{ padding: "16px 24px", color: '#475569', fontSize: '14px', whiteSpace: 'normal', wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                        {log.description || (log.model_name ? `[${log.model_name}]` : "—")}
+                      </td>
+                    </tr>
+                  ))}
+                  {logs.length === 0 && (
+                    <tr>
+                      <td colSpan="6" style={{ textAlign: "center", padding: "48px 24px" }}>
+                        <div style={{ color: '#94a3b8', fontSize: '16px', marginBottom: '8px' }}>No audit logs found.</div>
+                        <div style={{ color: '#cbd5e1', fontSize: '14px' }}>Try adjusting your filters.</div>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {logs.length > 0 && (
+              <div className="pagination" style={{ 
+                marginTop: 0, 
+                padding: '16px 24px', 
+                background: '#f8fafc', 
+                borderTop: '1px solid #e2e8f0',
+                borderBottomLeftRadius: '16px',
+                borderBottomRightRadius: '16px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
+              }}>
+                <span className="page-summary" style={{ color: '#64748b', fontSize: '14px', fontWeight: '500', margin: 0 }}>
+                  Showing page {page}
+                </span>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <button
+                    style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #e2e8f0', background: page <= 1 ? '#f1f5f9' : '#fff', color: page <= 1 ? '#94a3b8' : '#334155', cursor: page <= 1 ? 'not-allowed' : 'pointer', fontWeight: '500', fontSize: '14px', transition: 'all 0.2s' }}
+                    type="button"
+                    disabled={page <= 1}
+                    onClick={() => setPage((p) => p - 1)}
+                    onMouseEnter={(e) => { if (page > 1) { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#cbd5e1'; } }}
+                    onMouseLeave={(e) => { if (page > 1) { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e2e8f0'; } }}
+                  >
+                    Previous
+                  </button>
+                  <button
+                    style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #e2e8f0', background: logs.length < 50 ? '#f1f5f9' : '#fff', color: logs.length < 50 ? '#94a3b8' : '#334155', cursor: logs.length < 50 ? 'not-allowed' : 'pointer', fontWeight: '500', fontSize: '14px', transition: 'all 0.2s' }}
+                    type="button"
+                    disabled={logs.length < 50}
+                    onClick={() => setPage((p) => p + 1)}
+                    onMouseEnter={(e) => { if (logs.length >= 50) { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#cbd5e1'; } }}
+                    onMouseLeave={(e) => { if (logs.length >= 50) { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e2e8f0'; } }}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
             )}
-          </div>
-          <div className="pagination">
-            <button
-              type="button"
-              disabled={page <= 1}
-              onClick={() => setPage((p) => p - 1)}
-            >
-              Previous
-            </button>
-            <span>Page {page}</span>
-            <button
-              type="button"
-              disabled={logs.length < 50}
-              onClick={() => setPage((p) => p + 1)}
-            >
-              Next
-            </button>
           </div>
         </>
       )}

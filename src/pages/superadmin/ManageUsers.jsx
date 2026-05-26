@@ -194,49 +194,59 @@ export default function ManageUsers() {
         </select>
       </div>
 
-      {/* Debug panel: show counts to help diagnose missing rows */}
-      <div style={{ marginTop: 8, marginBottom: 8, fontSize: 13, color: '#475569' }}>
-        <strong>Debug:</strong> total users = {users.length}, filtered = {filteredUsers.length}, paginated = {paginatedUsers.length}
-        <div style={{ marginTop: 6 }}>
-          {users.map((u) => (
-            <div key={`dbg-${u.id}`} style={{ fontSize: 12, color: '#64748b' }}>{u.id} — {u.username} — {String(u.company_name)}</div>
-          ))}
-        </div>
-      </div>
-
-      <div className="card" style={{ marginTop: 16, display: 'flex', flexDirection: 'column', overflow: 'visible' }}>
-        <div className="table-wrapper" style={{ width: '100%' }}>
-          <table className="attendance-table" style={{ marginBottom: 0, width: '100%' }}>
-            <thead style={{ background: '#f8fafc' }}>
+      <div className="card" style={{ marginTop: 24, display: 'flex', flexDirection: 'column', overflow: 'visible', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', background: '#fff', border: '1px solid #f1f5f9', padding: 0 }}>
+        <div className="table-wrapper" style={{ width: '100%', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', overflow: 'visible' }}>
+          <table style={{ borderCollapse: 'collapse', width: '100%', textAlign: 'left' }}>
+            <thead style={{ background: 'linear-gradient(90deg, #f8fafc, #f1f5f9)', borderBottom: '2px solid #e2e8f0' }}>
               <tr>
-                <th style={{ width: "20%" }}>User</th>
-                <th style={{ width: "22%" }}>Email</th>
-                <th style={{ width: "18%" }}>Company</th>
-                <th style={{ width: "12%" }}>Role</th>
-                <th style={{ width: "10%" }}>Status</th>
-                <th style={{ width: "12%" }}>Permissions</th>
-                <th style={{ width: "6%", textAlign: "center" }}>Actions</th>
+                <th style={{ width: "20%", padding: "16px 24px", color: "#475569", fontWeight: "600", fontSize: "14px", textTransform: 'uppercase', letterSpacing: '0.05em' }}>User</th>
+                <th style={{ width: "22%", padding: "16px", color: "#475569", fontWeight: "600", fontSize: "14px", textTransform: 'uppercase', letterSpacing: '0.05em' }}>Email</th>
+                <th style={{ width: "18%", padding: "16px", color: "#475569", fontWeight: "600", fontSize: "14px", textTransform: 'uppercase', letterSpacing: '0.05em' }}>Company</th>
+                <th style={{ width: "12%", padding: "16px", color: "#475569", fontWeight: "600", fontSize: "14px", textTransform: 'uppercase', letterSpacing: '0.05em' }}>Role</th>
+                <th style={{ width: "10%", padding: "16px", color: "#475569", fontWeight: "600", fontSize: "14px", textTransform: 'uppercase', letterSpacing: '0.05em' }}>Status</th>
+                <th style={{ width: "12%", padding: "16px", color: "#475569", fontWeight: "600", fontSize: "14px", textTransform: 'uppercase', letterSpacing: '0.05em' }}>Permissions</th>
+                <th style={{ width: "6%", padding: "16px 24px", textAlign: "center", color: "#475569", fontWeight: "600", fontSize: "14px", textTransform: 'uppercase', letterSpacing: '0.05em' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {paginatedUsers.map((user) => (
-              <tr key={user.id}>
-                <td>
-                  <strong>{user.username}</strong>
+              <tr 
+                key={user.id} 
+                style={{ borderBottom: '1px solid #f1f5f9', transition: 'background-color 0.2s ease' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                <td style={{ padding: "16px 24px" }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'linear-gradient(135deg, #3b82f6, #2563eb)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '14px', boxShadow: '0 2px 4px rgba(37,99,235,0.2)' }}>
+                      {user.username.charAt(0).toUpperCase()}
+                    </div>
+                    <strong style={{ color: '#1e293b', fontSize: '15px' }}>{user.username}</strong>
+                  </div>
                 </td>
-                <td>{user.email}</td>
-                <td>{user.company_name ?? "—"}</td>
-                <td>{ROLE_LABELS[user.role] ?? user.role}</td>
-                <td>
+                <td style={{ padding: "16px", color: '#475569' }}>{user.email}</td>
+                <td style={{ padding: "16px", color: '#475569', fontWeight: '500' }}>{user.company_name ?? "—"}</td>
+                <td style={{ padding: "16px", color: '#475569' }}>
+                  <span style={{ background: '#f1f5f9', padding: '6px 12px', borderRadius: '20px', fontSize: '13px', fontWeight: '500' }}>
+                    {ROLE_LABELS[user.role] ?? user.role}
+                  </span>
+                </td>
+                <td style={{ padding: "16px" }}>
                   {!user.is_active ? (
-                    <span style={{ color: "#b91c1c", fontWeight: 500 }}>Blocked</span>
+                    <span style={{ background: "#fef2f2", color: "#dc2626", padding: "6px 12px", borderRadius: "20px", fontSize: "13px", fontWeight: "600", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#dc2626' }}></span> Blocked
+                    </span>
                   ) : user.is_locked ? (
-                    <span style={{ color: "#b45309", fontWeight: 500 }}>Locked</span>
+                    <span style={{ background: "#fffbeb", color: "#d97706", padding: "6px 12px", borderRadius: "20px", fontSize: "13px", fontWeight: "600", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#d97706' }}></span> Locked
+                    </span>
                   ) : (
-                    <span style={{ color: "#15803d", fontWeight: 500 }}>Active</span>
+                    <span style={{ background: "#f0fdf4", color: "#16a34a", padding: "6px 12px", borderRadius: "20px", fontSize: "13px", fontWeight: "600", display: "inline-flex", alignItems: "center", gap: "6px" }}>
+                      <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#16a34a' }}></span> Active
+                    </span>
                   )}
                 </td>
-                <td>
+                <td style={{ padding: "16px" }}>
                   <select
                     value={user.role}
                     onChange={(e) => handleRoleChange(user.id, e.target.value)}
@@ -255,15 +265,26 @@ export default function ManageUsers() {
                     ))}
                   </select>
                 </td>
-                <td style={{ textAlign: "center" }}>
+                <td style={{ padding: "16px 24px", textAlign: "center" }}>
                   <button
                     type="button"
-                    className="btn"
                     onClick={(e) => toggleActionMenu(user.id, e.currentTarget)}
                     disabled={actionLoading === user.id}
                     title="User actions"
                     aria-label="User actions"
-                    style={{ padding: "6px 8px", fontSize: 18, lineHeight: 1, borderRadius: 6, minWidth: "auto" }}
+                    style={{ 
+                      padding: "8px", 
+                      fontSize: 18, 
+                      lineHeight: 1, 
+                      borderRadius: '8px', 
+                      background: 'transparent', 
+                      border: 'none', 
+                      cursor: 'pointer', 
+                      color: '#64748b',
+                      transition: 'all 0.2s',
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.background = '#f1f5f9'; e.currentTarget.style.color = '#0f172a'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#64748b'; }}
                   >
                     ⋮
                   </button>
@@ -272,8 +293,9 @@ export default function ManageUsers() {
             ))}
             {paginatedUsers.length === 0 && (
               <tr>
-                <td colSpan="7" style={{ textAlign: "center", padding: "24px" }}>
-                  <p className="muted-text">No users match the filters.</p>
+                <td colSpan="7" style={{ textAlign: "center", padding: "48px 24px" }}>
+                  <div style={{ color: '#94a3b8', fontSize: '16px', marginBottom: '8px' }}>No users match the filters.</div>
+                  <div style={{ color: '#cbd5e1', fontSize: '14px' }}>Try adjusting your search criteria</div>
                 </td>
               </tr>
             )}
@@ -282,33 +304,90 @@ export default function ManageUsers() {
         </div>
 
         {filteredUsers.length > 0 && (
-          <div className="pagination" style={{ marginTop: 24 }}>
-            <button
-              className="page-btn"
-              disabled={currentPageSafe === 1}
-              onClick={() => setCurrentPage(currentPageSafe - 1)}
-            >
-              Previous
-            </button>
-            <div className="page-number-group">
-              {pageNumbers.map((pg) => (
-                <button
-                  key={pg}
-                  className={`page-btn ${pg === currentPageSafe ? "active" : ""}`}
-                  onClick={() => setCurrentPage(pg)}
-                >
-                  {pg}
-                </button>
-              ))}
+          <div className="pagination" style={{ 
+            marginTop: 0, 
+            padding: '16px 24px', 
+            background: '#f8fafc', 
+            borderTop: '1px solid #e2e8f0',
+            borderBottomLeftRadius: '16px',
+            borderBottomRightRadius: '16px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <span className="page-summary" style={{ color: '#64748b', fontSize: '14px', fontWeight: '500', margin: 0 }}>
+              Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredUsers.length)} of {filteredUsers.length} users
+            </span>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <button
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  border: '1px solid #e2e8f0',
+                  background: currentPageSafe === 1 ? '#f1f5f9' : '#fff',
+                  color: currentPageSafe === 1 ? '#94a3b8' : '#334155',
+                  cursor: currentPageSafe === 1 ? 'not-allowed' : 'pointer',
+                  fontWeight: '500',
+                  fontSize: '14px',
+                  transition: 'all 0.2s'
+                }}
+                disabled={currentPageSafe === 1}
+                onClick={() => setCurrentPage(currentPageSafe - 1)}
+                onMouseEnter={(e) => { if (currentPageSafe !== 1) { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#cbd5e1'; } }}
+                onMouseLeave={(e) => { if (currentPageSafe !== 1) { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e2e8f0'; } }}
+              >
+                Previous
+              </button>
+              
+              <div style={{ display: 'flex', gap: '4px' }}>
+                {pageNumbers.map((pg) => (
+                  <button
+                    key={pg}
+                    style={{
+                      width: '36px',
+                      height: '36px',
+                      borderRadius: '8px',
+                      border: pg === currentPageSafe ? 'none' : '1px solid #e2e8f0',
+                      background: pg === currentPageSafe ? 'linear-gradient(135deg, #3b82f6, #2563eb)' : '#fff',
+                      color: pg === currentPageSafe ? '#fff' : '#334155',
+                      cursor: 'pointer',
+                      fontWeight: pg === currentPageSafe ? '600' : '500',
+                      fontSize: '14px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: pg === currentPageSafe ? '0 2px 4px rgba(37,99,235,0.2)' : 'none',
+                      transition: 'all 0.2s'
+                    }}
+                    onClick={() => setCurrentPage(pg)}
+                    onMouseEnter={(e) => { if (pg !== currentPageSafe) { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#cbd5e1'; } }}
+                    onMouseLeave={(e) => { if (pg !== currentPageSafe) { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e2e8f0'; } }}
+                  >
+                    {pg}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: '8px',
+                  border: '1px solid #e2e8f0',
+                  background: currentPageSafe >= totalPages ? '#f1f5f9' : '#fff',
+                  color: currentPageSafe >= totalPages ? '#94a3b8' : '#334155',
+                  cursor: currentPageSafe >= totalPages ? 'not-allowed' : 'pointer',
+                  fontWeight: '500',
+                  fontSize: '14px',
+                  transition: 'all 0.2s'
+                }}
+                disabled={currentPageSafe >= totalPages}
+                onClick={() => setCurrentPage(currentPageSafe + 1)}
+                onMouseEnter={(e) => { if (currentPageSafe < totalPages) { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#cbd5e1'; } }}
+                onMouseLeave={(e) => { if (currentPageSafe < totalPages) { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e2e8f0'; } }}
+              >
+                Next
+              </button>
             </div>
-            <span className="page-summary">Page {currentPageSafe} of {totalPages || 1}</span>
-            <button
-              className="page-btn"
-              disabled={currentPageSafe >= totalPages}
-              onClick={() => setCurrentPage(currentPageSafe + 1)}
-            >
-              Next
-            </button>
           </div>
         )}
       </div>
