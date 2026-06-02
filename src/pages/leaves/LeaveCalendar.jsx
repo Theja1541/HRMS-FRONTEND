@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import api from "../../api/axios";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
@@ -12,7 +12,11 @@ const localizer = momentLocalizer(moment);
 export default function LeaveCalendar() {
 
   const [events, setEvents] = useState([]);
+  const [allLeaves, setAllLeaves] = useState([]);
   const [employeeOptions, setEmployeeOptions] = useState([]);
+  const [departmentOptions, setDepartmentOptions] = useState([]);
+  const [leaveTypeOptions, setLeaveTypeOptions] = useState([]);
+  
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   const [selectedDepartment, setSelectedDepartment] = useState("");
@@ -30,11 +34,83 @@ export default function LeaveCalendar() {
   const [view, setView] = useState("month");
   const [date, setDate] = useState(new Date());
 
+  /* ================= CALCULATE STATS ================= */
+  const activeRangeStats = useMemo(() => {
+    if (!allLeaves.length) return { totalLeaves: 0, uniqueEmployees: 0, peakDayLeaves: 0 };
+
+    let start = moment(date);
+    let end = moment(date);
+
+    if (view === "month" || view === "agenda") {
+      start = moment(date).startOf("month");
+      end = moment(date).endOf("month");
+    } else if (view === "week") {
+      start = moment(date).startOf("week");
+      end = moment(date).endOf("week");
+    } else if (view === "day") {
+      start = moment(date).startOf("day");
+      end = moment(date).endOf("day");
+    }
+
+    let total = 0;
+    const employeesOnLeave = new Set();
+    const dayCounts = {};
+
+    allLeaves.forEach(e => {
+      const eventStart = moment(e.start);
+      const eventEnd = moment(e.end);
+
+      // Check if event overlaps with the visible range
+      if (eventStart.isSameOrBefore(end, "day") && eventEnd.isSameOrAfter(start, "day")) {
+        total++;
+        if (e.title) employeesOnLeave.add(e.title);
+
+        // Count leaves day by day within the intersection
+        let cur = moment.max(eventStart, start).clone();
+        const rangeEnd = moment.min(eventEnd, end);
+        while (cur.isSameOrBefore(rangeEnd, "day")) {
+          const k = cur.format("YYYY-MM-DD");
+          dayCounts[k] = (dayCounts[k] || 0) + 1;
+          cur.add(1, "day");
+        }
+      }
+    });
+
+    const peakDayCount = Object.values(dayCounts).length ? Math.max(...Object.values(dayCounts)) : 0;
+
+    return {
+      totalLeaves: total,
+      uniqueEmployees: employeesOnLeave.size,
+      peakDayLeaves: peakDayCount
+    };
+  }, [allLeaves, date, view]);
+
+  const selectedEmployeeLeaves = useMemo(() => {
+    if (!selectedEmployee) return [];
+    return allLeaves.filter(e => e.title === selectedEmployee.label);
+  }, [allLeaves, selectedEmployee]);
+
   /* ================= FETCH EMPLOYEES ================= */
 
   useEffect(() => {
     fetchEmployees();
+    fetchOptions();
   }, []);
+
+  const fetchOptions = async () => {
+    try {
+      const deptRes = await api.get("/employees/departments/");
+      if (deptRes.data && deptRes.data.departments) {
+        setDepartmentOptions(deptRes.data.departments);
+      }
+      const typeRes = await api.get("/leaves/types/");
+      if (typeRes.data) {
+        setLeaveTypeOptions(typeRes.data);
+      }
+    } catch (err) {
+      console.error("Failed to fetch options", err);
+    }
+  };
 
   const fetchEmployees = async () => {
     try {
@@ -67,9 +143,7 @@ export default function LeaveCalendar() {
 }, [selectedEmployee, selectedDepartment, leaveType]);
 
   const fetchCalendar = async () => {
-
     try {
-
       const params = {};
 
       if (selectedEmployee) params.employee_id = selectedEmployee.value;
@@ -85,41 +159,22 @@ export default function LeaveCalendar() {
         leave_type: e.leave_type,
         avatar: e.avatar,
         department: e.department,
+        document: e.document,
         type: e.type
       }));
 
-      // Build daily summary events
-      const summaryEvents = [];
+      setAllLeaves(formatted);
 
-      Object.entries(counts).forEach(([date, count]) => {
-
-        summaryEvents.push({
-          title: `${count} ${count === 1 ? "employee" : "employees"} on leave`,
-          start: new Date(date),
-          end: new Date(date),
-          allDay: true,
-          count: count,
-          type: "summary"
-        });
-
-      });
-
-      setEvents(summaryEvents);
-
-      /* ================= BUILD HEATMAP ================= */
-
+      /* ================= BUILD HEATMAP & GROUPS ================= */
       const counts = {};
       const grouped = {};
 
       formatted.forEach(event => {
-
         let current = moment(event.start);
         const end = moment(event.end);
 
         while (current.isSameOrBefore(end)) {
-
           const key = current.format("YYYY-MM-DD");
-
           counts[key] = (counts[key] || 0) + 1;
 
           if (!grouped[key]) grouped[key] = [];
@@ -127,11 +182,25 @@ export default function LeaveCalendar() {
 
           current.add(1, "day");
         }
-
       });
 
       setLeaveHeatmap(counts);
       setDayEvents(grouped);
+
+      // Build daily summary events
+      const summaryEvents = [];
+      Object.entries(counts).forEach(([dateStr, count]) => {
+        summaryEvents.push({
+          title: `${count} ${count === 1 ? "employee" : "employees"} on leave`,
+          start: new Date(dateStr),
+          end: new Date(dateStr),
+          allDay: true,
+          count: count,
+          type: "summary"
+        });
+      });
+
+      setEvents(summaryEvents);
 
     } catch (err) {
       console.error("Calendar error", err);
@@ -301,10 +370,9 @@ export default function LeaveCalendar() {
             <label>🏢 Department</label>
             <select value={selectedDepartment} onChange={(e)=>setSelectedDepartment(e.target.value)}>
               <option value="">All Departments</option>
-              <option value="HR">HR</option>
-              <option value="IT">IT</option>
-              <option value="Finance">Finance</option>
-              <option value="Sales">Sales</option>
+              {departmentOptions.map((dept, index) => (
+                <option key={index} value={dept}>{dept}</option>
+              ))}
             </select>
           </div>
 
@@ -312,9 +380,9 @@ export default function LeaveCalendar() {
             <label>🍃 Leave Type</label>
             <select value={leaveType} onChange={(e)=>setLeaveType(e.target.value)}>
               <option value="">All Types</option>
-              <option value="Sick Leave">Sick Leave</option>
-              <option value="Casual Leave">Casual Leave</option>
-              <option value="Earned Leave">Earned Leave</option>
+              {leaveTypeOptions.map((type) => (
+                <option key={type.id} value={type.name}>{type.name}</option>
+              ))}
             </select>
           </div>
         </div>
@@ -350,6 +418,47 @@ export default function LeaveCalendar() {
         </div>
       </div>
 
+      {/* SELECTED EMPLOYEE DETAILS */}
+      {selectedEmployee && (
+        <div className="selected-employee-details-card">
+          <div className="emp-details-header">
+            <div className="emp-avatar-circle">
+              {selectedEmployee.label.split(" ").map(n => n[0]).join("")}
+            </div>
+            <div>
+              <h3>{selectedEmployee.label}</h3>
+              <p className="emp-subtitle">Individual Employee Leave Details</p>
+            </div>
+            <div className="emp-total-leaves-badge">
+              <strong>{selectedEmployeeLeaves.length}</strong> Total Leaves
+            </div>
+          </div>
+          <div className="emp-leaves-list">
+            <h4>Leave History & Planned Leaves</h4>
+            {selectedEmployeeLeaves.length === 0 ? (
+              <p className="no-leaves-msg">No leaves recorded for this employee.</p>
+            ) : (
+              <div className="leaves-scroll-grid">
+                {selectedEmployeeLeaves.map((leave, idx) => (
+                  <div key={idx} className="individual-leave-item">
+                    <div className="leave-badge-type" style={{ borderLeft: `4px solid ${departmentColors[leave.department] || '#64748b'}` }}>
+                      <strong>{leave.leave_type || "Leave"}</strong>
+                      <span>{leave.department || "General"}</span>
+                    </div>
+                    <div className="leave-date-range">
+                      📅 {moment(leave.start).format("MMM D, YYYY")} - {moment(leave.end).format("MMM D, YYYY")}
+                    </div>
+                    <div className="leave-duration">
+                      {moment(leave.end).diff(moment(leave.start), 'days') + 1} days
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* STATS CARDS */}
       <div className="calendar-stats">
         <div className="stat-card">
@@ -357,8 +466,10 @@ export default function LeaveCalendar() {
             <span style={{color: '#2563eb'}}>👥</span>
           </div>
           <div className="stat-info">
-            <span className="stat-label">Total Leaves</span>
-            <span className="stat-value">{events.length}</span>
+            <span className="stat-label">
+              {view === "month" ? "Leaves this Month" : view === "week" ? "Leaves this Week" : "Leaves Today"}
+            </span>
+            <span className="stat-value">{activeRangeStats.totalLeaves}</span>
           </div>
         </div>
         <div className="stat-card">
@@ -366,8 +477,8 @@ export default function LeaveCalendar() {
             <span style={{color: '#f59e0b'}}>📅</span>
           </div>
           <div className="stat-info">
-            <span className="stat-label">Days with Leaves</span>
-            <span className="stat-value">{Object.keys(leaveHeatmap).length}</span>
+            <span className="stat-label">Employees on Leave</span>
+            <span className="stat-value">{activeRangeStats.uniqueEmployees}</span>
           </div>
         </div>
         <div className="stat-card">
@@ -375,54 +486,15 @@ export default function LeaveCalendar() {
             <span style={{color: '#ef4444'}}>⚠️</span>
           </div>
           <div className="stat-info">
-            <span className="stat-label">Peak Day</span>
+            <span className="stat-label">Peak Day Leaves</span>
             <span className="stat-value">
-              {Object.values(leaveHeatmap).length
-              ? Math.max(...Object.values(leaveHeatmap))
-              : 0} leaves
+              {activeRangeStats.peakDayLeaves} leaves
             </span>
           </div>
         </div>
       </div>
 
-      {/* LEGEND */}
-      <div className="calendar-legend">
-        <div className="legend-title">Leave Density:</div>
-        <div className="legend-item">
-          <span className="legend-box" style={{background: '#dbeafe'}}></span>
-          <span>2-3 leaves</span>
-        </div>
-        <div className="legend-item">
-          <span className="legend-box" style={{background: '#fef3c7'}}></span>
-          <span>4-6 leaves</span>
-        </div>
-        <div className="legend-item">
-          <span className="legend-box" style={{background: '#fed7aa'}}></span>
-          <span>7-9 leaves</span>
-        </div>
-        <div className="legend-item">
-          <span className="legend-box" style={{background: '#fee2e2'}}></span>
-          <span>10+ leaves</span>
-        </div>
-        <div className="legend-divider"></div>
-        <div className="legend-title">Departments:</div>
-        <div className="legend-item">
-          <span className="legend-dot" style={{background: '#2563eb'}}></span>
-          <span>HR</span>
-        </div>
-        <div className="legend-item">
-          <span className="legend-dot" style={{background: '#7c3aed'}}></span>
-          <span>IT</span>
-        </div>
-        <div className="legend-item">
-          <span className="legend-dot" style={{background: '#f59e0b'}}></span>
-          <span>Finance</span>
-        </div>
-        <div className="legend-item">
-          <span className="legend-dot" style={{background: '#10b981'}}></span>
-          <span>Sales</span>
-        </div>
-      </div>
+
 
       {/* CALENDAR */}
       <div className="calendar-wrapper">
@@ -434,8 +506,12 @@ export default function LeaveCalendar() {
           selectable
           onSelectSlot={(slot)=>handleDateClick(slot.start)}
           onSelectEvent={(event)=>{
-            setSelectedEvent(event);
-            setShowModal(true);
+            if (event.type === "summary") {
+              handleDateClick(event.start);
+            } else {
+              setSelectedEvent(event);
+              setShowModal(true);
+            }
           }}
           view={view}
           onView={setView}
@@ -486,6 +562,16 @@ export default function LeaveCalendar() {
                 <span className="label">Total Days:</span>
                 <span className="value">{moment(selectedEvent.end).diff(moment(selectedEvent.start), 'days') + 1} days</span>
               </div>
+              {selectedEvent.document && (
+                <div className="detail-row">
+                  <span className="label">Attached Document:</span>
+                  <span className="value">
+                    <a href={selectedEvent.document} target="_blank" rel="noopener noreferrer" style={{ color: "#2563eb", textDecoration: "underline" }}>
+                      View Document
+                    </a>
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -495,7 +581,12 @@ export default function LeaveCalendar() {
       {selectedDate && (
         <div className="side-panel">
           <div className="panel-header">
-            <h3>{moment(selectedDate).format('MMMM D, YYYY')}</h3>
+            <div>
+              <h3>{moment(selectedDate).format('MMMM D, YYYY')}</h3>
+              <p style={{ margin: "4px 0 0 0", fontSize: "13px", color: "#64748b", fontWeight: "600" }}>
+                {Object.values(dayDetails).flat().length} employee(s) on leave
+              </p>
+            </div>
             <button className="close-btn" onClick={() => setSelectedDate(null)}>×</button>
           </div>
           <div className="panel-body">
@@ -508,7 +599,17 @@ export default function LeaveCalendar() {
                 <div key={dept} className="dept-section">
                   <h4>{dept}</h4>
                   {employees.map((emp, i) => (
-                    <div key={i} className="employee-card">
+                    <div 
+                      key={i} 
+                      className="employee-card" 
+                      onClick={() => {
+                        setSelectedEvent(emp);
+                        setShowModal(true);
+                      }}
+                      style={{ cursor: "pointer", transition: "background 0.2s" }}
+                      onMouseOver={(e) => e.currentTarget.style.backgroundColor = "#f1f5f9"}
+                      onMouseOut={(e) => e.currentTarget.style.backgroundColor = "transparent"}
+                    >
                       {emp.avatar && <img src={emp.avatar} alt="" />}
                       <div className="emp-info">
                         <span className="emp-name">{emp.title}</span>

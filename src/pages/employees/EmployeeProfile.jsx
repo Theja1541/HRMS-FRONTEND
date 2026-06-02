@@ -7,12 +7,14 @@ import api from "../../api/axios";
 import { getEmployeeById, patchEmployeeById } from "../../api/employees";
 import SalaryTimeline from "../payroll/SalaryTimeline";
 import "../../styles/employeeProfile.css";
+import { useCompanyPermissions } from "../../hooks/useCompanyPermissions";
 
 export default function EmployeeProfile() {
-
   const { id } = useParams();
   const navigate = useNavigate();
   const { employees } = useEmployees();
+  const { hasPermission } = useCompanyPermissions();
+  const canAddRevision = hasPermission("payroll", "edit", "payroll-summary");
 
   const [employee, setEmployee] = useState(
     employees.find((e) => String(e.id) === String(id))
@@ -263,7 +265,7 @@ export default function EmployeeProfile() {
       {/* JOB */}
 
       <Section title="Job Details">
-        <Field label="Role" value={employee.role} />
+        <Field label="Role" value={employee.designation || employee.role} />
         <Field label="Department" value={employee.department} />
         <Field label="Designation" value={employee.designation} />
         <Field label="Employment Type" value={employee.employment_type} />
@@ -294,12 +296,14 @@ export default function EmployeeProfile() {
 
           <h3>Salary Growth Timeline</h3>
 
-          <button
-            className="btn"
-            onClick={() => navigate(`/employees/${employee.id}/salary-revision`)}
-          >
-            Add Salary Revision
-          </button>
+          {canAddRevision && (
+            <button
+              className="btn"
+              onClick={() => navigate(`/employees/${employee.id}/salary-revision`)}
+            >
+              Add Salary Revision
+            </button>
+          )}
 
         </div>
 
@@ -321,11 +325,10 @@ export default function EmployeeProfile() {
         <Field label="PAN" value={employee.pan} />
 
         <Field label="PF Applicable" value={employee.pf_applicable ? "Yes" : "No"} />
-        <Field label="PF Number" value={employee.pf_number} />
-
         {employee.pf_applicable && (
-          <Field label="UAN Number" value={employee.uan_number} />
+          <Field label="PF Number" value={employee.pf_number} />
         )}
+        <Field label="UAN Number" value={employee.uan_number} />
 
         <Field label="ESI Applicable" value={employee.esi_applicable ? "Yes" : "No"} />
 

@@ -253,52 +253,56 @@ export default function PayrollSummary() {
       <div className="charts-section">
         
         {/* BAR CHART */}
-        <div className="chart-card">
+        <div className="chart-card" style={{ width: '100%', minWidth: 0 }}>
           <div className="chart-header">
             <h3>Salary Breakdown</h3>
             <p>Gross vs Net Pay Comparison</p>
           </div>
           <div className="chart-body">
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={monthlyData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip formatter={(value) => formatINR(value)} />
-                <Legend />
-                <Bar dataKey="Gross Salary" fill="#3b82f6" radius={[8, 8, 0, 0]} />
-                <Bar dataKey="Net Pay" fill="#16a34a" radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="responsive-chart-container">
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={monthlyData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip formatter={(value) => formatINR(value)} />
+                  <Legend />
+                  <Bar dataKey="Gross Salary" fill="#3b82f6" radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="Net Pay" fill="#16a34a" radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
 
         {/* PIE CHART */}
-        <div className="chart-card">
+        <div className="chart-card" style={{ width: '100%', minWidth: 0 }}>
           <div className="chart-header">
             <h3>Salary Distribution</h3>
             <p>Net Pay vs Deductions</p>
           </div>
           <div className="chart-body">
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={distributionData}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}
-                  outerRadius={100}
-                  dataKey="value"
-                >
-                  {distributionData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => formatINR(value)} />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
+            <div className="responsive-chart-container">
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={distributionData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(1)}%`}
+                    outerRadius={100}
+                    dataKey="value"
+                  >
+                    {distributionData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value) => formatINR(value)} />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
           </div>
         </div>
       </div>

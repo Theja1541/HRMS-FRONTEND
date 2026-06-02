@@ -57,6 +57,12 @@ export default function MyLeaves() {
     return (e - s) / (1000 * 60 * 60 * 24) + 1;
   };
 
+  const getDocumentUrl = (url) => {
+    if (!url) return null;
+    if (url.startsWith("http")) return url;
+    return `http://127.0.0.1:8000${url}`;
+  };
+
   const filteredLeaves =
     filter === "ALL"
       ? leaves
@@ -234,43 +240,91 @@ export default function MyLeaves() {
               <h3>Leave Details</h3>
               <button className="close-btn" onClick={() => setViewModal(null)}>×</button>
             </div>
-            <div className="modal-body">
-              <div className="detail-row">
-                <span className="label">Employee Name:</span>
-                <span className="value">{viewModal.employee_name}</span>
+            <div className="modal-body" style={{ padding: '0 24px 24px 24px' }}>
+              
+              {/* Header Section */}
+              <div style={{ display: 'flex', gap: '16px', marginBottom: '24px', alignItems: 'center', paddingTop: '10px' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '20px', color: '#2563eb', fontWeight: 'bold' }}>
+                  {viewModal.employee_name ? viewModal.employee_name.charAt(0) : 'E'}
+                </div>
+                <div>
+                  <h4 style={{ margin: '0 0 4px', fontSize: '18px', color: '#0f172a' }}>{viewModal.employee_name}</h4>
+                  <p style={{ margin: '0', fontSize: '13px', color: '#64748b' }}>Leave Application Details</p>
+                </div>
               </div>
-              <div className="detail-row">
-                <span className="label">Leave Type:</span>
-                <span className="value">{viewModal.leave_type_name}</span>
+
+              {/* Status and Type Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #f1f5f9' }}>
+                  <p style={{ margin: '0 0 6px', fontSize: '12px', color: '#64748b', textTransform: 'uppercase', fontWeight: '600', letterSpacing: '0.5px' }}>Leave Type</p>
+                  <p style={{ margin: '0', fontSize: '15px', color: '#0f172a', fontWeight: '600' }}>{viewModal.leave_type_name}</p>
+                </div>
+                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', border: '1px solid #f1f5f9' }}>
+                  <p style={{ margin: '0 0 6px', fontSize: '12px', color: '#64748b', textTransform: 'uppercase', fontWeight: '600', letterSpacing: '0.5px' }}>Current Status</p>
+                  <span className={`status-badge ${viewModal.status?.toLowerCase()}`} style={{ display: 'inline-flex', padding: '4px 10px', fontSize: '12px' }}>
+                    {viewModal.status === "PENDING" && "🟡 Pending Review"}
+                    {viewModal.status === "APPROVED" && "🟢 Approved"}
+                    {viewModal.status === "REJECTED" && "🔴 Rejected"}
+                    {viewModal.status === "CANCELLED" && "⚫ Cancelled"}
+                  </span>
+                </div>
               </div>
-              <div className="detail-row">
-                <span className="label">Start Date:</span>
-                <span className="value">{new Date(viewModal.start_date).toLocaleDateString()}</span>
+
+              {/* Date Information */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px', background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '12px', padding: '16px' }}>
+                <div style={{ flex: 1 }}>
+                  <p style={{ margin: '0 0 4px', fontSize: '12px', color: '#64748b', fontWeight: '600' }}>Start Date</p>
+                  <p style={{ margin: '0', fontSize: '14px', color: '#1e293b', fontWeight: '500' }}>
+                    {new Date(viewModal.start_date).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
+                  </p>
+                </div>
+                <div style={{ width: '1px', background: '#e2e8f0', margin: '0 16px' }}></div>
+                <div style={{ flex: 1 }}>
+                  <p style={{ margin: '0 0 4px', fontSize: '12px', color: '#64748b', fontWeight: '600' }}>End Date</p>
+                  <p style={{ margin: '0', fontSize: '14px', color: '#1e293b', fontWeight: '500' }}>
+                    {new Date(viewModal.end_date).toLocaleDateString(undefined, { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' })}
+                  </p>
+                </div>
+                <div style={{ width: '1px', background: '#e2e8f0', margin: '0 16px' }}></div>
+                <div style={{ flex: '0 0 auto' }}>
+                  <p style={{ margin: '0 0 4px', fontSize: '12px', color: '#64748b', fontWeight: '600' }}>Duration</p>
+                  <p style={{ margin: '0', fontSize: '14px', color: '#2563eb', fontWeight: '600' }}>
+                    {calculateDays(viewModal.start_date, viewModal.end_date)} day(s)
+                  </p>
+                </div>
               </div>
-              <div className="detail-row">
-                <span className="label">End Date:</span>
-                <span className="value">{new Date(viewModal.end_date).toLocaleDateString()}</span>
+
+              {/* Reason */}
+              <div style={{ marginBottom: '24px' }}>
+                <p style={{ margin: '0 0 8px', fontSize: '13px', color: '#334155', fontWeight: '600' }}>Reason for Leave</p>
+                <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '8px', fontSize: '14px', color: '#475569', lineHeight: '1.6', border: '1px solid #f1f5f9' }}>
+                  {viewModal.reason || "No reason provided."}
+                </div>
               </div>
-              <div className="detail-row">
-                <span className="label">Number of Days:</span>
-                <span className="value">{calculateDays(viewModal.start_date, viewModal.end_date)}</span>
-              </div>
-              <div className="detail-row">
-                <span className="label">Reason:</span>
-                <span className="value">{viewModal.reason}</span>
-              </div>
-              <div className="detail-row">
-                <span className="label">Status:</span>
-                <span className={`status-badge ${viewModal.status?.toLowerCase()}`}>
-                  {viewModal.status === "PENDING" && "🟡 Pending"}
-                  {viewModal.status === "APPROVED" && "🟢 Approved"}
-                  {viewModal.status === "REJECTED" && "🔴 Rejected"}
-                  {viewModal.status === "CANCELLED" && "⚫ Cancelled"}
+
+              {/* Document */}
+              {viewModal.document && (
+                <div style={{ marginBottom: '24px', padding: '16px', border: '1px dashed #cbd5e1', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fcfcfc' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <div style={{ width: '36px', height: '36px', background: '#f1f5f9', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '16px' }}>
+                      📎
+                    </div>
+                    <div>
+                      <p style={{ margin: '0 0 2px', fontSize: '13px', fontWeight: '600', color: '#1e293b' }}>Supporting Document</p>
+                      <p style={{ margin: '0', fontSize: '12px', color: '#64748b' }}>Attachment provided</p>
+                    </div>
+                  </div>
+                  <a href={getDocumentUrl(viewModal.document)} target="_blank" rel="noopener noreferrer" style={{ padding: '8px 16px', background: '#eff6ff', color: '#2563eb', textDecoration: 'none', borderRadius: '6px', fontSize: '13px', fontWeight: '600', transition: 'background 0.2s' }} onMouseOver={(e) => e.target.style.background = '#dbeafe'} onMouseOut={(e) => e.target.style.background = '#eff6ff'}>
+                    View File
+                  </a>
+                </div>
+              )}
+              
+              {/* Footer */}
+              <div style={{ marginTop: 'auto', paddingTop: '16px', borderTop: '1px solid #e2e8f0', textAlign: 'right' }}>
+                <span style={{ fontSize: '12px', color: '#94a3b8' }}>
+                  Submitted on {new Date(viewModal.applied_on).toLocaleString(undefined, { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                 </span>
-              </div>
-              <div className="detail-row">
-                <span className="label">Applied Date:</span>
-                <span className="value">{new Date(viewModal.applied_on).toLocaleDateString()}</span>
               </div>
             </div>
           </div>

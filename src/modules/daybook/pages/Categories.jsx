@@ -1,162 +1,184 @@
-import React, { useEffect, useState } from "react";
-import { getCategories, createCategory, updateCategory, deleteCategory } from "../services/daybookApi";
+import { useState, useEffect } from "react";
+import { getCategories, createCategory, updateCategory, deleteCategory } from "../../../api/daybook";
 import "../../../styles/daybook.css";
+import "../../../styles/employees.css";
+import { useCompanyPermissions } from "../../../hooks/useCompanyPermissions";
 
 export default function Categories() {
+  const { hasPermission } = useCompanyPermissions();
+  const canCreate = hasPermission("daybook", "create", "categories");
+  const canEdit = hasPermission("daybook", "edit", "categories");
+
   const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [editId, setEditId] = useState(null);
-  const [formData, setFormData] = useState({ name: "", category_type: "EXPENSE", description: "" });
-  const [search, setSearch] = useState("");
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [formData, setFormData] = useState({
+    name: "",
+    category_type: "EXPENSE",
+    description: "",
+    is_active: true
+  });
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const fetchCategories = async () => {
-    setLoading(true);
     try {
       const res = await getCategories();
-      const data = res.data;
-      setCategories(Array.isArray(data) ? data : (data?.results || []));
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
+      setCategories(res.data.results || res.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
     }
   };
 
-  useEffect(() => { fetchCategories(); }, []);
-
-  const handleOpen = (category = null) => {
-    if (category) {
-      setEditId(category.id);
-      setFormData(category);
-    } else {
-      setEditId(null);
-      setFormData({ name: "", category_type: "EXPENSE", description: "" });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (editingCategory) {
+        await updateCategory(editingCategory.id, formData);
+      } else {
+        await createCategory(formData);
+      }
+      fetchCategories();
+      closeModal();
+    } catch (error) {
+      console.error("Error saving category:", error);
+      alert("Failed to save category");
     }
+  };
+
+  const handleEdit = (category) => {
+    setEditingCategory(category);
+    setFormData(category);
     setShowModal(true);
   };
 
-  const handleSave = async (e) => {
-    e.preventDefault();
-    try {
-      if (editId) await updateCategory(editId, formData);
-      else await createCategory(formData);
-      setShowModal(false);
-      fetchCategories();
-    } catch (err) {
-      console.error(err);
-      alert("Failed to save category.");
-    }
+  const closeModal = () => {
+    setShowModal(false);
+    setEditingCategory(null);
+    setFormData({
+      name: "",
+      category_type: "EXPENSE",
+      description: "",
+      is_active: true
+    });
   };
-
-  const handleDelete = async (id) => {
-    if (window.confirm("Delete this category?")) {
-      try {
-        await deleteCategory(id);
-        fetchCategories();
-      } catch (err) {
-        console.error(err);
-      }
-    }
-  };
-
-  const filteredCategories = categories.filter(c => 
-    c.name.toLowerCase().includes(search.toLowerCase())
-  );
 
   return (
-    <div className="daybook-page">
+    <div className="employees-page">
+      {/* HEADER */}
       <div className="page-header">
         <div>
           <h2 className="page-title">Categories</h2>
-          <p className="page-subtitle">Manage daybook transaction categories</p>
+          <p className="page-subtitle">Manage ledger income and expense categories</p>
         </div>
         <div className="header-actions">
-          <button className="add-daybook-btn btn primary" onClick={() => handleOpen()}>
-            + Add Category
-          </button>
+          {canCreate && (
+            <button className="add-employee-btn" onClick={() => setShowModal(true)}>
+              + Add Category
+            </button>
+          )}
         </div>
       </div>
 
-      <div className="filter-bar">
-        <input
-          type="text"
-          className="search-input"
-          placeholder="Search categories..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </div>
-
+      {/* TABLE WRAPPER */}
       <div className="table-wrapper">
-        {loading ? (
-          <div className="empty-state">Loading categories...</div>
-        ) : filteredCategories.length === 0 ? (
-          <div className="empty-state">No categories found.</div>
-        ) : (
-          <table className="daybook-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Type</th>
-                <th>Description</th>
-                <th style={{ textAlign: "center" }}>Actions</th>
+        <table className="employees-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Description</th>
+              <th>Status</th>
+              <th style={{ textAlign: 'center' }}>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {categories.map((category) => (
+              <tr key={category.id}>
+                <td><strong>{category.name}</strong></td>
+                <td>
+                  <span className={`badge ${category.category_type.toLowerCase() === 'income' ? 'credit' : 'debit'}`}>
+                    {category.category_type}
+                  </span>
+                </td>
+                <td>{category.description || '-'}</td>
+                <td>
+                  <span className={`badge ${category.is_active ? 'credit' : 'debit'}`}>
+                    {category.is_active ? 'Active' : 'Inactive'}
+                  </span>
+                </td>
+                <td className="actions-cell">
+                  <div className="action-buttons">
+                    {canEdit && (
+                      <button className="action-btn action-btn-edit" onClick={() => handleEdit(category)}>Edit</button>
+                    )}
+                  </div>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {filteredCategories.map((category) => (
-                <tr key={category.id}>
-                  <td><strong>{category.name}</strong></td>
-                  <td>
-                    <span style={{
-                      padding: "4px 8px", borderRadius: "4px", fontSize: "12px", fontWeight: "600",
-                      background: category.category_type === 'INCOME' ? '#dcfce7' : '#fee2e2',
-                      color: category.category_type === 'INCOME' ? '#16a34a' : '#dc2626'
-                    }}>
-                      {category.category_type}
-                    </span>
-                  </td>
-                  <td>{category.description || "-"}</td>
-                  <td className="actions-cell">
-                    <div className="action-buttons">
-                      <button className="action-btn action-btn-edit" onClick={() => handleOpen(category)}>Edit</button>
-                      <button className="action-btn action-btn-deactivate" onClick={() => handleDelete(category.id)}>Delete</button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {showModal && (
-        <div className="modal-overlay" onClick={() => setShowModal(false)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: "500px", width: "90%" }}>
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px', width: '90%' }}>
             <div className="modal-header">
-              <h3>{editId ? "Edit Category" : "Add Category"}</h3>
-              <button className="modal-close" onClick={() => setShowModal(false)}>×</button>
+              <h3>{editingCategory ? "Edit Category" : "Add Category"}</h3>
+              <button onClick={closeModal} className="modal-close">×</button>
             </div>
-            <form onSubmit={handleSave} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-              <div>
-                <label style={{ display: "block", marginBottom: "4px", fontSize: "14px", fontWeight: "600" }}>Name</label>
-                <input required type="text" className="search-input" style={{ width: "100%" }} value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />
+            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div className="form-group" style={{ margin: 0 }}>
+                <label style={{ fontWeight: 600, color: '#475569', fontSize: '13px', display: 'block', marginBottom: '6px' }}>Name *</label>
+                <input
+                  type="text"
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  required
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
+                />
               </div>
-              <div>
-                <label style={{ display: "block", marginBottom: "4px", fontSize: "14px", fontWeight: "600" }}>Type</label>
-                <select className="filter-select" style={{ width: "100%" }} value={formData.category_type} onChange={e => setFormData({...formData, category_type: e.target.value})}>
+
+              <div className="form-group" style={{ margin: 0 }}>
+                <label style={{ fontWeight: 600, color: '#475569', fontSize: '13px', display: 'block', marginBottom: '6px' }}>Type *</label>
+                <select
+                  value={formData.category_type}
+                  onChange={(e) => setFormData({ ...formData, category_type: e.target.value })}
+                  required
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', background: 'white' }}
+                >
                   <option value="EXPENSE">Expense</option>
                   <option value="INCOME">Income</option>
                 </select>
               </div>
-              <div>
-                <label style={{ display: "block", marginBottom: "4px", fontSize: "14px", fontWeight: "600" }}>Description</label>
-                <textarea className="search-input" style={{ width: "100%", minHeight: "80px", resize: "vertical" }} value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
+
+              <div className="form-group" style={{ margin: 0 }}>
+                <label style={{ fontWeight: 600, color: '#475569', fontSize: '13px', display: 'block', marginBottom: '6px' }}>Description</label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  rows="3"
+                  style={{ width: '100%', padding: '10px 14px', borderRadius: '8px', border: '1px solid #cbd5e1', resize: 'vertical' }}
+                />
               </div>
-              
-              <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "10px" }}>
-                <button type="button" className="btn" onClick={() => setShowModal(false)}>Cancel</button>
+
+              <div className="form-group" style={{ margin: 0 }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontWeight: 600, color: '#475569', fontSize: '13px' }}>
+                  <input
+                    type="checkbox"
+                    checked={formData.is_active}
+                    onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                    style={{ width: 'auto', margin: 0 }}
+                  />
+                  Active
+                </label>
+              </div>
+
+              <div className="modal-actions" style={{ margin: 0, padding: '12px 0 0 0', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'flex-end', gap: '10px' }}>
                 <button type="submit" className="btn primary">Save</button>
+                <button type="button" className="btn" onClick={closeModal} style={{ background: '#64748b', color: 'white' }}>Cancel</button>
               </div>
             </form>
           </div>
@@ -165,3 +187,4 @@ export default function Categories() {
     </div>
   );
 }
+

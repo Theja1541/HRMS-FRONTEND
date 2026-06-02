@@ -18,21 +18,29 @@ export default function AuditLogs() {
   const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [filters, setFilters] = useState({
     company_id: "",
     action: "",
   });
 
+  useEffect(() => {
+    setPage(1);
+  }, [filters.company_id, filters.action, itemsPerPage]);
+
   const fetchLogs = async () => {
     setLoading(true);
     try {
-      const params = { page, page_size: 50 };
+      const params = { page, page_size: itemsPerPage };
       if (filters.company_id) params.company_id = filters.company_id;
       if (filters.action) params.action = filters.action;
       const res = await getSuperAdminAuditLogs(params);
       setLogs(res.data.results || []);
+      setTotalCount(res.data.count || 0);
     } catch {
       setLogs([]);
+      setTotalCount(0);
     } finally {
       setLoading(false);
     }
@@ -53,15 +61,21 @@ export default function AuditLogs() {
 
   useEffect(() => {
     fetchLogs();
-  }, [page, filters.company_id, filters.action]);
+  }, [page, filters.company_id, filters.action, itemsPerPage]);
 
   const applyFilters = () => {
     setPage(1);
     fetchLogs();
   };
 
+  const totalPages = Math.ceil(totalCount / itemsPerPage) || 1;
+  const pageNumbers = Array.from({ length: Math.min(totalPages, 5) }, (_, idx) => {
+    const start = Math.max(1, page - 2);
+    return start + idx <= totalPages ? start + idx : null;
+  }).filter(Boolean);
+
   return (
-    <div>
+    <div className="audit-logs-page">
       <div className="page-header">
         <h2 className="page-title">Audit Logs & Activity Monitoring</h2>
       </div>
@@ -69,30 +83,36 @@ export default function AuditLogs() {
         Security feature: track every important action across the platform (admin created employee, payroll generated, user login, password reset, etc.).
       </p>
 
-      <div className="filters-row" style={{ marginTop: 16, marginBottom: 16 }}>
-        <label style={{ marginRight: 8 }}>Company:</label>
-        <select
-          value={filters.company_id}
-          onChange={(e) => setFilters({ ...filters, company_id: e.target.value })}
-          style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e5e7eb" }}
-        >
-          <option value="">All companies</option>
-          {companies.map((c) => (
-            <option key={c.id} value={c.id}>{c.name}</option>
-          ))}
-        </select>
-        <label style={{ marginLeft: 16, marginRight: 8 }}>Action:</label>
-        <select
-          value={filters.action}
-          onChange={(e) => setFilters({ ...filters, action: e.target.value })}
-          style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e5e7eb" }}
-        >
-          <option value="">All actions</option>
-          {Object.entries(ACTION_LABELS).map(([value, label]) => (
-            <option key={value} value={value}>{label}</option>
-          ))}
-        </select>
-        <button type="button" className="btn primary" onClick={applyFilters}>
+      <div className="filters-row" style={{ marginTop: 16, marginBottom: 16, display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 200px' }}>
+          <label style={{ margin: 0 }}>Company:</label>
+          <select
+            value={filters.company_id}
+            onChange={(e) => setFilters({ ...filters, company_id: e.target.value })}
+            style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e5e7eb", flex: 1, minWidth: 0 }}
+          >
+            <option value="">All companies</option>
+            {companies.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 200px' }}>
+          <label style={{ margin: 0 }}>Action:</label>
+          <select
+            value={filters.action}
+            onChange={(e) => setFilters({ ...filters, action: e.target.value })}
+            style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e5e7eb", flex: 1, minWidth: 0 }}
+          >
+            <option value="">All actions</option>
+            {Object.entries(ACTION_LABELS).map(([value, label]) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
+          </select>
+        </div>
+        
+        <button type="button" className="btn primary" onClick={applyFilters} style={{ flex: '0 0 auto' }}>
           Apply
         </button>
       </div>
@@ -101,8 +121,8 @@ export default function AuditLogs() {
         <p>Loading...</p>
       ) : (
         <>
-          <div className="card" style={{ marginTop: 24, display: 'flex', flexDirection: 'column', overflow: 'visible', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', background: '#fff', border: '1px solid #f1f5f9', padding: 0 }}>
-            <div className="table-wrapper" style={{ width: '100%', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', overflow: 'visible' }}>
+          <div className="card" style={{ marginTop: 24, display: 'flex', flexDirection: 'column', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', background: '#fff', border: '1px solid #f1f5f9', padding: 0 }}>
+            <div className="responsive-table-container" style={{ width: '100%', borderTopLeftRadius: '16px', borderTopRightRadius: '16px' }}>
               <table style={{ borderCollapse: 'collapse', width: '100%', textAlign: 'left' }}>
                 <thead style={{ background: 'linear-gradient(90deg, #f8fafc, #f1f5f9)', borderBottom: '2px solid #e2e8f0' }}>
                   <tr>
@@ -151,38 +171,46 @@ export default function AuditLogs() {
             </div>
 
             {logs.length > 0 && (
-              <div className="pagination" style={{ 
-                marginTop: 0, 
-                padding: '16px 24px', 
-                background: '#f8fafc', 
-                borderTop: '1px solid #e2e8f0',
-                borderBottomLeftRadius: '16px',
-                borderBottomRightRadius: '16px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center'
-              }}>
-                <span className="page-summary" style={{ color: '#64748b', fontSize: '14px', fontWeight: '500', margin: 0 }}>
-                  Showing page {page}
-                </span>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <div className="attendance-pagination-container" style={{ margin: 0, borderTop: '1px solid #e2e8f0', borderTopLeftRadius: 0, borderTopRightRadius: 0, borderBottomLeftRadius: '16px', borderBottomRightRadius: '16px' }}>
+                <div className="pagination-left">
+                  <span>Show</span>
+                  <select
+                    value={itemsPerPage}
+                    onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                    className="items-per-page-select"
+                  >
+                    <option value={10}>10</option>
+                    <option value={20}>20</option>
+                    <option value={50}>50</option>
+                    <option value={100}>100</option>
+                  </select>
+                  <span>entries per page</span>
+                </div>
+
+                <div className="pagination-right">
                   <button
-                    style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #e2e8f0', background: page <= 1 ? '#f1f5f9' : '#fff', color: page <= 1 ? '#94a3b8' : '#334155', cursor: page <= 1 ? 'not-allowed' : 'pointer', fontWeight: '500', fontSize: '14px', transition: 'all 0.2s' }}
-                    type="button"
-                    disabled={page <= 1}
-                    onClick={() => setPage((p) => p - 1)}
-                    onMouseEnter={(e) => { if (page > 1) { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#cbd5e1'; } }}
-                    onMouseLeave={(e) => { if (page > 1) { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e2e8f0'; } }}
+                    className="page-btn"
+                    disabled={page === 1}
+                    onClick={() => setPage((p) => Math.max(p - 1, 1))}
                   >
                     Previous
                   </button>
+                  <div className="page-number-group" style={{ display: 'flex', gap: '4px' }}>
+                    {pageNumbers.map((pg) => (
+                      <button
+                        key={pg}
+                        className={`page-btn ${pg === page ? "active" : ""}`}
+                        onClick={() => setPage(pg)}
+                      >
+                        {pg}
+                      </button>
+                    ))}
+                  </div>
+                  <span className="page-summary">Page {page} of {totalPages}</span>
                   <button
-                    style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #e2e8f0', background: logs.length < 50 ? '#f1f5f9' : '#fff', color: logs.length < 50 ? '#94a3b8' : '#334155', cursor: logs.length < 50 ? 'not-allowed' : 'pointer', fontWeight: '500', fontSize: '14px', transition: 'all 0.2s' }}
-                    type="button"
-                    disabled={logs.length < 50}
-                    onClick={() => setPage((p) => p + 1)}
-                    onMouseEnter={(e) => { if (logs.length >= 50) { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#cbd5e1'; } }}
-                    onMouseLeave={(e) => { if (logs.length >= 50) { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e2e8f0'; } }}
+                    className="page-btn"
+                    disabled={page >= totalPages}
+                    onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
                   >
                     Next
                   </button>

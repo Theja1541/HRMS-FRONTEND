@@ -186,6 +186,16 @@ export default function SendNotification() {
 
   return (
     <div>
+      <style>{`
+        @media (max-width: 1023px) {
+          .sn-layout { grid-template-columns: 1fr !important; }
+          .sn-targets { grid-template-columns: 1fr !important; }
+          .sn-types { grid-template-columns: repeat(3, 1fr) !important; }
+        }
+        @media (max-width: 480px) {
+          .sn-types { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+      `}</style>
       {/* ── Hero ── */}
       <div className="page-hero">
         <h2 style={{ margin: 0, color: "white", fontSize: 22 }}>📢 Send Notifications</h2>
@@ -195,7 +205,7 @@ export default function SendNotification() {
       </div>
 
       {/* ── 2-column layout ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 310px", gap: 20, alignItems: "start" }}>
+      <div className="sn-layout" style={{ display: "grid", gridTemplateColumns: "1fr 310px", gap: 20, alignItems: "start" }}>
 
         {/* ══ LEFT: Steps ══ */}
         <div style={{ display: "flex", flexDirection: "column", gap: 16, minWidth: 0 }}>
@@ -204,7 +214,7 @@ export default function SendNotification() {
           <div style={CARD}>
             <SHeader>📍 Step 1 — Choose Target Audience</SHeader>
 
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
+            <div className="sn-targets" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
               {TARGET_OPTIONS.map((opt) => {
                 const sel = target === opt.value;
                 return (
@@ -325,7 +335,7 @@ export default function SendNotification() {
           {/* STEP 2 — Type */}
           <div style={CARD}>
             <SHeader>🎨 Step 2 — Notification Type</SHeader>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 8 }}>
+            <div className="sn-types" style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 8 }}>
               {TYPE_OPTIONS.map((opt) => {
                 const sel = type === opt.value;
                 return (

@@ -438,18 +438,168 @@
   padding: 0 12px;
 }
 
-/* Manage Users page fixes: ensure table rows aren't clipped by global card/table rules */
-.manage-users-page .card {
-  overflow: visible !important;
+/* ==========================================================================
+   SUPERADMIN PORTAL TABLE LAYOUTS (Manage Users, Audit Logs, Companies)
+   Resolves browser layout engine conflicts of mixed overflow values.
+   ========================================================================== */
+.manage-users-page .card,
+.audit-logs-page .card,
+.companies-page .card {
+  overflow: visible !important; /* Ensure shadows and fixed dropdown menus render naturally */
 }
-.manage-users-page .table-wrapper {
-  overflow-y: visible !important;
+
+.manage-users-page .table-wrapper,
+.audit-logs-page .table-wrapper,
+.companies-page .table-wrapper {
+  min-height: unset !important;  /* Override global min-height from attendance.css */
+  height: auto !important;       /* Allow container to expand dynamically with row count */
+  overflow: visible !important;  /* Make the entire table fully visible without scrollbars */
 }
-.manage-users-page .attendance-table,
-.manage-users-page .attendance-table tbody,
-.manage-users-page .attendance-table tr {
-  display: table !important;
+
+/* ==========================================
+   ATTENDANCE-STYLE PAGINATION FOR SUPERADMIN
+   ========================================== */
+
+.attendance-pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  background: #f8fafc;
+  padding: 12px 20px;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  animation: fadeIn 0.3s ease;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.pagination-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.items-per-page-select {
+  padding: 6px 12px !important;
+  border-radius: 6px !important;
+  border: 1px solid #cbd5e1 !important;
+  background: white !important;
+  font-size: 13px !important;
+  color: #1e293b !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  outline: none !important;
+  transition: all 0.2s ease !important;
+  width: auto !important;
+  margin-bottom: 0 !important;
+}
+
+.items-per-page-select:focus {
+  border-color: #2563eb !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15) !important;
+}
+
+.pagination-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.page-btn {
+  padding: 6px 14px !important;
+  border-radius: 6px !important;
+  border: 1px solid #cbd5e1 !important;
+  background: white !important;
+  color: #475569 !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  width: auto !important;
+  margin-bottom: 0 !important;
+  height: auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: normal !important;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: #f1f5f9 !important;
+  color: #1e293b !important;
+  border-color: #94a3b8 !important;
+}
+
+.page-btn.active {
+  background: #2563eb !important;
+  color: white !important;
+  border-color: #2563eb !important;
+  font-weight: 600 !important;
+}
+
+.page-btn:disabled {
+  opacity: 0.5 !important;
+  cursor: not-allowed !important;
+}
+
+.page-summary {
+  font-size: 13px !important;
+  color: #64748b !important;
+  font-weight: 500 !important;
+  margin: 0 !important;
+}
+
+/* ==========================================================================
+   GLOBAL RESPONSIVE UTILITIES
+   ========================================================================== */
+
+/* Responsive Table Wrapper (Horizontal Scroll on Mobile/Tablet) */
+.responsive-table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Responsive Grid */
+.responsive-grid {
+  display: grid;
+  gap: 16px;
+}
+.responsive-grid-2 { grid-template-columns: repeat(2, 1fr); }
+.responsive-grid-3 { grid-template-columns: repeat(3, 1fr); }
+.responsive-grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+/* Responsive Chart Container */
+.responsive-chart-container {
   width: 100%;
 }
 
+/* Responsive Breakpoints */
+@media (max-width: 1023px) { /* Tablet (768px - 1023px) and Mobile */
+  .responsive-grid-3, .responsive-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
 
+@media (max-width: 767px) { /* Mobile (0 - 767px) */
+  .responsive-grid-2, .responsive-grid-3, .responsive-grid-4 {
+    grid-template-columns: 1fr;
+  }
+  
+  .responsive-chart-container {
+    height: 300px !important; /* Fixed mobile height to prevent charts disappearing */
+    min-height: 300px;
+  }
+  
+  /* Utilities for hiding/showing */
+  .hide-on-mobile {
+    display: none !important;
+  }
+}

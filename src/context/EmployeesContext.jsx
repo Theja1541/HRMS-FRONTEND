@@ -51,6 +51,7 @@ export function EmployeesProvider({ children }) {
   const [search, setSearch] = useState("");
   const [department, setDepartment] = useState("");
   const [role, setRole] = useState("");
+  const [pageSize, setPageSize] = useState(10);
   const [loading, setLoading] = useState(false);
 
   /* ================= ATTENDANCE STATE ================= */
@@ -58,11 +59,11 @@ export function EmployeesProvider({ children }) {
 
   /* ================= FETCH EMPLOYEES ================= */
   const fetchEmployees = useCallback(
-    async (pageNumber = 1, searchQuery = search, dept = department, roleFilter = role) => {
+    async (pageNumber = 1, searchQuery = search, dept = department, roleFilter = role, size = pageSize) => {
       try {
         setLoading(true);
 
-        const params = { page: pageNumber };
+        const params = { page: pageNumber, page_size: size };
         if (searchQuery) params.search = searchQuery;
         if (dept) params.department = dept;
         if (roleFilter) params.role = roleFilter;
@@ -78,11 +79,11 @@ export function EmployeesProvider({ children }) {
         setLoading(false);
       }
     },
-    [search, department, role]
+    [search, department, role, pageSize]
   );
 
   const refreshEmployees = async () => {
-    await fetchEmployees(page, search, department, role);
+    await fetchEmployees(page, search, department, role, pageSize);
   };
 
   /* ================= FETCH ATTENDANCE ================= */
@@ -149,10 +150,12 @@ export function EmployeesProvider({ children }) {
         search,
         department,
         role,
+        pageSize,
         loading,
         setSearch,
         setDepartment,
         setRole,
+        setPageSize,
         fetchEmployees,
         refreshEmployees,
         addEmployee: async (formData) => {

@@ -13,7 +13,6 @@ export default function HolidayCreate() {
     from_date: "",
     to_date: "",
     holiday_type: "PUBLIC",
-    payment_type: "PAID",
     state: "ALL",
     description: "",
     is_active: true
@@ -88,7 +87,7 @@ export default function HolidayCreate() {
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+          <div className="responsive-grid">
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <label style={{ fontSize: "14px", fontWeight: "600", color: "#334155" }}>From Date</label>
               <input 
@@ -117,34 +116,19 @@ export default function HolidayCreate() {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ fontSize: "14px", fontWeight: "600", color: "#334155" }}>Holiday Type</label>
-              <select 
-                name="holiday_type" 
-                value={formData.holiday_type} 
-                onChange={handleChange} 
-                style={{ padding: '12px 16px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: "14px", outline: "none", background: "white" }}
-              >
-                <option value="PUBLIC">🌍 Public Holiday</option>
-                <option value="OPTIONAL">✨ Optional Holiday</option>
-                <option value="COMPANY">🏢 Company Holiday</option>
-                <option value="FESTIVAL">🎊 Festival</option>
-              </select>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <label style={{ fontSize: "14px", fontWeight: "600", color: "#334155" }}>Payment Type</label>
-              <select 
-                name="payment_type" 
-                value={formData.payment_type} 
-                onChange={handleChange} 
-                style={{ padding: '12px 16px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: "14px", outline: "none", background: "white" }}
-              >
-                <option value="PAID">🟢 Paid</option>
-                <option value="UNPAID">🟠 Unpaid</option>
-              </select>
-            </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <label style={{ fontSize: "14px", fontWeight: "600", color: "#334155" }}>Holiday Type</label>
+            <select 
+              name="holiday_type" 
+              value={formData.holiday_type} 
+              onChange={handleChange} 
+              style={{ padding: '12px 16px', border: '1px solid #e2e8f0', borderRadius: '8px', fontSize: "14px", outline: "none", background: "white" }}
+            >
+              <option value="PUBLIC">🌍 Public Holiday</option>
+              <option value="OPTIONAL">✨ Optional Holiday</option>
+              <option value="COMPANY">🏢 Company Holiday</option>
+              <option value="FESTIVAL">🎊 Festival</option>
+            </select>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -177,7 +161,7 @@ export default function HolidayCreate() {
             ></textarea>
           </div>
 
-          <div style={{ display: 'flex', gap: '16px', justifyContent: 'flex-end', marginTop: '16px', paddingTop: '24px', borderTop: '1px solid #f1f5f9' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'flex-end', marginTop: '16px', paddingTop: '24px', borderTop: '1px solid #f1f5f9' }}>
             <button 
               type="button" 
               onClick={() => navigate("/holidays")}

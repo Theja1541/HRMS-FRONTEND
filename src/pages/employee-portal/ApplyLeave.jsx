@@ -15,6 +15,7 @@ export default function ApplyLeave() {
     fromDate: "",
     toDate: "",
     reason: "",
+    document: null,
   });
 
   const [loading, setLoading] = useState(false);
@@ -70,12 +71,16 @@ export default function ApplyLeave() {
 
   const handleChange = (e) => {
 
-    const { name, value } = e.target;
+    const { name, value, files } = e.target;
 
-    setForm({
-      ...form,
-      [name]: value
-    });
+    if (name === "document") {
+      setForm({ ...form, document: files[0] });
+    } else {
+      setForm({
+        ...form,
+        [name]: value
+      });
+    }
 
     if (name === "leaveTypeId") {
       const selected = leaveTypes.find(t => t.id === parseInt(value));
@@ -106,11 +111,17 @@ export default function ApplyLeave() {
 
       setLoading(true);
 
-      await api.post("/leaves/apply/", {
-        leave_type: leaveTypeId,
-        start_date: fromDate,
-        end_date: toDate,
-        reason
+      const payload = new FormData();
+      payload.append("leave_type", form.leaveTypeId);
+      payload.append("start_date", form.fromDate);
+      payload.append("end_date", form.toDate);
+      payload.append("reason", form.reason);
+      if (form.document) {
+        payload.append("document", form.document);
+      }
+
+      await api.post("/leaves/apply/", payload, {
+        headers: { "Content-Type": "multipart/form-data" }
       });
 
       toast.success("Leave applied successfully ✅");
@@ -119,7 +130,8 @@ export default function ApplyLeave() {
         leaveTypeId: "",
         fromDate: "",
         toDate: "",
-        reason: ""
+        reason: "",
+        document: null
       });
 
       setTotalDays(0);
@@ -264,6 +276,20 @@ export default function ApplyLeave() {
                 onChange={handleChange}
               />
 
+            </div>
+
+            {/* DOCUMENT UPLOAD */}
+            <div className="form-group">
+              <label>Supporting Document (Optional)</label>
+              <input
+                type="file"
+                name="document"
+                onChange={handleChange}
+                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+              />
+              <small style={{ color: "#6b7280", marginTop: "5px", display: "block" }}>
+                Required for certain leaves exceeding specific limits. Max 5MB.
+              </small>
             </div>
 
             {/* SUBMIT */}

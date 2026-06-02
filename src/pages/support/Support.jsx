@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { getSupportTickets, createSupportTicket } from "../../api/support";
+import { createSupportTicket, getSupportTickets } from "../../api/support";
 import "../../styles/pages.css";
+import { useCompanyPermissions } from "../../hooks/useCompanyPermissions";
 
 const PRIORITY_OPTIONS = [
   { value: "LOW", label: "Low" },
@@ -15,6 +16,9 @@ const STATUS_LABELS = {
 };
 
 export default function Support() {
+  const { hasPermission } = useCompanyPermissions();
+  const canCreate = hasPermission("support", "create", "view");
+
   const [tickets, setTickets] = useState([]);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState("");
@@ -79,13 +83,15 @@ export default function Support() {
           </p>
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
-          <button
-            type="button"
-            className={`btn ${activeTab === 'new' ? 'primary' : 'secondary'}`}
-            onClick={() => setActiveTab('new')}
-          >
-            New Ticket
-          </button>
+          {canCreate && (
+            <button
+              type="button"
+              className={`btn ${activeTab === 'new' ? 'primary' : 'secondary'}`}
+              onClick={() => setActiveTab('new')}
+            >
+              New Ticket
+            </button>
+          )}
           <button
             type="button"
             className={`btn ${activeTab === 'list' ? 'primary' : 'secondary'}`}
@@ -199,26 +205,28 @@ export default function Support() {
           <p>Loading...</p>
         ) : (
           <>
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>Ticket</th>
-                  <th>Priority</th>
-                  <th>Status</th>
-                  <th>Created</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tickets.map((ticket) => (
-                  <tr key={ticket.id}>
-                    <td>{ticket.title}</td>
-                    <td>{PRIORITY_OPTIONS.find((o) => o.value === ticket.priority)?.label ?? ticket.priority}</td>
-                    <td>{STATUS_LABELS[ticket.status] ?? ticket.status}</td>
-                    <td>{ticket.created_at ? new Date(ticket.created_at).toLocaleDateString() : "—"}</td>
+            <div className="responsive-table-container">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th>Ticket</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Created</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {tickets.map((ticket) => (
+                    <tr key={ticket.id}>
+                      <td>{ticket.title}</td>
+                      <td>{PRIORITY_OPTIONS.find((o) => o.value === ticket.priority)?.label ?? ticket.priority}</td>
+                      <td>{STATUS_LABELS[ticket.status] ?? ticket.status}</td>
+                      <td>{ticket.created_at ? new Date(ticket.created_at).toLocaleDateString() : "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
             {tickets.length === 0 && !fetchError && (
               <p className="muted-text" style={{ padding: 24 }}>No support tickets yet. Create one above.</p>
             )}

@@ -11,6 +11,7 @@ export default function EmployeeLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [lockoutActive, setLockoutActive] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!user || user.role === "SUPER_ADMIN") {
@@ -33,9 +34,28 @@ export default function EmployeeLayout() {
 
   return (
     <div className="employee-layout">
+      {/* Mobile Toggle Button */}
+      <button
+        className="mobile-menu-btn"
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+      >
+        ☰
+      </button>
+
+      {/* Backdrop Overlay */}
+      {sidebarOpen && (
+        <div
+          className="sidebar-overlay"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
       {/* SIDEBAR */}
-      <EmployeeSidebar lockoutActive={lockoutActive} />
+      <EmployeeSidebar 
+        lockoutActive={lockoutActive} 
+        isOpen={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
 
       {/* MAIN CONTENT */}
       <div className="employee-body">

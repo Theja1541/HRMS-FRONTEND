@@ -4,6 +4,7 @@ import api from "../../api/axios";
 import { useAuth } from "../../auth/AuthContext";
 import { deleteCompanyLogo, getCompanyBranding, uploadCompanyLogo } from "../../api/companies";
 import { useToast } from "../../context/ToastContext";
+import BillingDashboard from "../../components/billing/BillingDashboard";
 import "../../styles/settings.css";
 
 export default function Settings() {
@@ -227,7 +228,7 @@ export default function Settings() {
   };
 
   return (
-    <div className="settings-page">
+    <div className={`settings-page ${activeTab === "subscription-plan" ? "billing-active" : ""}`}>
       <div className="settings-header">
         <h2>Settings</h2>
         <p>Manage your account settings and password</p>
@@ -417,65 +418,7 @@ export default function Settings() {
         )}
 
         {activeTab === "subscription-plan" && canViewSubscription && (
-          <div className="settings-card subscription-panel">
-            <div className="subscription-gradient-header">
-              <div className="sub-header-details">
-                <span className="sub-badge-pill">CURRENT SUBSCRIPTION</span>
-                <h3>{branding?.pricing_plan_name || "Free Trial / Custom Plan"}</h3>
-                <p className="sub-tagline">Manage your enterprise billing tier and limits</p>
-              </div>
-              <div className="sub-status-pill-wrap">
-                {branding?.pricing_plan_name ? (
-                  <span className={`sub-status-badge ${isSubscriptionExpired ? "expired" : "active"}`}>
-                    {isSubscriptionExpired ? "⊘ Expired" : "✓ Active"}
-                  </span>
-                ) : (
-                  <span className="sub-status-badge trial">
-                    ⚡ Trial Tier
-                  </span>
-                )}
-              </div>
-            </div>
-
-            <div className="subscription-details-grid">
-              <div className="sub-detail-tile">
-                <span className="tile-label">Billing Cycle</span>
-                <strong className="tile-value">Monthly</strong>
-              </div>
-
-              <div className="sub-detail-tile">
-                <span className="tile-label">Pricing Rate</span>
-                <strong className="tile-value price-highlight">
-                  {branding?.pricing_plan_price ? `${formattedPrice}/mo` : "Custom / Negotiated"}
-                </strong>
-              </div>
-
-              <div className="sub-detail-tile">
-                <span className="tile-label">Status</span>
-                <strong className={`tile-value ${isSubscriptionExpired ? "text-danger" : "text-success"}`}>
-                  {branding?.pricing_plan_name ? (isSubscriptionExpired ? "Suspended" : "Good Standing") : "Trial / Active"}
-                </strong>
-              </div>
-
-              <div className="sub-detail-tile">
-                <span className="tile-label">Renewal / Expiry Date</span>
-                <strong className="tile-value">{formattedExpiryDate}</strong>
-              </div>
-            </div>
-
-            <div className="subscription-meta-info">
-              <h4>📋 Subscription Information & Features</h4>
-              <p>Your subscription covers your current employee limit and HR payroll processing capabilities. Features are actively managed by the system administrator.</p>
-              
-              <div className="cta-support-box">
-                <div className="support-icon">💡</div>
-                <div className="support-text">
-                  <strong>Need to upgrade or make changes?</strong>
-                  <p>To upgrade your plan, change employee quotas, or update payment references, please contact our Platform Super Administrator or submit a support ticket.</p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <BillingDashboard />
         )}
       </div>
     </div>

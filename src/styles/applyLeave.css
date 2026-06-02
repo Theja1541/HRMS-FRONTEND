@@ -326,3 +326,32 @@ padding:22px;
 }
 
 }
+/* ==========================================
+   APPLY LEAVE — MOBILE RESPONSIVE
+   ========================================== */
+@media (max-width: 768px) {
+  .apply-leave-page {
+    padding: 14px !important;
+  }
+  .apply-leave-card {
+    padding: 18px !important;
+  }
+  .leave-type-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+  .leave-date-row {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+  .leave-date-row input {
+    width: 100% !important;
+  }
+  .apply-leave-actions {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  .apply-leave-actions button {
+    width: 100% !important;
+  }
+}

@@ -1,7 +1,7 @@
 import { useEmployees } from "../../context/EmployeesContext";
 import { useEffect, useState } from "react";
 import { getPayrollDashboardSummary } from "../../api/payroll";
-import { getLeaveRequests } from "../../api/leaves";
+import { getLeaveAnalytics } from "../../api/leaves";
 import { useAuth } from "../../auth/AuthContext.jsx";
 import { getMyNotifications } from "../../api/notifications";
 import CountUp from "react-countup";
@@ -129,21 +129,36 @@ export default function Dashboard() {
   const [upcomingHoliday, setUpcomingHoliday] = useState(null);
 
   useEffect(() => {
-    async function fetchDashboardData() {
+    async function fetchAttendance() {
       try {
         const attRes = await getAttendanceDashboardSummary();
         setAttendanceSummary(attRes.data);
-        
+      } catch (err) {
+        console.error("Error fetching attendance summary:", err);
+      }
+    }
+
+    async function fetchDeptDistribution() {
+      try {
         const deptRes = await getDepartmentDistribution();
         setDeptDistribution(deptRes.data);
+      } catch (err) {
+        console.error("Error fetching department distribution:", err);
+      }
+    }
 
+    async function fetchHolidays() {
+      try {
         const holRes = await getUpcomingHolidays();
         setUpcomingHoliday(holRes.data);
       } catch (err) {
-        console.error("Error fetching dashboard analytics:", err);
+        console.error("Error fetching upcoming holidays:", err);
       }
     }
-    fetchDashboardData();
+
+    fetchAttendance();
+    fetchDeptDistribution();
+    fetchHolidays();
   }, []);
   
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d', '#ffc658'];
@@ -156,38 +171,16 @@ export default function Dashboard() {
   const [onLeaveToday, setOnLeaveToday] = useState(0);
 
   useEffect(() => {
-    function normalizeList(res) {
-      const data = res.data;
-      if (!data) return [];
-      return Array.isArray(data.results) ? data.results : (Array.isArray(data) ? data : []);
-    }
-
-    async function fetchPendingLeaves() {
+    async function fetchLeaveAnalytics() {
       try {
-        const res = await getLeaveRequests({ status: "PENDING" });
-        const list = normalizeList(res);
-        setPendingLeaves(list.length);
+        const res = await getLeaveAnalytics();
+        setPendingLeaves(res.data.pending_leaves || 0);
+        setOnLeaveToday(res.data.on_leave_today || 0);
       } catch (err) {
-        console.log("Failed to fetch pending leaves");
+        console.log("Failed to fetch leave analytics", err);
       }
     }
-
-    async function fetchOnLeaveToday() {
-      try {
-        const res = await getLeaveRequests({ status: "APPROVED" });
-        const list = normalizeList(res);
-        const today = new Date().toISOString().split("T")[0];
-        const todayLeaves = list.filter(
-          (leave) => leave.start_date <= today && leave.end_date >= today
-        );
-        setOnLeaveToday(todayLeaves.length);
-      } catch (err) {
-        console.log("Failed to fetch on leave today");
-      }
-    }
-
-    fetchPendingLeaves();
-    fetchOnLeaveToday();
+    fetchLeaveAnalytics();
   }, []);
 
   const totalEmployees = employees.length;
@@ -214,10 +207,15 @@ export default function Dashboard() {
   ================================ */
   return (
     <div className="dashboard-page">
-
+      <style>{`
+        .span-2 { grid-column: span 2; }
+        @media (max-width: 768px) {
+          .span-2 { grid-column: span 1 !important; }
+        }
+      `}</style>
       {/* ================= HERO ================= */}
-      <div className="dashboard-hero">
-        <div className="hero-content">
+      <div className="dashboard-hero" style={{ overflow: 'visible' }}>
+        <div className="hero-content" style={{ overflow: 'visible', zIndex: 10 }}>
 
           <div>
             <h2>
@@ -243,7 +241,7 @@ export default function Dashboard() {
               </div>
 
               {showNotifications && (
-                <div className="notification-dropdown">
+                <div className="notification-dropdown" style={{ zIndex: 9999 }}>
                   {notifications.length === 0 ? (
                     <div className="notification-empty">
                       No notifications
@@ -283,7 +281,7 @@ export default function Dashboard() {
       </div>
       
       {/* ================= ATTENDANCE ANALYTICS ================= */}
-      <div className="dashboard-kpis" style={{ marginBottom: '24px', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px' }}>
+      <div className="dashboard-kpis" style={{ marginBottom: '24px', display: 'grid', gap: '16px' }}>
         <div className="kpi-card blue" onClick={() => window.location.href='/employees'} style={{ cursor: 'pointer' }}>
           <h3><CountUp end={activeEmployees || 0} duration={1.5} /></h3>
           <span>Total Employees</span>
@@ -306,10 +304,10 @@ export default function Dashboard() {
       <div className="dashboard-grid">
 
         {/* Attendance Trend */}
-        <div className="dashboard-card" style={{ gridColumn: 'span 2' }}>
+        <div className="dashboard-card span-2">
           <h3>Attendance Trend (Last 7 Days)</h3>
           {!attendanceSummary ? <p className="muted">Loading...</p> : (
-            <div style={{ width: '100%', height: 300 }}>
+            <div className="responsive-chart-container" style={{ width: '100%', height: 300 }}>
               <ResponsiveContainer>
                 <LineChart data={attendanceSummary.weekly_trend} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" />
@@ -317,8 +315,8 @@ export default function Dashboard() {
                   <YAxis />
                   <RechartsTooltip />
                   <Legend />
-                  <Line type="monotone" dataKey="present" stroke="#10b981" strokeWidth={2} name="Present" />
-                  <Line type="monotone" dataKey="absent" stroke="#ef4444" strokeWidth={2} name="Absent" />
+                  <Line type="monotone" dataKey="present" stroke="#10b981" strokeWidth={2} name="Present" animationDuration={500} />
+                  <Line type="monotone" dataKey="absent" stroke="#ef4444" strokeWidth={2} name="Absent" animationDuration={500} />
                 </LineChart>
               </ResponsiveContainer>
             </div>
@@ -329,10 +327,10 @@ export default function Dashboard() {
         <div className="dashboard-card">
           <h3>Employee Distribution (Dept)</h3>
           {deptDistribution.length === 0 ? <p className="muted">Loading...</p> : (
-            <div style={{ width: '100%', height: 300 }}>
+            <div className="responsive-chart-container" style={{ width: '100%', height: 300 }}>
               <ResponsiveContainer>
                 <PieChart>
-                  <Pie data={deptDistribution} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
+                  <Pie data={deptDistribution} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label animationDuration={500}>
                     {deptDistribution.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
@@ -368,18 +366,27 @@ export default function Dashboard() {
               <div className={`payroll-status ${payrollSummary.status.toLowerCase()}`}>
                 {payrollSummary.status}
               </div>
-              <div style={{ width: '100%', height: 200, marginTop: '20px' }}>
+              <div className="responsive-chart-container" style={{ width: '100%', height: 200, marginTop: '20px' }}>
                 <ResponsiveContainer>
-                  <PieChart>
-                    <Pie data={[
-                      { name: 'Paid', value: payrollSummary.paid },
-                      { name: 'Draft/Pending', value: payrollSummary.draft + payrollSummary.approved }
-                    ]} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={80} label>
-                      <Cell fill="#10b981" />
-                      <Cell fill="#f59e0b" />
-                    </Pie>
-                    <RechartsTooltip />
-                  </PieChart>
+                  <BarChart data={[
+                    { name: 'Paid', value: payrollSummary.paid },
+                    { name: 'Draft/Pending', value: payrollSummary.draft + payrollSummary.approved }
+                  ]} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" tick={{fontSize: 12}} />
+                    <YAxis tick={{fontSize: 12}} />
+                    <RechartsTooltip cursor={{fill: 'transparent'}} />
+                    <Bar dataKey="value" animationDuration={500} radius={[4, 4, 0, 0]}>
+                      {
+                        [
+                          { name: 'Paid', value: payrollSummary.paid },
+                          { name: 'Draft/Pending', value: payrollSummary.draft + payrollSummary.approved }
+                        ].map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={index === 0 ? "#10b981" : "#f59e0b"} />
+                        ))
+                      }
+                    </Bar>
+                  </BarChart>
                 </ResponsiveContainer>
               </div>
             </div>
@@ -412,9 +419,9 @@ export default function Dashboard() {
         </div>
 
         {/* Leave Analytics */}
-        <div className="dashboard-card">
+        <div className="dashboard-card" style={{ gridColumn: '2' }}>
           <h3>Leave Analytics</h3>
-          <div style={{ width: '100%', height: 300 }}>
+          <div className="responsive-chart-container" style={{ width: '100%', height: 300 }}>
             {pendingLeaves === 0 && onLeaveToday === 0 ? (
                <div style={{ display: 'flex', height: '100%', alignItems: 'center', justifyContent: 'center', color: '#64748b' }}>No leaves requested/approved today</div>
             ) : (
@@ -432,6 +439,7 @@ export default function Dashboard() {
                     innerRadius={60}
                     outerRadius={80}
                     label
+                    animationDuration={500}
                   >
                     <Cell key="cell-0" fill="#f59e0b" />
                     <Cell key="cell-1" fill="#10b981" />

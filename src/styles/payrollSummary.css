@@ -405,3 +405,49 @@
     font-size: 24px;
   }
 }
+
+/* ==========================================
+   PAYROLL SUMMARY — MOBILE RESPONSIVE
+   ========================================== */
+@media (max-width: 1024px) {
+  .payroll-summary-stats {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .payroll-summary-page {
+    padding: 14px !important;
+  }
+  .payroll-summary-header {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+  }
+  .payroll-summary-header-actions {
+    width: 100% !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  .payroll-summary-header-actions button {
+    width: 100% !important;
+  }
+  .payroll-summary-stats {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  .payroll-summary-table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .payroll-summary-table {
+    min-width: 700px !important;
+  }
+  .payroll-summary-filters {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  .payroll-summary-filters select {
+    width: 100% !important;
+  }
+}

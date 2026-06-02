@@ -1,329 +1,1348 @@
-/* =========================
-   MOBILE RESPONSIVENESS
-   For all remaining components
-========================= */
+/* ==========================================================================
+   MOBILE & VIEWPORT RESPONSIVENESS OVERRIDES (LOADED ABSOLUTE LAST)
+   Covers: Super Admin, Company Admin, Company HR, Employee Portals
+   ========================================================================== */
 
-/* Tables - General */
+
+/* ==========================================
+   1. GLOBAL BOX MODEL SAFETY
+   ========================================== */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* ==========================================
+   2. GLOBAL TABLES â€” SCROLLABLE ON MOBILE
+   ========================================== */
 @media (max-width: 768px) {
-  table {
-    font-size: 12px;
-    display: block;
-    overflow-x: auto;
-    white-space: nowrap;
+  .table-wrapper {
+    width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    margin: 16px 0 !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+  }
+
+  /* Force all tables to have a minimum width so columns don't collapse */
+  table:not(.calendar-grid) {
+    display: table !important;
+    width: 100% !important;
+    min-width: 650px !important;
   }
 
   th, td {
     padding: 10px 12px !important;
+    font-size: 13px !important;
+    white-space: nowrap;
+  }
+
+  /* Pagination bar stacks vertically */
+  .pagination {
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 16px !important;
+  }
+
+  .page-number-group {
+    justify-content: center !important;
+    width: 100% !important;
+  }
+
+  .page-summary {
+    text-align: center !important;
+    margin-bottom: 4px !important;
+  }
+
+  /* Attendance pagination container */
+  .attendance-pagination-container {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    padding: 12px 16px !important;
+  }
+
+  .pagination-right {
+    width: 100% !important;
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+  }
+
+  .pagination-left {
+    width: 100% !important;
+    justify-content: center !important;
   }
 }
 
-/* Attendance */
+
+/* ==========================================
+   3. PAGE HEADERS & ACTION BUTTONS
+   ========================================== */
 @media (max-width: 768px) {
-  .attendance-controls {
-    flex-direction: column;
-    gap: 12px;
+  .page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+    margin-bottom: 20px !important;
   }
 
+  .page-title {
+    font-size: 20px !important;
+  }
+
+  .page-hero {
+    padding: 20px 18px !important;
+    border-radius: 14px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .page-hero h2 {
+    font-size: 18px !important;
+  }
+
+  .header-actions {
+    width: 100% !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    align-items: stretch !important;
+  }
+
+  .header-actions button,
+  .header-actions a,
+  .header-actions .btn,
+  .header-actions .add-employee-btn,
+  .header-actions .settings-btn,
+  .header-actions .deactivated-btn {
+    width: 100% !important;
+    margin: 0 !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    padding: 12px 16px !important;
+  }
+
+  .button-group {
+    flex-direction: column !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  .button-group button,
+  .button-group a {
+    width: 100% !important;
+  }
+}
+
+
+/* ==========================================
+   4. FILTER BARS & SEARCH INPUTS
+   ========================================== */
+@media (max-width: 768px) {
+  .filter-bar,
+  .filters-row,
+  .audit-filters,
+  .attendance-controls,
+  .payroll-filters,
+  .leave-filters,
+  .report-filters,
+  .company-filters {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+    padding: 14px !important;
+    width: 100% !important;
+  }
+
+  .filter-bar input,
+  .filter-bar select,
+  .filter-bar button,
+  .filters-row input,
+  .filters-row select,
+  .filters-row button,
+  .audit-filters input,
+  .audit-filters select,
+  .audit-filters button,
+  .search-input,
+  .filter-select,
   .attendance-controls input,
   .attendance-controls select,
-  .attendance-controls button {
-    width: 100%;
+  .attendance-controls button,
+  .payroll-filters select,
+  .payroll-filters button,
+  .payroll-filters input,
+  .leave-filters select,
+  .leave-filters button,
+  .leave-filters input,
+  .report-filters select,
+  .report-filters button,
+  .company-filters select,
+  .company-filters input,
+  .company-filters button {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    min-width: unset !important;
+  }
+
+  /* Inline filter label alignment */
+  .filters-row label,
+  .audit-filters label {
+    display: block !important;
+    margin: 0 !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #64748b !important;
+    margin-bottom: 4px !important;
+  }
+
+  /* Tab navigation */
+  .tab-nav,
+  .tabs {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .tab-nav button,
+  .tabs button,
+  .tab-btn {
+    flex: 1 1 auto !important;
+    min-width: 120px !important;
+    text-align: center !important;
   }
 }
 
-/* Payroll */
+
+/* ==========================================
+   5. DASHBOARDS, KPI & STAT CARDS
+   ========================================== */
+@media (max-width: 1024px) {
+  .dashboard-kpis {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .superadmin-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
 @media (max-width: 768px) {
-  .payroll-filters {
-    flex-direction: column;
-  }
-
-  .payroll-filters select,
-  .payroll-filters button {
-    width: 100%;
-  }
-
+  .dashboard-kpis,
+  .dashboard-grid,
+  .employee-dashboard-grid,
+  .employee-stats,
+  .card-grid,
+  .stats-grid,
+  .superadmin-grid,
+  .attendance-summary-grid,
+  .email-stats,
+  .profile-grid,
+  .documents-grid,
+  .leave-balance-grid,
+  .leave-stats,
   .payroll-summary-grid {
     grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* Super Admin specific grids */
+  .superadmin-stats {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .stat-card {
+    min-width: unset !important;
+    width: 100% !important;
+  }
+
+  /* 2-column payroll stats â†’ 1 col on small phone */
+  .payroll-stats {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .kpi-card {
+    min-height: auto !important;
+    padding: 18px !important;
+  }
+
+  .kpi-card h3 {
+    font-size: 22px !important;
   }
 }
 
-/* Leaves */
-@media (max-width: 768px) {
-  .leave-filters {
-    flex-direction: column;
+@media (max-width: 480px) {
+  .payroll-stats {
+    grid-template-columns: 1fr !important;
   }
 
-  .leave-stats {
+  .dashboard-kpis {
     grid-template-columns: 1fr !important;
   }
 }
 
-/* Employee Portal */
+
+/* ==========================================
+   6. MULTI-STEP FORMS & EMPLOYEE ONBOARDING
+   ========================================== */
 @media (max-width: 768px) {
-  .employee-dashboard-grid {
-    grid-template-columns: 1fr !important;
+  .employee-form-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 14px !important;
   }
 
-  .employee-stats {
-    grid-template-columns: 1fr !important;
+  .stepper {
+    gap: 4px !important;
+    overflow-x: auto !important;
+    padding-bottom: 8px !important;
+  }
+
+  .step p {
+    display: none !important;
+  }
+
+  .step span {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 12px !important;
   }
 }
 
-/* Forms - General */
-@media (max-width: 768px) {
+@media (max-width: 480px) {
+  .employee-form-grid,
   .form-row {
-    flex-direction: column;
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
   }
 
   .form-group {
     width: 100% !important;
   }
-}
 
-/* Modals */
-@media (max-width: 480px) {
-  .modal-content {
-    width: 95% !important;
-    max-width: 95% !important;
-    padding: 16px !important;
+  .step-actions {
+    flex-direction: column !important;
+    gap: 10px !important;
   }
 
-  .modal-header h3 {
+  .step-actions button,
+  .step-actions .btn {
+    width: 100% !important;
+  }
+
+  .step span {
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 11px !important;
+  }
+}
+
+
+/* ==========================================
+   7. MODALS & POPUPS
+   ========================================== */
+@media (max-width: 768px) {
+  .modal-overlay {
+    padding: 12px !important;
+    align-items: flex-end !important; /* Bottom-sheet style */
+  }
+
+  .modal-card,
+  .modal-content,
+  .preview-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 20px !important;
+    border-radius: 20px 20px 0 0 !important;
+    margin: 0 !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
+  }
+
+  .modal-header h3,
+  .preview-content h3 {
     font-size: 16px !important;
   }
-}
 
-/* Cards */
-@media (max-width: 768px) {
-  .card-grid {
-    grid-template-columns: 1fr !important;
+  .modal-actions {
+    flex-direction: column !important;
+    gap: 10px !important;
+    width: 100% !important;
   }
 
-  .stats-grid {
-    grid-template-columns: 1fr !important;
+  .modal-actions button,
+  .modal-actions .btn {
+    width: 100% !important;
   }
 }
 
-/* Buttons */
 @media (max-width: 480px) {
-  .button-group {
-    flex-direction: column;
-  }
-
-  .button-group button {
-    width: 100%;
+  .modal-card,
+  .modal-content {
+    border-radius: 16px 16px 0 0 !important;
   }
 }
 
-/* Header Actions */
+
+/* ==========================================
+   8. BILLING & FEATURE COMPARISON
+   ========================================== */
 @media (max-width: 768px) {
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start !important;
-    gap: 12px;
+  .subscription-panel {
+    border-radius: 16px !important;
   }
 
-  .header-actions {
-    width: 100%;
-    flex-direction: column;
+  .subscription-gradient-header {
+    padding: 20px 18px !important;
   }
 
-  .header-actions button {
-    width: 100%;
+  .subscription-details-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .sub-detail-tile {
+    padding: 14px !important;
+  }
+
+  #pricing-plans-section {
+    padding: 20px 14px !important;
+    border-radius: 16px !important;
+  }
+
+  #pricing-plans-section .table-wrapper {
+    margin-top: 16px !important;
+    border-radius: 10px !important;
+    overflow-x: auto !important;
+  }
+
+  /* Billing plan cards grid */
+  .billing-plans-grid,
+  .plans-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* Feature comparison table wrapper */
+  .compare-table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
   }
 }
 
-/* Employee Sidebar */
+
+/* ==========================================
+   9. LEAVE CALENDAR
+   ========================================== */
 @media (max-width: 768px) {
-  .employee-sidebar {
-    position: fixed;
-    left: -260px;
-    top: 0;
-    height: 100vh;
-    z-index: 999;
-    transition: left 0.3s ease;
-  }
-
-  .employee-sidebar.mobile-open {
-    left: 0;
-  }
-}
-
-/* Salary Timeline */
-@media (max-width: 768px) {
-  .salary-timeline {
-    padding: 16px;
-  }
-
-  .timeline-item {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-}
-
-/* Leave Calendar */
-@media (max-width: 768px) {
-  .calendar-grid {
-    font-size: 12px;
-  }
-
   .calendar-day {
-    padding: 8px 4px;
+    padding: 4px 2px !important;
+    min-height: 42px !important;
+    font-size: 10px !important;
+  }
+
+  .calendar-header {
+    flex-direction: column !important;
+    gap: 10px !important;
+    align-items: flex-start !important;
+  }
+
+  .calendar-nav {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+
+  .leave-legend {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
   }
 }
 
-/* Payslip */
+
+/* ==========================================
+   10. PAYSLIPS & SALARY
+   ========================================== */
 @media (max-width: 768px) {
   .payslip-container {
-    padding: 16px;
+    padding: 16px !important;
+    border-radius: 12px !important;
   }
 
   .payslip-header {
-    flex-direction: column;
-    text-align: center;
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: 12px !important;
   }
-}
 
-/* Super Admin */
-@media (max-width: 768px) {
-  .superadmin-grid {
+  .payslip-grid,
+  .salary-grid {
     grid-template-columns: 1fr !important;
+    gap: 12px !important;
   }
 
-  .user-management-table {
-    overflow-x: auto;
-  }
-}
-
-/* Attendance Summary */
-@media (max-width: 768px) {
-  .attendance-summary-grid {
-    grid-template-columns: 1fr !important;
-  }
-}
-
-/* Monthly Attendance */
-@media (max-width: 768px) {
-  .monthly-attendance-header {
-    flex-direction: column;
-    gap: 12px;
+  /* Salary timeline items */
+  .salary-timeline,
+  .timeline-item {
+    padding: 12px !important;
   }
 
-  .month-selector {
-    width: 100%;
+  .timeline-item {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
   }
 }
 
-/* Email Dashboard */
+
+/* ==========================================
+   11. EMPLOYEE PROFILE PAGE
+   ========================================== */
 @media (max-width: 768px) {
-  .email-stats {
-    grid-template-columns: 1fr !important;
-  }
-
-  .email-list {
-    font-size: 12px;
-  }
-}
-
-/* Profile */
-@media (max-width: 768px) {
-  .profile-grid {
-    grid-template-columns: 1fr !important;
-  }
-
   .profile-header {
-    flex-direction: column;
-    text-align: center;
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: 16px !important;
   }
 
   .profile-avatar {
-    margin: 0 auto;
+    margin: 0 auto !important;
+  }
+
+  .profile-info-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .profile-tabs {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .profile-tab-btn {
+    flex: 1 1 auto !important;
+    min-width: 120px !important;
+    text-align: center !important;
   }
 }
 
-/* Documents */
+
+/* ==========================================
+   12. SETTINGS PAGE
+   ========================================== */
 @media (max-width: 768px) {
-  .documents-grid {
+  .settings-tabs-wrapper {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .settings-tab-btn {
+    flex: 1 1 auto !important;
+    min-width: 120px !important;
+    text-align: center !important;
+    font-size: 13px !important;
+    padding: 10px 12px !important;
+  }
+
+  /* Settings form fields */
+  .settings-form-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* Two-column settings layouts */
+  .settings-section {
     grid-template-columns: 1fr !important;
   }
 }
 
-/* Leave Balance */
+
+/* ==========================================
+   13. ATTENDANCE PAGES
+   ========================================== */
 @media (max-width: 768px) {
-  .leave-balance-grid {
+  .attendance-controls {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: stretch !important;
+    padding: 14px !important;
+  }
+
+  .attendance-summary-cards {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  .attendance-tabs {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    white-space: nowrap !important;
+    flex-wrap: nowrap !important;
+    padding-bottom: 4px !important;
+  }
+
+  /* Monthly attendance calendar */
+  .monthly-calendar {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .month-grid {
+    min-width: 600px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .attendance-summary-cards {
     grid-template-columns: 1fr !important;
   }
 }
 
-/* Apply Leave */
+
+/* ==========================================
+   14. DAYBOOK & COMPANY USERS
+   ========================================== */
 @media (max-width: 768px) {
-  .leave-form {
-    padding: 16px;
+  /* Daybook entries list */
+  .daybook-entries {
+    grid-template-columns: 1fr !important;
   }
 
-  .date-range {
-    flex-direction: column;
+  /* Company Users HR onboarding tabs */
+  .company-users-tabs {
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    padding-bottom: 4px !important;
+  }
+
+  /* Onboard form actions */
+  .onboard-form-actions {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  .onboard-form-actions button {
+    width: 100% !important;
   }
 }
 
-/* Navbar */
-@media (max-width: 768px) {
-  .navbar {
-    padding: 12px 16px;
-  }
 
-  .navbar-menu {
-    display: none;
-  }
-
-  .mobile-menu-toggle {
-    display: block;
-  }
-}
-
-/* Toast Notifications */
+/* ==========================================
+   15. LOGIN PAGE
+   ========================================== */
 @media (max-width: 480px) {
-  .toast {
-    width: 90% !important;
-    left: 5% !important;
-    right: 5% !important;
+  .login-card {
+    width: 95% !important;
+    max-width: 380px !important;
+    padding: 24px 18px !important;
+    margin: auto !important;
+  }
+
+  .login-logo {
+    font-size: 20px !important;
   }
 }
 
-/* Dropdown Menus */
+
+/* ==========================================
+   16. NOTIFICATIONS PAGE
+   ========================================== */
 @media (max-width: 768px) {
-  .dropdown-menu {
-    position: fixed !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    right: auto !important;
-    width: 90%;
-    max-width: 300px;
+  .notification-list {
+    gap: 12px !important;
+  }
+
+  .notification-item {
+    padding: 14px !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    align-items: flex-start !important;
+  }
+
+  .notification-meta {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
   }
 }
 
-/* Filters */
+
+/* ==========================================
+   17. SUPPORT TICKETS
+   ========================================== */
 @media (max-width: 768px) {
-  .filter-bar {
-    flex-direction: column;
-    gap: 12px;
+  .ticket-header {
+    flex-direction: column !important;
+    gap: 12px !important;
   }
 
-  .filter-bar input,
-  .filter-bar select {
-    width: 100%;
+  .ticket-meta {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .ticket-actions {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .ticket-actions button {
+    width: 100% !important;
   }
 }
 
-/* Pagination */
+
+/* ==========================================
+   18. COMPANY ADMIN â€” COMPANY HR PORTAL
+   ========================================== */
+@media (max-width: 768px) {
+  /* Company page header with search */
+  .companies-page .page-header,
+  .company-admin-page .page-header {
+    flex-direction: column !important;
+    gap: 14px !important;
+    align-items: stretch !important;
+  }
+
+  /* Company cards grid */
+  .companies-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* Company detail tabs */
+  .company-detail-tabs {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  /* Reports charts area */
+  .reports-grid,
+  .analytics-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+}
+
+
+/* ==========================================
+   19. GENERAL CARD & SECTION LAYOUT
+   ========================================== */
+@media (max-width: 768px) {
+  /* Cards full width */
+  .card {
+    padding: 16px !important;
+    border-radius: 12px !important;
+    margin-bottom: 16px !important;
+  }
+
+  /* Two-column card sections */
+  .card-row,
+  .two-col-layout,
+  .detail-grid {
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  /* Summary boxes in cards */
+  .summary-box {
+    padding: 14px !important;
+  }
+
+  /* Section headings */
+  .section-title {
+    font-size: 16px !important;
+  }
+
+  /* Status badges wrap */
+  .status-row {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+}
+
+
+/* ==========================================
+   20. EMPLOYEE PORTAL â€” LAYOUT ADJUSTMENTS
+   ========================================== */
+@media (max-width: 768px) {
+  /* Employee content padding */
+  .employee-content {
+    padding: 16px !important;
+  }
+
+  /* Employee header â€” hamburger occupies left space */
+  .employee-header {
+    padding-left: 68px !important;
+    min-height: 56px !important;
+  }
+
+  /* Employee header right actions */
+  .employee-header-right {
+    gap: 8px !important;
+  }
+
+  .employee-user {
+    display: none !important; /* Hide username text on very small screens */
+  }
+
+  /* Employee dashboard quick actions */
+  .quick-actions-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  .quick-action-card {
+    padding: 16px 12px !important;
+  }
+
+  .quick-action-card .icon {
+    font-size: 24px !important;
+  }
+
+  /* My salary detail rows */
+  .salary-breakdown-row {
+    flex-direction: column !important;
+    gap: 8px !important;
+    align-items: flex-start !important;
+  }
+}
+
 @media (max-width: 480px) {
-  .pagination {
-    flex-wrap: wrap;
-    gap: 8px;
+  .quick-actions-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 
-  .pagination button {
-    padding: 6px 10px;
-    font-size: 12px;
+  .employee-content {
+    padding: 12px !important;
+  }
+}
+
+
+/* ==========================================
+   21. ADMIN / HR PORTAL â€” LAYOUT
+   ========================================== */
+@media (max-width: 768px) {
+  /* Admin layout root */
+  .layout-root {
+    overflow: visible !important;
+  }
+
+  /* Admin main content */
+  .layout-main {
+    overflow-x: hidden !important;
+  }
+
+  .layout-content {
+    padding: 14px !important;
+  }
+
+  .layout-topbar {
+    padding: 10px 14px 0 68px !important;
+  }
+
+  /* Payroll page sections */
+  .payroll-header-actions {
+    flex-direction: column !important;
+    gap: 10px !important;
+    align-items: stretch !important;
+  }
+
+  .payroll-header-actions button {
+    width: 100% !important;
+  }
+
+  /* Leave management */
+  .leave-header-actions {
+    flex-direction: column !important;
+    gap: 10px !important;
+    align-items: stretch !important;
+  }
+
+  /* Admin dashboard charts stacked */
+  .chart-row {
+    flex-direction: column !important;
+    gap: 20px !important;
+  }
+
+  .chart-row > div {
+    width: 100% !important;
+  }
+}
+
+
+/* ==========================================
+   22. RECHARTS / CHART CONTAINERS
+   ========================================== */
+@media (max-width: 768px) {
+  /* Make recharts responsive */
+  .recharts-wrapper,
+  .recharts-responsive-container {
+    width: 100% !important;
+  }
+
+  /* Chart card padding */
+  .chart-container {
+    padding: 16px !important;
+    margin-top: 16px !important;
+  }
+
+  /* Prevent chart overflow */
+  .recharts-legend-wrapper {
+    width: 100% !important;
+    white-space: normal !important;
+  }
+}
+
+
+/* ==========================================
+   23. GLOBAL OVERFLOW SAFETY
+   ========================================== */
+@media (max-width: 768px) {
+  /* Prevent any element from causing horizontal scroll */
+  body {
+    overflow-x: hidden !important;
+  }
+
+  /* Make all images responsive */
+  img {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Prevent text from overflowing */
+  p, span, h1, h2, h3, h4, h5, h6 {
+    word-break: break-word !important;
+    overflow-wrap: break-word !important;
+  }
+}
+
+/* ==========================================================================
+   CRITICAL INLINE-STYLE OVERRIDES (Added in pass-2)
+   These target components that use hardcoded inline styles unresponsive
+   to media queries — we add wrapper CSS classes matched from JSX.
+   ========================================================================== */
+
+/* ==========================================
+   A. SUPERADMIN — COMPANIES & BILLING TABLE
+   ========================================== */
+@media (max-width: 768px) {
+  /* Companies table — force horizontal scroll */
+  .companies-page .table-wrapper,
+  .manage-users-page .table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .companies-page table,
+  .manage-users-page table {
+    min-width: 750px !important;
+  }
+
+  /* Company detail header with two-col layout */
+  .company-detail-header {
+    flex-direction: column !important;
+    gap: 16px !important;
+    align-items: flex-start !important;
+  }
+
+  /* Billing tabs */
+  .billing-tabs-row {
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+    flex-wrap: nowrap !important;
+  }
+}
+
+/* ==========================================
+   B. ADMIN LAYOUT TOPBAR FIX
+   ========================================== */
+@media (max-width: 768px) {
+  .layout-topbar {
+    padding-left: 68px !important;
+    min-height: 54px !important;
+  }
+
+  /* Ensure content doesn't start hidden behind topbar */
+  .layout-content {
+    padding-top: 8px !important;
+  }
+}
+
+/* ==========================================
+   C. PAYROLL PAGE INLINE GRID FIX
+   (targets the inline grid used for payslip layout)
+   ========================================== */
+@media (max-width: 768px) {
+  /* Override any inline grid with 2+ columns inside payroll area */
+  .payroll-page [style*='grid-template-columns'],
+  .payroll-section [style*='grid-template-columns'] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Payroll filter area */
+  .payroll-page .filter-controls {
+    flex-direction: column !important;
+    gap: 10px !important;
+    align-items: stretch !important;
+  }
+}
+
+/* ==========================================
+   D. REPORTS PAGE
+   ========================================== */
+@media (max-width: 768px) {
+  .reports-page {
+    padding: 14px !important;
+  }
+
+  .reports-header {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+  }
+
+  .reports-filter-row {
+    flex-direction: column !important;
+    gap: 10px !important;
+    align-items: stretch !important;
+  }
+
+  .reports-filter-row select,
+  .reports-filter-row input,
+  .reports-filter-row button {
+    width: 100% !important;
+  }
+
+  .reports-charts-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+  }
+
+  .report-card {
+    padding: 16px !important;
+  }
+
+  .report-table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .report-table {
+    min-width: 640px !important;
+  }
+}
+
+/* ==========================================
+   E. SUPPORT TICKETS PAGE
+   ========================================== */
+@media (max-width: 768px) {
+  .support-page {
+    padding: 14px !important;
+  }
+
+  .support-header {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+  }
+
+  .support-header button {
+    width: 100% !important;
+  }
+
+  .support-filters {
+    flex-direction: column !important;
+    gap: 10px !important;
+    align-items: stretch !important;
+  }
+
+  .support-filters select,
+  .support-filters input {
+    width: 100% !important;
+  }
+
+  .ticket-list {
+    gap: 12px !important;
+  }
+
+  .ticket-card {
+    padding: 16px !important;
+  }
+
+  .ticket-meta {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .ticket-actions {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .ticket-actions button {
+    width: 100% !important;
+  }
+}
+
+/* ==========================================
+   F. NOTIFICATIONS PAGE (EMPLOYEE / ADMIN)
+   ========================================== */
+@media (max-width: 768px) {
+  .notifications-page {
+    padding: 14px !important;
+  }
+
+  .notifications-header {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+  }
+
+  .notification-item {
+    padding: 14px !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    align-items: flex-start !important;
+  }
+
+  .notification-item .notif-actions {
+    width: 100% !important;
+    display: flex !important;
+    gap: 8px !important;
+  }
+
+  .notification-item .notif-actions button {
+    flex: 1 !important;
+  }
+}
+
+/* ==========================================
+   G. HOLIDAYS PAGE
+   ========================================== */
+@media (max-width: 768px) {
+  .holidays-page {
+    padding: 14px !important;
+  }
+
+  .holidays-header {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+  }
+
+  .holidays-header button {
+    width: 100% !important;
+  }
+
+  .holidays-table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .holidays-table {
+    min-width: 540px !important;
+  }
+
+  .holidays-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+}
+
+/* ==========================================
+   H. ASSET MANAGEMENT PAGES
+   ========================================== */
+@media (max-width: 768px) {
+  .asset-management-page {
+    padding: 14px !important;
+  }
+
+  .asset-header {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+  }
+
+  .asset-header button {
+    width: 100% !important;
+  }
+
+  .asset-filters {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  .asset-filters input,
+  .asset-filters select {
+    width: 100% !important;
+  }
+
+  .asset-table-wrapper,
+  .asset-return-table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .asset-table,
+  .asset-return-table {
+    min-width: 640px !important;
+  }
+
+  .asset-summary-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .asset-summary-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ==========================================
+   I. SALARY REVISION & SALARY EDITOR
+   ========================================== */
+@media (max-width: 768px) {
+  .salary-revision-page {
+    padding: 14px !important;
+  }
+
+  .salary-revision-header {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+  }
+
+  .salary-editor-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .salary-editor-actions {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  .salary-editor-actions button {
+    width: 100% !important;
+  }
+
+  .revision-table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .revision-table {
+    min-width: 580px !important;
+  }
+}
+
+/* ==========================================
+   J. SUPER ADMIN DASHBOARD KPI GRID
+   ========================================== */
+@media (max-width: 768px) {
+  .superadmin-dashboard-page {
+    padding: 14px !important;
+  }
+
+  .superadmin-kpi-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  .superadmin-charts-row {
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  .superadmin-quick-actions {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .superadmin-kpi-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .superadmin-quick-actions {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ==========================================
+   K. COMPANY EMPLOYEES & COMPANY PAYROLL (SuperAdmin)
+   ========================================== */
+@media (max-width: 768px) {
+  .company-employees-page {
+    padding: 14px !important;
+  }
+
+  .company-employees-header {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+  }
+
+  .company-employees-table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .company-employees-table {
+    min-width: 640px !important;
+  }
+
+  .company-payroll-page {
+    padding: 14px !important;
+  }
+
+  .company-payroll-header {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+  }
+
+  .company-payroll-table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
+
+/* ==========================================
+   L. GLOBAL — ENSURE NO HORIZONTAL OVERFLOW
+   ========================================== */
+@media (max-width: 768px) {
+  /* Catch-all for any inline display:flex with gap that may overflow */
+  .layout-content > * {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+
+  /* Ensure all form inputs/selects are box-sizing:border-box */
+  input, select, textarea, button {
+    box-sizing: border-box !important;
+    max-width: 100% !important;
+  }
+
+  /* Prevent recharts/charts from overflowing */
+  .recharts-responsive-container,
+  .recharts-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+
+  /* Page content never wider than viewport */
+  .super-page,
+  .layout-content,
+  .employee-content,
+  .employee-main {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
   }
 }

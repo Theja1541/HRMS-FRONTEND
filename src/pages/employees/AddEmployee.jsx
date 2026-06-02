@@ -48,21 +48,6 @@ export default function AddEmployee() {
 
   return (
     <div className="add-employee-page">
-      {/* ================= HEADER ================= */}
-      <div className="add-employee-header">
-        <div>
-          <h2>{isEditMode ? "Edit Employee" : "Add New Employee"}</h2>
-          <p>
-            {isEditMode
-              ? "Update employee details and documents"
-              : "Step-by-step employee onboarding"}
-          </p>
-        </div>
-        <button className="btn ghost header-back-btn" onClick={() => navigate("/employees")}>
-          Back to Employees
-        </button>
-      </div>
-
       {/* ================= ERROR ================= */}
       {error && (
         <div className="form-error" style={{ marginBottom: 20 }}>

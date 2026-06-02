@@ -1,574 +1,603 @@
-/* ================= PAGE ================= */
+/* Daybook Styles */
 
-.daybooks-page {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+.daybook-dashboard,
+.transactions-page,
+.add-transaction-page,
+.vendors-page,
+.categories-page,
+.reports-page {
+  padding: 20px;
 }
 
-/* ================= HEADER ================= */
-
+/* Page Headers - Fixed */
 .page-header {
-  background: linear-gradient(135deg, #020617, #2563eb);
-  color: white;
-  padding: 24px 28px;
-  border-radius: 18px;
+  background: linear-gradient(135deg, #0f172a, #1e3a8a, #2563eb);
+  background-size: 200% 200%;
+  animation: gradientMove 8s ease infinite;
+  color: #ffffff;
+  padding: 28px 34px;
+  border-radius: 22px;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  animation: fadeSlideIn 0.4s ease-out;
+  align-items: center;
+  margin-bottom: 32px;
+  box-shadow: 0 25px 60px rgba(37, 99, 235, 0.35);
 }
 
-.page-title {
-  font-size: 20px;
-  font-weight: 600;
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.page-header h1 {
+  font-size: 24px;
+  color: #ffffff;
   margin: 0;
-}
-
-.page-subtitle {
-  font-size: 14px;
-  color: #cbd5e1;
-  margin-top: 4px;
+  font-weight: 600;
 }
 
 .header-actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
-}
-
-.settings-btn {
-  background: #64748b;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 8px;
-  border: none;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.settings-btn:hover {
-  background: #475569;
-}
-
-.deactivated-btn {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  padding: 10px 20px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.deactivated-btn:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.add-daybook-btn {
-  background: #2563eb;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 8px;
-  border: none;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.add-daybook-btn:hover {
-  background: #1d4ed8;
-}
-
-@keyframes fadeSlideIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ================= FILTER BAR ================= */
-
-.filter-bar {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  background: #f8fafc;
-  padding: 14px 18px;
-  border-radius: 14px;
-  border: 1px solid #e2e8f0;
-  flex-wrap: wrap;
-}
-
-.search-input {
-  flex: 1;
-  min-width: 240px;
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  font-size: 14px;
-  background: white;
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: #2563eb;
-}
-
-.filter-select {
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  font-size: 14px;
-  background: white;
-  cursor: pointer;
-  min-width: 150px;
-}
-
-.filter-select:focus {
-  outline: none;
-  border-color: #2563eb;
-}
-
-/* ================= TABLE WRAPPER ================= */
-
-.table-wrapper {
-  background: white;
-  border-radius: 16px;
-  overflow-x: auto;
-  overflow-y: visible;
-  position: relative;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.05);
-}
-
-/* ================= TABLE ================= */
-
-.daybooks-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.daybooks-table th {
-  background: #f8fafc;
-  color: #1e293b;
-  text-align: left;
-  padding: 14px;
-  font-size: 14px;
-  font-weight: 600;
-  border-bottom: 1px solid #e2e8f0;
-  position: sticky;
-  top: 0;
-  z-index: 2;
-}
-
-.daybooks-table td {
-  padding: 14px;
-  border-bottom: 1px solid #e5e7eb;
-  vertical-align: middle;
-  color: #0f172a;
-  font-weight: 500;
-  font-size: 14px;
-}
-
-.daybooks-table tbody tr:hover {
-  background: #f1f5f9;
-}
-
-/* ================= EMPTY STATE ================= */
-
-.empty-state {
-  padding: 60px 40px;
-  text-align: center;
-  color: #64748b;
-  font-size: 16px;
-  font-weight: 500;
-}
-
-/* ================= ACTION BUTTONS ================= */
-
-.actions-cell {
-  text-align: center;
-  position: relative;
-  min-width: 220px;
-  white-space: nowrap;
-}
-
-.daybook-cell {
-  display: flex;
-  align-items: center;
   gap: 10px;
 }
 
-.daybook-avatar,
-.daybook-avatar-img {
-  width: 36px;
-  height: 36px;
-  border-radius: 999px;
-  flex-shrink: 0;
-}
-
-.daybook-avatar {
-  display: inline-flex;
+.date-filter {
+  display: flex;
+  gap: 10px;
   align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #1d4ed8, #2563eb);
-  color: white;
+}
+
+.date-filter input {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Stats Cards */
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.stat-icon {
+  font-size: 48px;
+}
+
+.stat-info h3 {
+  font-size: 32px;
+  margin: 0;
+  color: #2c3e50;
+  font-weight: bold;
+}
+
+.stat-info p {
+  margin: 5px 0 0 0;
+  color: #666;
+  font-size: 14px;
+}
+
+/* Summary Cards */
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.summary-card {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.summary-card h3 {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.summary-card .amount {
+  font-size: 32px;
+  font-weight: bold;
+  margin: 0;
+}
+
+.summary-card.credit .amount {
+  color: #28a745;
+}
+
+.summary-card.debit .amount {
+  color: #dc3545;
+}
+
+.summary-card .subtitle {
   font-size: 12px;
-  font-weight: 700;
+  color: #999;
+  margin: 5px 0;
 }
 
-.daybook-avatar-img {
-  object-fit: cover;
-  border: 1px solid #dbeafe;
+.summary-card.balance .amount {
+  color: #007bff;
 }
 
-.daybook-meta {
+/* Tables */
+.transactions-table,
+.vendors-table,
+.categories-table,
+.report-results table {
+  width: 100%;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.transactions-table thead,
+.vendors-table thead,
+.categories-table thead,
+.report-results table thead {
+  background: #f8f9fa;
+}
+
+.transactions-table th,
+.transactions-table td,
+.vendors-table th,
+.vendors-table td,
+.categories-table th,
+.categories-table td,
+.report-results table th,
+.report-results table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.transactions-table td.debit-amount {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.transactions-table td.credit-amount {
+  color: #28a745;
+  font-weight: 600;
+}
+
+/* Filters */
+.filters {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filters input,
+.filters select {
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+/* Forms */
+.transaction-form {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  max-width: 800px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.form-group textarea {
+  resize: vertical;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.radio-group {
+  display: flex;
+  gap: 20px;
+}
+
+.radio-group label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.form-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+/* Transaction Details Modal */
+.transaction-details {
+  max-width: 600px;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.detail-item {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 5px;
 }
 
-.daybook-meta-sub {
+.detail-item.full-width {
+  grid-column: 1 / -1;
+}
+
+.detail-item label {
+  font-weight: 600;
+  color: #666;
   font-size: 12px;
-  color: #64748b;
-  font-weight: 500;
+  text-transform: uppercase;
 }
 
-.action-buttons {
+.detail-item span {
+  color: #333;
+  font-size: 16px;
+}
+
+.amount-large {
+  font-size: 24px !important;
+  font-weight: bold;
+  color: #007bff;
+}
+
+.modal-actions {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-  justify-content: center;
-}
-
-.action-btn {
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: none;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.action-btn-view {
-  background: #dbeafe;
-  color: #1d4ed8;
-}
-
-.action-btn-view:hover {
-  background: #2563eb;
-  color: white;
-}
-
-.action-btn-edit {
-  background: #fef3c7;
-  color: #b45309;
-}
-
-.action-btn-edit:hover {
-  background: #f59e0b;
-  color: white;
-}
-
-.action-btn-deactivate {
-  background: #fee2e2;
-  color: #dc2626;
-}
-
-.action-btn-deactivate:hover {
-  background: #dc2626;
-  color: white;
-}
-
-/* ================= PAGINATION ================= */
-
-.pagination {
-  display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   gap: 10px;
-  align-items: center;
-  flex-wrap: wrap;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
 }
 
-.page-summary {
-  font-size: 14px;
-  color: #475569;
-  font-weight: 600;
-  padding: 0 12px;
+/* Buttons */
+.btn-view {
+  background: #17a2b8;
+  color: white;
+  padding: 6px 12px;
+  margin-right: 5px;
 }
 
-.page-btn {
+.btn-view:hover {
+  background: #138496;
+}
+
+.btn-primary,
+.btn-secondary,
+.btn-edit,
+.btn-delete {
   padding: 10px 20px;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  background: white;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  font-weight: 500;
-  color: #475569;
   font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s;
 }
 
-.page-btn:hover:not(:disabled) {
-  background: #2563eb;
+.btn-primary {
+  background: #007bff;
   color: white;
-  border-color: #2563eb;
 }
 
-.page-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  background: #f8fafc;
+.btn-primary:hover {
+  background: #0056b3;
 }
 
-.page-btn.active {
-  background: #1d4ed8;
+.btn-secondary {
+  background: #6c757d;
   color: white;
-  border-color: #1d4ed8;
 }
 
-.page-number-group {
-  display: flex;
-  gap: 6px;
-  align-items: center;
+.btn-secondary:hover {
+  background: #545b62;
 }
 
-/* ================= MODAL OVERLAY ================= */
+.btn-edit {
+  background: #ffc107;
+  color: #000;
+  padding: 6px 12px;
+  margin-right: 5px;
+}
 
+.btn-edit:hover {
+  background: #e0a800;
+}
+
+.btn-delete {
+  background: #dc3545;
+  color: white;
+  padding: 6px 12px;
+}
+
+.btn-delete:hover {
+  background: #c82333;
+}
+
+/* Modal */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  backdrop-filter: blur(4px);
+  background: rgba(0,0,0,0.5);
   display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 10000;
-}
-
-.modal-card {
-  background: white;
-  border-radius: 16px;
-  padding: 28px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-  animation: modalSlideUp 0.3s ease;
-}
-
-.modal-card.wide {
-  max-width: 900px;
-  width: 90%;
-}
-
-.modal-header {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  z-index: 1000;
 }
 
-.modal-header h3 {
-  margin: 0;
-}
-
-.modal-close {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #334155;
-}
-
-.modal-table-scroll {
-  max-height: 500px;
+.modal-content {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 90vh;
   overflow-y: auto;
 }
 
-@keyframes modalSlideUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.modal-content h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
 }
 
-.btn {
-  border: none;
-  padding: 10px 20px;
+/* Transaction Type Radio */
+.transaction-type-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border: 2px solid #ddd;
   border-radius: 8px;
-  font-weight: 500;
-  font-size: 14px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.3s;
 }
 
-.btn.primary {
-  background: #2563eb;
-  color: white;
+.transaction-type-label:hover {
+  border-color: #007bff;
+  background: #f8f9fa;
 }
 
-.btn.primary:hover {
-  background: #1d4ed8;
+.transaction-type-label input[type="radio"]:checked + span {
+  font-weight: bold;
 }
 
-/* Mobile Responsiveness */
+.debit-label {
+  color: #dc3545;
+}
+
+.credit-label {
+  color: #28a745;
+}
+
+.form-hint {
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+  color: #666;
+  font-style: italic;
+}
+
+/* Badge */
+.badge {
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.badge.debit {
+  background: #ffe5e5;
+  color: #dc3545;
+}
+
+.badge.credit {
+  background: #e5ffe5;
+  color: #28a745;
+}
+
+.badge.expense {
+  background: #ffe5e5;
+  color: #dc3545;
+}
+
+.badge.income {
+  background: #e5ffe5;
+  color: #28a745;
+}
+
+/* Report Controls */
+.report-controls {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.report-results {
+  background: white;
+  padding: 30px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.report-results h2,
+.report-results h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Loading */
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #666;
+}
+
+/* Recent Transactions */
+.recent-transactions {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.recent-transactions h2 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
   .page-header {
     flex-direction: column;
-    gap: 16px;
     align-items: flex-start;
+    gap: 15px;
   }
 
-  .filter-bar {
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .filters {
     flex-direction: column;
   }
 
-  .search-input,
-  .filter-select {
+  .filters input,
+  .filters select {
     width: 100%;
   }
 
-  .daybooks-table {
-    font-size: 13px;
+  .form-row {
+    grid-template-columns: 1fr;
   }
 
-  .daybooks-table th,
-  .daybooks-table td {
-    padding: 12px;
+  .report-controls {
+    flex-direction: column;
   }
-
-  .action-buttons {
-    gap: 6px;
-  }
-
-  .action-btn {
-    padding: 6px 10px;
-    font-size: 12px;
-  }
-
-  .daybook-avatar,
-  .daybook-avatar-img {
-    width: 30px;
-    height: 30px;
-  }
-
-  .daybook-meta-sub {
-    font-size: 11px;
-  }
-
-  .page-summary {
-    width: 100%;
-    text-align: center;
-    padding: 4px 0;
+}
+/* ==========================================
+   DAYBOOK — MOBILE RESPONSIVE
+   ========================================== */
+@media (max-width: 1024px) {
+  .daybook-stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
   }
 }
 
-.daybook-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px,1fr));
-  gap: 16px;
+@media (max-width: 768px) {
+  .daybook-page {
+    padding: 14px !important;
+  }
+  .daybook-header {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+  }
+  .daybook-header-actions {
+    width: 100% !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  .daybook-header-actions button {
+    width: 100% !important;
+  }
+  .daybook-filters {
+    flex-direction: column !important;
+    gap: 10px !important;
+    padding: 12px !important;
+  }
+  .daybook-filters input,
+  .daybook-filters select {
+    width: 100% !important;
+  }
+  .daybook-stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  .daybook-table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .daybook-table {
+    min-width: 650px !important;
+  }
+  .daybook-tabs {
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
 }
 
-.stat-card {
-  background: white;
-  padding: 18px;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-  border: 1px solid #e2e8f0;
-}
-
-.stat-card h4 {
-  font-size: 13px;
-  color: #64748b;
-  margin-bottom: 6px;
-}
-
-.stat-card p {
-  font-size: 22px;
-  font-weight: 700;
-  color: #0f172a;
-}
-
-.table-wrapper {
-  margin-top: 20px;
-}
-
-/* ================= FORM STYLES ================= */
-.daybook-form {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.form-section-title {
-  font-size: 16px;
-  color: #2563eb;
-  margin: 10px 0 0 0;
-  border-bottom: 1px solid #e2e8f0;
-  padding-bottom: 8px;
-}
-
-.form-row {
-  display: flex;
-  gap: 20px;
-  flex-wrap: wrap;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  flex: 1;
-  min-width: 250px;
-}
-
-.form-group label {
-  font-size: 14px;
-  font-weight: 600;
-  color: #334155;
-}
-
-.form-input {
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: 1px solid #cbd5e1;
-  font-size: 14px;
-  background: white;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: #2563eb;
-}
-
-.form-input.error {
-  border-color: #ef4444;
-}
-
-.error-text {
-  color: #ef4444;
-  font-size: 12px;
-  margin-top: 2px;
+@media (max-width: 480px) {
+  .daybook-stats-grid {
+    grid-template-columns: 1fr !important;
+  }
 }

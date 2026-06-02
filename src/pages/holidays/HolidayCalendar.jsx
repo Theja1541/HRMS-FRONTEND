@@ -30,7 +30,7 @@ export default function HolidayCalendar() {
 
   return (
     <div className="dashboard-page">
-      <div className="header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+      <div className="header" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
         <h2>Holiday Calendar</h2>
         <button className="btn-secondary" onClick={() => navigate("/holidays")}>List View</button>
       </div>

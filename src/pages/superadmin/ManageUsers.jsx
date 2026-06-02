@@ -26,7 +26,11 @@ export default function ManageUsers() {
   const [openMenuId, setOpenMenuId] = useState(null);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterRole, filterCompany, itemsPerPage]);
 
   const fetchUsers = async () => {
     try {
@@ -168,34 +172,38 @@ export default function ManageUsers() {
         View all users across the platform. Assign roles, reset passwords, and block or unblock access.
       </p>
 
-      <div className="filters-row" style={{ marginTop: 16, marginBottom: 16 }}>
-        <label style={{ marginRight: 8 }}>Role:</label>
-        <select
-          value={filterRole}
-          onChange={(e) => handleFilterChange(setFilterRole, e.target.value)}
-          style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e5e7eb" }}
-        >
-          <option value="">All roles</option>
-          {Object.entries(ROLE_LABELS).map(([value, label]) => (
-            <option key={value} value={value}>{label}</option>
-          ))}
-          
-        </select>
-        <label style={{ marginLeft: 16, marginRight: 8 }}>Company:</label>
-        <select
-          value={filterCompany}
-          onChange={(e) => handleFilterChange(setFilterCompany, e.target.value)}
-          style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e5e7eb" }}
-        >
-          <option value="">All companies</option>
-          {companies.map((c) => (
-            <option key={c} value={c}>{c}</option>
-          ))}
-        </select>
+      <div className="filters-row" style={{ marginTop: 16, marginBottom: 16, display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 200px' }}>
+          <label style={{ margin: 0 }}>Role:</label>
+          <select
+            value={filterRole}
+            onChange={(e) => handleFilterChange(setFilterRole, e.target.value)}
+            style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e5e7eb", flex: 1, minWidth: 0 }}
+          >
+            <option value="">All roles</option>
+            {Object.entries(ROLE_LABELS).map(([value, label]) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
+          </select>
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 200px' }}>
+          <label style={{ margin: 0 }}>Company:</label>
+          <select
+            value={filterCompany}
+            onChange={(e) => handleFilterChange(setFilterCompany, e.target.value)}
+            style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e5e7eb", flex: 1, minWidth: 0 }}
+          >
+            <option value="">All companies</option>
+            {companies.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
-      <div className="card" style={{ marginTop: 24, display: 'flex', flexDirection: 'column', overflow: 'visible', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', background: '#fff', border: '1px solid #f1f5f9', padding: 0 }}>
-        <div className="table-wrapper" style={{ width: '100%', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', overflow: 'visible' }}>
+      <div className="card" style={{ marginTop: 24, display: 'flex', flexDirection: 'column', borderRadius: '16px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', background: '#fff', border: '1px solid #f1f5f9', padding: 0 }}>
+        <div className="responsive-table-container" style={{ width: '100%', borderTopLeftRadius: '16px', borderTopRightRadius: '16px' }}>
           <table style={{ borderCollapse: 'collapse', width: '100%', textAlign: 'left' }}>
             <thead style={{ background: 'linear-gradient(90deg, #f8fafc, #f1f5f9)', borderBottom: '2px solid #e2e8f0' }}>
               <tr>
@@ -304,86 +312,46 @@ export default function ManageUsers() {
         </div>
 
         {filteredUsers.length > 0 && (
-          <div className="pagination" style={{ 
-            marginTop: 0, 
-            padding: '16px 24px', 
-            background: '#f8fafc', 
-            borderTop: '1px solid #e2e8f0',
-            borderBottomLeftRadius: '16px',
-            borderBottomRightRadius: '16px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
-            <span className="page-summary" style={{ color: '#64748b', fontSize: '14px', fontWeight: '500', margin: 0 }}>
-              Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredUsers.length)} of {filteredUsers.length} users
-            </span>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div className="attendance-pagination-container" style={{ margin: 0, borderTop: '1px solid #e2e8f0', borderTopLeftRadius: 0, borderTopRightRadius: 0, borderBottomLeftRadius: '16px', borderBottomRightRadius: '16px' }}>
+            <div className="pagination-left">
+              <span>Show</span>
+              <select
+                value={itemsPerPage}
+                onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                className="items-per-page-select"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+              <span>entries per page</span>
+            </div>
+
+            <div className="pagination-right">
               <button
-                style={{
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  border: '1px solid #e2e8f0',
-                  background: currentPageSafe === 1 ? '#f1f5f9' : '#fff',
-                  color: currentPageSafe === 1 ? '#94a3b8' : '#334155',
-                  cursor: currentPageSafe === 1 ? 'not-allowed' : 'pointer',
-                  fontWeight: '500',
-                  fontSize: '14px',
-                  transition: 'all 0.2s'
-                }}
+                className="page-btn"
                 disabled={currentPageSafe === 1}
                 onClick={() => setCurrentPage(currentPageSafe - 1)}
-                onMouseEnter={(e) => { if (currentPageSafe !== 1) { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#cbd5e1'; } }}
-                onMouseLeave={(e) => { if (currentPageSafe !== 1) { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e2e8f0'; } }}
               >
                 Previous
               </button>
-              
-              <div style={{ display: 'flex', gap: '4px' }}>
+              <div className="page-number-group" style={{ display: 'flex', gap: '4px' }}>
                 {pageNumbers.map((pg) => (
                   <button
                     key={pg}
-                    style={{
-                      width: '36px',
-                      height: '36px',
-                      borderRadius: '8px',
-                      border: pg === currentPageSafe ? 'none' : '1px solid #e2e8f0',
-                      background: pg === currentPageSafe ? 'linear-gradient(135deg, #3b82f6, #2563eb)' : '#fff',
-                      color: pg === currentPageSafe ? '#fff' : '#334155',
-                      cursor: 'pointer',
-                      fontWeight: pg === currentPageSafe ? '600' : '500',
-                      fontSize: '14px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      boxShadow: pg === currentPageSafe ? '0 2px 4px rgba(37,99,235,0.2)' : 'none',
-                      transition: 'all 0.2s'
-                    }}
+                    className={`page-btn ${pg === currentPageSafe ? "active" : ""}`}
                     onClick={() => setCurrentPage(pg)}
-                    onMouseEnter={(e) => { if (pg !== currentPageSafe) { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#cbd5e1'; } }}
-                    onMouseLeave={(e) => { if (pg !== currentPageSafe) { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e2e8f0'; } }}
                   >
                     {pg}
                   </button>
                 ))}
               </div>
-
+              <span className="page-summary">Page {currentPageSafe} of {totalPages}</span>
               <button
-                style={{
-                  padding: '8px 16px',
-                  borderRadius: '8px',
-                  border: '1px solid #e2e8f0',
-                  background: currentPageSafe >= totalPages ? '#f1f5f9' : '#fff',
-                  color: currentPageSafe >= totalPages ? '#94a3b8' : '#334155',
-                  cursor: currentPageSafe >= totalPages ? 'not-allowed' : 'pointer',
-                  fontWeight: '500',
-                  fontSize: '14px',
-                  transition: 'all 0.2s'
-                }}
+                className="page-btn"
                 disabled={currentPageSafe >= totalPages}
                 onClick={() => setCurrentPage(currentPageSafe + 1)}
-                onMouseEnter={(e) => { if (currentPageSafe < totalPages) { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#cbd5e1'; } }}
-                onMouseLeave={(e) => { if (currentPageSafe < totalPages) { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e2e8f0'; } }}
               >
                 Next
               </button>

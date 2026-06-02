@@ -34,6 +34,15 @@ export default function EmployeeStepForm({ employee }) {
   const [customRoles, setCustomRoles] = useState([]);
   const [customDepartments, setCustomDepartments] = useState([]);
 
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    type: "confirm", // "confirm" or "alert"
+    title: "",
+    message: "",
+    onConfirm: null,
+    onClose: null,
+  });
+
   const [form, setForm] = useState({
     employee_id: "",
     first_name: "",
@@ -46,7 +55,7 @@ export default function EmployeeStepForm({ employee }) {
     blood_group: "",
     nationality: "",
 
-    role: "EMPLOYEE",
+    role: "",
     department: "",
     designation: "",
     employment_type: "Full-time",
@@ -105,6 +114,7 @@ export default function EmployeeStepForm({ employee }) {
     setForm((prev) => ({
       ...prev,
       ...employee,
+      role: employee.designation || employee.role || "",
       is_active: employee.is_active ?? true,
     }));
     
@@ -182,9 +192,9 @@ export default function EmployeeStepForm({ employee }) {
     const newErrors = {};
 
     if (currentStep === 0) {
-      if (!form.employee_id) newErrors.employee_id = "This field is required";
-      if (!form.first_name) newErrors.first_name = "This field is required";
-      if (!form.email) newErrors.email = "This field is required";
+      if (!form.employee_id) newErrors.employee_id = "please enter this field";
+      if (!form.first_name) newErrors.first_name = "please enter this field";
+      if (!form.email) newErrors.email = "please enter this field";
       else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
         newErrors.email = "Invalid email format";
       }
@@ -195,14 +205,15 @@ export default function EmployeeStepForm({ employee }) {
     }
 
     if (currentStep === 1) {
-      if (!form.department) newErrors.department = "This field is required";
-      if (!form.designation) newErrors.designation = "This field is required";
-      if (!form.joining_date) newErrors.joining_date = "This field is required";
+      if (!form.role) newErrors.role = "please enter this field";
+      if (!form.department) newErrors.department = "please enter this field";
+      if (!form.designation) newErrors.designation = "please enter this field";
+      if (!form.joining_date) newErrors.joining_date = "please enter this field";
     }
 
     if (currentStep === 2) {
       if (toAmount(salary.basic) <= 0) {
-        newErrors.basic = "Basic salary is required";
+        newErrors.basic = "please enter this field";
       }
     }
 
@@ -249,47 +260,106 @@ export default function EmployeeStepForm({ employee }) {
   };
 
   const handleSave = async () => {
-  if (!form.employee_id || !form.first_name || !form.email) {
-    alert("Employee ID, First Name, and Email are required");
-    return;
-  }
+    if (!form.employee_id || !form.first_name || !form.email) {
+      setModalConfig({
+        isOpen: true,
+        type: "alert",
+        title: "Validation Error",
+        message: "Employee ID, First Name, and Email are required fields.",
+        onConfirm: null
+      });
+      return;
+    }
 
-  if (idExists && !employee?.id) {
-    alert("Employee ID already exists. Please use a different ID.");
-    return;
-  }
+    if (idExists && !employee?.id) {
+      setModalConfig({
+        isOpen: true,
+        type: "alert",
+        title: "Validation Error",
+        message: "Employee ID already exists. Please use a unique ID.",
+        onConfirm: null
+      });
+      return;
+    }
 
-  const formData = new FormData();
-  const fileFields = [
-    "profile_photo", "resume", "offer_letter", "aadhar_card",
-    "pan_card", "address_proof", "education_cert", "experience_cert"
-  ];
+    // Trigger Custom Styled Confirmation Modal
+    setModalConfig({
+      isOpen: true,
+      type: "confirm",
+      title: employee?.id ? "Update Employee Details" : "Onboard New Employee",
+      message: employee?.id 
+        ? "Are you sure you want to save the changes made to this employee's profile?" 
+        : "Are you sure you want to onboard and create a profile for this employee?",
+      onConfirm: async () => {
+        await executeSave();
+      }
+    });
+  };
 
-  Object.keys(form).forEach((key) => {
-    const value = form[key];
-    
-    if (fileFields.includes(key)) {
-      if (value instanceof File) {
+  const executeSave = async () => {
+    const formData = new FormData();
+    const fileFields = [
+      "profile_photo", "resume", "offer_letter", "aadhar_card",
+      "pan_card", "address_proof", "education_cert", "experience_cert"
+    ];
+
+    // Complex metadata fields to exclude from dynamic FormData appending
+    const excludedFields = [
+      "history",
+      "salary",
+      "salary_history",
+      "user",
+      "id",
+      "full_name",
+      "status",
+      "created_at",
+      "updated_at"
+    ];
+
+    Object.keys(form).forEach((key) => {
+      if (excludedFields.includes(key)) return;
+      
+      const value = form[key];
+      
+      if (fileFields.includes(key)) {
+        if (value instanceof File) {
+          formData.append(key, value);
+        }
+      } else if (value !== null && value !== undefined) {
         formData.append(key, value);
       }
-    } else if (value !== null && value !== undefined) {
-      formData.append(key, value);
+    });
+
+    formData.append("salary", JSON.stringify(salaryPayload));
+
+    const result = employee?.id
+      ? await updateEmployee(employee.id, formData)
+      : await addEmployee(formData);
+
+    if (!result?.success) {
+      setModalConfig({
+        isOpen: true,
+        type: "alert",
+        title: "Saving Failed",
+        message: result?.error || "An error occurred while saving employee details.",
+        onConfirm: null
+      });
+      return;
     }
-  });
 
-  formData.append("salary", JSON.stringify(salaryPayload));
-
-  const result = employee?.id
-    ? await updateEmployee(employee.id, formData)
-    : await addEmployee(formData);
-
-  if (!result?.success) {
-    alert(result?.error || "Failed to save employee");
-    return;
-  }
-
-  navigate("/employees");
-};
+    // Trigger Custom Styled Success Alert Modal
+    setModalConfig({
+      isOpen: true,
+      type: "alert",
+      title: employee?.id ? "Successfully Updated" : "Successfully Onboarded",
+      message: employee?.id 
+        ? "Successfully Updated." 
+        : "Employee successfully onboarded.",
+      onConfirm: () => {
+        navigate("/employees");
+      }
+    });
+  };
 
   const payroll = useMemo(() => calculatePayroll(salary), [salary]);
   const salaryPayload = useMemo(() => buildCalculatedSalaryPayload(salary), [salary]);
@@ -297,6 +367,20 @@ export default function EmployeeStepForm({ employee }) {
 
   return (
     <div className="step-form-card">
+      <div className="cu-card-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28, borderBottom: "1px solid #f1f5f9", paddingBottom: 16 }}>
+        <h3 className="cu-card-title" style={{ margin: 0, color: "#0f172a", fontSize: "18px", fontWeight: 700, display: "flex", alignItems: "center", gap: "8px" }}>
+          {employee?.id ? "✨ Edit Employee Details" : "✨ Onboard New Employee"}
+        </h3>
+        <button
+          type="button"
+          className="btn secondary"
+          style={{ fontSize: 13, padding: "8px 16px", background: "#ffffff", color: "#475569", border: "1px solid #cbd5e1", borderRadius: "10px", fontWeight: "600", cursor: "pointer" }}
+          onClick={() => navigate("/employees")}
+        >
+          ← Back to Employees
+        </button>
+      </div>
+
       <div className="stepper">
         {steps.map((label, i) => (
           <div key={i} className={`step ${i <= step ? "active" : ""}`}>
@@ -306,7 +390,7 @@ export default function EmployeeStepForm({ employee }) {
         ))}
       </div>
 
-      <div className={`form-grid step-animate ${direction}`}>
+      <div className={`employee-form-grid step-animate ${direction}`}>
         {/* ================= STEP 0 ================= */}
         {step === 0 && (
           <>
@@ -379,20 +463,37 @@ export default function EmployeeStepForm({ employee }) {
               </select>
             </div>
 
-            <Input label="Address"
-              value={form.address}
-              onChange={(e)=>update("address", e.target.value)}
-            />
-
-            <Input label="Blood Group"
-              value={form.blood_group}
-              onChange={(e)=>update("blood_group", e.target.value)}
-            />
+            <div className="form-field">
+              <label>Blood Group</label>
+              <select
+                value={form.blood_group || ""}
+                onChange={(e)=>update("blood_group", e.target.value)}
+              >
+                <option value="">Select Blood Group</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+              </select>
+            </div>
 
             <Input label="Nationality"
               value={form.nationality}
               onChange={(e)=>update("nationality", e.target.value)}
             />
+
+            <div className="form-field" style={{ gridColumn: "1 / -1" }}>
+              <label>Address</label>
+              <textarea
+                value={form.address || ""}
+                onChange={(e) => update("address", e.target.value)}
+                placeholder="Enter street, city, state, pincode"
+              />
+            </div>
           </>
         )}
 
@@ -402,15 +503,23 @@ export default function EmployeeStepForm({ employee }) {
             <div className="form-field">
               <label>Role *</label>
               <select
-                value={form.role || "EMPLOYEE"}
-                onChange={(e)=>update("role", e.target.value)}
+                value={form.role || ""}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  update("role", val);
+                  update("designation", val);
+                }}
+                className={errors.role ? "input-error" : ""}
               >
-                <option value="EMPLOYEE">Employee</option>
-                <option value="HR">HR</option>
-                {customRoles.map((role, index) => (
-                  <option key={index} value={role}>{role}</option>
-                ))}
+                <option value="">Select Role</option>
+                {customRoles
+                  .filter((role) => role && role.toLowerCase() !== "employee")
+                  .map((role, index) => (
+                    <option key={index} value={role}>{role}</option>
+                  ))
+                }
               </select>
+              {errors.role && <small className="error-text">{errors.role}</small>}
             </div>
 
             <div className="form-field">
@@ -418,6 +527,7 @@ export default function EmployeeStepForm({ employee }) {
               <select
                 value={form.department || ""}
                 onChange={(e)=>update("department", e.target.value)}
+                className={errors.department ? "input-error" : ""}
               >
                 <option value="">Select Department</option>
                 {customDepartments.map((dept, index) => (
@@ -429,7 +539,11 @@ export default function EmployeeStepForm({ employee }) {
 
             <Input label="Designation *"
               value={form.designation}
-              onChange={(e)=>update("designation", e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value;
+                update("designation", val);
+                update("role", val);
+              }}
               error={errors.designation}
             />
 
@@ -449,15 +563,15 @@ export default function EmployeeStepForm({ employee }) {
         {/* ================= SALARY STEP ================= */}
           {step === 2 && (
           <div className="salary-step-wrapper">
-
-            <table className="payroll-table">
-              <thead>
-                <tr>
-                  <th>Component</th>
-                  <th>Monthly</th>
-                  <th>Yearly</th>
-                </tr>
-              </thead>
+            <div className="responsive-table-container">
+              <table className="payroll-table" style={{ tableLayout: "fixed", minWidth: "600px", width: "100%" }}>
+                <thead>
+                  <tr>
+                    <th style={{ width: "45%" }}>Component</th>
+                    <th style={{ width: "27.5%", textAlign: "right" }}>Monthly</th>
+                    <th style={{ width: "27.5%", textAlign: "right" }}>Yearly</th>
+                  </tr>
+                </thead>
 
               <tbody>
                 <SectionRow label="Earnings (A)" />
@@ -486,10 +600,10 @@ export default function EmployeeStepForm({ employee }) {
                 <SalaryRow label="Gratuity" field="gratuity" salary={salary} setSalary={updateSalary} />
 
                 <SummaryRow label="Additional Benefits (C)" value={additionalBenefits} className="summary-benefits" />
-                <SummaryRow label="CTC (A + C)" value={ctc} className="summary-ctc" />
-              </tbody>
-            </table>
-
+                  <SummaryRow label="CTC (A + C)" value={ctc} className="summary-ctc" />
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
 
@@ -505,13 +619,15 @@ export default function EmployeeStepForm({ employee }) {
               error={errors.uan_number}
             />
 
-            <Input label="PF Number"
-              value={form.pf_number || ""}
-              onChange={(e)=>update("pf_number", e.target.value)}
-              maxLength={50}
-              helperText="Provident Fund membership/account number."
-              error={errors.pf_number}
-            />
+            {form.pf_applicable && (
+              <Input label="PF Number"
+                value={form.pf_number || ""}
+                onChange={(e)=>update("pf_number", e.target.value)}
+                maxLength={50}
+                helperText="Provident Fund membership/account number."
+                error={errors.pf_number}
+              />
+            )}
 
             <Input label="Bank Name"
               value={form.bank_name}
@@ -535,6 +651,38 @@ export default function EmployeeStepForm({ employee }) {
               onChange={(e)=>update("pan", e.target.value.toUpperCase())}
               error={errors.pan}
             />
+
+            <div className="form-field" style={{ gridColumn: "1 / -1", display: "flex", gap: "24px", marginTop: "12px", marginBottom: "12px" }}>
+              <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontWeight: "600", fontSize: "13px" }}>
+                <input
+                  type="checkbox"
+                  checked={form.pf_applicable || false}
+                  onChange={(e) => update("pf_applicable", e.target.checked)}
+                  style={{ width: "18px", height: "18px" }}
+                />
+                PF Applicable
+              </label>
+              <label style={{ display: "flex", alignItems: "center", gap: "8px", cursor: "pointer", fontWeight: "600", fontSize: "13px" }}>
+                <input
+                  type="checkbox"
+                  checked={form.esi_applicable || false}
+                  onChange={(e) => update("esi_applicable", e.target.checked)}
+                  style={{ width: "18px", height: "18px" }}
+                />
+                ESI Applicable
+              </label>
+            </div>
+
+            {form.esi_applicable && (
+              <Input
+                label="ESI Number"
+                value={form.esi_number || ""}
+                onChange={(e) => update("esi_number", e.target.value)}
+                maxLength={25}
+                helperText="17-digit number issued by ESIC."
+                error={errors.esi_number}
+              />
+            )}
           </>
         )}
 
@@ -545,56 +693,56 @@ export default function EmployeeStepForm({ employee }) {
             <FileField
               label="Profile Photo"
               accept="image/*"
-              currentFile={employee?.profile_photo}
+              currentFile={form.profile_photo}
               onChange={(file) => update("profile_photo", file)}
             />
 
             <FileField
               label="Resume"
               accept=".pdf,.doc,.docx"
-              currentFile={employee?.resume}
+              currentFile={form.resume}
               onChange={(file) => update("resume", file)}
             />
 
             <FileField
               label="Offer Letter"
               accept=".pdf"
-              currentFile={employee?.offer_letter}
+              currentFile={form.offer_letter}
               onChange={(file) => update("offer_letter", file)}
             />
 
             <FileField
               label="Aadhar Card"
               accept=".pdf,.jpg,.jpeg,.png"
-              currentFile={employee?.aadhar_card}
+              currentFile={form.aadhar_card}
               onChange={(file) => update("aadhar_card", file)}
             />
 
             <FileField
               label="PAN Card"
               accept=".pdf,.jpg,.jpeg,.png"
-              currentFile={employee?.pan_card}
+              currentFile={form.pan_card}
               onChange={(file) => update("pan_card", file)}
             />
 
             <FileField
               label="Address Proof"
               accept=".pdf,.jpg,.jpeg,.png"
-              currentFile={employee?.address_proof}
+              currentFile={form.address_proof}
               onChange={(file) => update("address_proof", file)}
             />
 
             <FileField
               label="Education Certificate"
               accept=".pdf"
-              currentFile={employee?.education_cert}
+              currentFile={form.education_cert}
               onChange={(file) => update("education_cert", file)}
             />
 
             <FileField
               label="Experience Certificate"
               accept=".pdf"
-              currentFile={employee?.experience_cert}
+              currentFile={form.experience_cert}
               onChange={(file) => update("experience_cert", file)}
             />
           </>
@@ -615,40 +763,179 @@ export default function EmployeeStepForm({ employee }) {
               error={errors.emergency_number}
             />
 
-            <div className="form-field">
+            <div className="form-field" style={{ gridColumn: "1 / -1" }}>
               <label>Notes</label>
               <textarea
-                value={form.notes}
+                value={form.notes || ""}
                 onChange={(e)=>update("notes", e.target.value)}
+                placeholder="Enter any additional notes..."
               />
             </div>
           </>
         )}
       </div>
 
-      <div className="step-actions">
-        {step > 0 && (
-          <button className="btn ghost" onClick={handleBack}>
+      {/* 1:1 Replica Stepper Navigation Buttons */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: "1px solid #f1f5f9", paddingTop: 20, marginTop: 24 }}>
+        {step > 0 ? (
+          <button type="button" className="btn ghost" onClick={handleBack}>
             Back
           </button>
-        )}
-
-        {step < steps.length - 1 ? (
-          <button className="btn primary" onClick={handleNext}>
-            Next
-          </button>
         ) : (
-          <button className="btn primary" onClick={handleSave}>
-            Save Employee
-          </button>
+          <div />
         )}
+        
+        <div style={{ display: "flex", gap: 12 }}>
+          {step < steps.length - 1 ? (
+            <button type="button" className="btn primary" onClick={handleNext}>
+              Next Step
+            </button>
+          ) : (
+            <button type="button" className="btn primary" onClick={handleSave}>
+              {employee?.id ? "✨ Save Changes" : "✨ Onboard Employee"}
+            </button>
+          )}
+        </div>
       </div>
+
+      {modalConfig.isOpen && (
+        <div style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: "rgba(15, 23, 42, 0.4)",
+          backdropFilter: "blur(8px)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 9999,
+        }}>
+          <div style={{
+            background: "rgba(255, 255, 255, 0.95)",
+            border: "1px solid rgba(255, 255, 255, 0.2)",
+            borderRadius: "16px",
+            boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+            padding: "24px",
+            width: "90%",
+            maxWidth: "420px",
+            textAlign: "center",
+          }}>
+            <div style={{
+              width: "56px",
+              height: "56px",
+              borderRadius: "50%",
+              backgroundColor: modalConfig.type === "confirm" ? "#e0e7ff" : "#d1fae5",
+              color: modalConfig.type === "confirm" ? "#4f46e5" : "#10b981",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "24px",
+              margin: "0 auto 16px auto",
+            }}>
+              {modalConfig.type === "confirm" ? "❓" : "🎉"}
+            </div>
+
+            <h3 style={{
+              fontSize: "18px",
+              fontWeight: "700",
+              color: "#0f172a",
+              marginBottom: "8px",
+              fontFamily: "'Outfit', 'Inter', sans-serif"
+            }}>
+              {modalConfig.title}
+            </h3>
+
+            <p style={{
+              fontSize: "14px",
+              color: "#64748b",
+              lineHeight: "1.5",
+              marginBottom: "24px",
+              fontFamily: "'Inter', sans-serif"
+            }}>
+              {modalConfig.message}
+            </p>
+
+            <div style={{
+              display: "flex",
+              gap: "12px",
+              justifyContent: "center"
+            }}>
+              {modalConfig.type === "confirm" ? (
+                <>
+                  <button
+                    onClick={() => {
+                      setModalConfig(prev => ({ ...prev, isOpen: false }));
+                      if (modalConfig.onClose) modalConfig.onClose();
+                    }}
+                    style={{
+                      padding: "10px 20px",
+                      borderRadius: "8px",
+                      border: "1px solid #cbd5e1",
+                      background: "white",
+                      color: "#475569",
+                      fontWeight: "600",
+                      fontSize: "14px",
+                      cursor: "pointer",
+                      fontFamily: "'Inter', sans-serif"
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => {
+                      setModalConfig(prev => ({ ...prev, isOpen: false }));
+                      if (modalConfig.onConfirm) modalConfig.onConfirm();
+                    }}
+                    style={{
+                      padding: "10px 20px",
+                      borderRadius: "8px",
+                      border: "none",
+                      background: "linear-gradient(135deg, #4f46e5 0%, #3730a3 100%)",
+                      color: "white",
+                      fontWeight: "600",
+                      fontSize: "14px",
+                      cursor: "pointer",
+                      boxShadow: "0 4px 6px -1px rgba(79, 70, 229, 0.2)",
+                      fontFamily: "'Inter', sans-serif"
+                    }}
+                  >
+                    Confirm
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => {
+                    setModalConfig(prev => ({ ...prev, isOpen: false }));
+                    if (modalConfig.onConfirm) modalConfig.onConfirm();
+                  }}
+                  style={{
+                    padding: "10px 24px",
+                    borderRadius: "8px",
+                    border: "none",
+                    background: "linear-gradient(135deg, #10b981 0%, #059669 100%)",
+                    color: "white",
+                    fontWeight: "600",
+                    fontSize: "14px",
+                    cursor: "pointer",
+                    boxShadow: "0 4px 6px -1px rgba(16, 185, 129, 0.2)",
+                    fontFamily: "'Inter', sans-serif"
+                  }}
+                >
+                  Awesome
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-const Input = ({ label, error, helperText, ...props }) => (
-  <div className="form-field">
+const Input = ({ label, error, helperText, containerStyle, ...props }) => (
+  <div className="form-field" style={containerStyle}>
     <label>{label}</label>
     <input {...props} className={error ? "input-error" : ""} />
     {helperText && <small style={{ color: "#64748b" }}>{helperText}</small>}
@@ -657,17 +944,30 @@ const Input = ({ label, error, helperText, ...props }) => (
 );
 
 const FileField = ({ label, accept, currentFile, onChange }) => {
-  const getFileName = (url) => {
-    if (!url) return null;
-    return url.split('/').pop();
+  const getFileName = (file) => {
+    if (!file) return null;
+    if (typeof file === 'string') {
+      return file.split('/').pop();
+    }
+    return file.name;
   };
+
+  const fileUrl = typeof currentFile === 'string' ? currentFile : null;
 
   return (
     <div className="form-field">
       <label>{label}</label>
-      {currentFile && typeof currentFile === 'string' && (
-        <div className="current-file-text">
-          Current: <a href={currentFile} target="_blank" rel="noopener noreferrer">{getFileName(currentFile)}</a>
+      {currentFile && (
+        <div className="current-file-text" style={{ marginBottom: "6px", fontSize: "13px" }}>
+          {fileUrl ? (
+            <span>
+              Current: <a href={fileUrl} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "underline", color: "#4f46e5", fontWeight: "600" }}>{getFileName(currentFile)}</a>
+            </span>
+          ) : (
+            <span style={{ fontWeight: "600", color: "#10b981" }}>
+              Selected: {getFileName(currentFile)} (Ready to upload)
+            </span>
+          )}
         </div>
       )}
       <input

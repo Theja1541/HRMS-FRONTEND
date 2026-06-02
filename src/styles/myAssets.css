@@ -102,3 +102,31 @@
   color: #6b7280;
   padding: 40px;
 }
+
+/* ==========================================
+   MY ASSETS — MOBILE RESPONSIVE
+   ========================================== */
+@media (max-width: 768px) {
+  .my-assets-page {
+    padding: 14px !important;
+  }
+  .assets-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+  .asset-card {
+    padding: 14px !important;
+  }
+  .assets-table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .assets-table {
+    min-width: 560px !important;
+  }
+  .assets-header {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+  }
+}

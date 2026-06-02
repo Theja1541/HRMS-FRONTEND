@@ -95,9 +95,10 @@
   background: white;
   border-radius: 16px;
   overflow-x: auto;      /* ✅ Scroll inside wrapper only */
-  overflow-y: hidden;
+  overflow-y: visible;   /* ✅ Allow dropdown menu visibility */
   max-width: 100%;       /* ✅ Prevent overflow outside */
   box-shadow: 0 12px 35px rgba(15, 23, 42, 0.08);
+  min-height: 280px;     /* ✅ Guarantee enough vertical space for dropdown options */
 }
 
 .premium-table {
@@ -280,7 +281,10 @@
   color: white;
 }
 
-.status-badge.leave {
+.status-badge.leave,
+.status-badge.half-day,
+.status-badge.paid-leave,
+.status-badge.unpaid-leave {
   background: #f59e0b;
   color: white;
 }
@@ -459,4 +463,701 @@
 
 .att-btn.holiday { background: #3b82f6; }
 .att-btn.weekoff { background: #a855f7; }
-.att-btn.present-holiday { background: #0d9488; }
+.att-btn.present-holiday { background: #0d9488; }
+
+/* ===============================
+   ACTION DROPDOWN MENU
+================================ */
+
+.action-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.more-actions-btn {
+  background: #64748b;
+  color: white;
+  font-size: 14px;
+  padding: 6px 12px;
+  line-height: 1;
+}
+
+.more-actions-btn.active {
+  background: #f59e0b; /* Yellow background for active leaves */
+  opacity: 1;
+}
+
+.action-dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 6px;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  z-index: 999;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideDown 0.15s ease-out;
+}
+
+.action-dropdown-menu.open-upwards {
+  top: auto;
+  bottom: 100%;
+  margin-top: 0;
+  margin-bottom: 6px;
+  animation: slideUp 0.15s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown-item {
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 13px;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-weight: 500;
+}
+
+.dropdown-item:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.dropdown-item.active {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+/* ===============================
+   PAGINATION CONTAINER
+================================ */
+
+.attendance-pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  background: #f8fafc;
+  padding: 12px 20px;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  animation: fadeIn 0.3s ease;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.pagination-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.items-per-page-select {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: white;
+  font-size: 13px;
+  color: #1e293b;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.items-per-page-select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+.pagination-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.page-btn {
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: white;
+  color: #475569;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.page-btn:hover:not(:disabled) {
+  background: #f1f5f9;
+  color: #1e293b;
+  border-color: #94a3b8;
+}
+
+.page-btn.active {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+  font-weight: 600;
+}
+
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.page-summary {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+/* ===============================
+   RESPONSIVE — TABLET (≤ 1024px)
+================================ */
+
+@media (max-width: 1024px) {
+  /* Page wrapper spacing */
+  .attendance-page {
+    gap: 18px !important;
+  }
+
+  /* Page header */
+  .page-header {
+    padding: 20px 22px !important;
+  }
+
+  .page-title {
+    font-size: 18px !important;
+  }
+
+  /* Summary cards — 2-column grid */
+  .attendance-summary-cards {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 14px !important;
+    flex-wrap: unset !important;
+  }
+
+  .summary-card {
+    min-width: unset !important;
+  }
+
+  /* Filters bar — 2-column grid */
+  .filters-bar {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+
+  .filters-bar input,
+  .filters-bar select {
+    min-width: unset !important;
+    width: 100% !important;
+  }
+
+  /* Bulk action bar — 2-column grid */
+  .bulk-action-bar {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+    align-items: center !important;
+  }
+
+  .bulk-action-bar select {
+    width: 100% !important;
+  }
+
+  /* Month grid — 4 columns */
+  .month-grid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  /* Table wrapper */
+  .table-wrapper,
+  .attendance-table-wrapper {
+    overflow-x: auto !important;
+  }
+
+  .premium-table {
+    min-width: 820px !important;
+  }
+
+  .attendance-table {
+    min-width: 720px !important;
+  }
+
+  /* Pagination */
+  .attendance-pagination-container {
+    padding: 10px 16px !important;
+  }
+
+  /* Modal */
+  .modal-card {
+    width: 90vw !important;
+    max-width: 420px !important;
+  }
+}
+
+/* ===============================
+   RESPONSIVE — MOBILE (≤ 768px)
+================================ */
+
+@media (max-width: 768px) {
+  /* Page wrapper */
+  .attendance-page {
+    gap: 14px !important;
+  }
+
+  /* Page header — stack vertically */
+  .page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+    padding: 16px 18px !important;
+    border-radius: 14px !important;
+  }
+
+  .page-title {
+    font-size: 17px !important;
+  }
+
+  .page-subtitle {
+    font-size: 13px !important;
+  }
+
+  .date-badge {
+    align-self: flex-start !important;
+    font-size: 12px !important;
+    padding: 5px 12px !important;
+  }
+
+  /* Bulk action bar — single column */
+  .bulk-action-bar {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    padding: 12px 14px !important;
+  }
+
+  .bulk-action-bar select {
+    width: 100% !important;
+    font-size: 14px !important;
+  }
+
+  .bulk-btn {
+    width: 100% !important;
+    text-align: center !important;
+    padding: 10px 18px !important;
+  }
+
+  /* Filters bar — single column */
+  .filters-bar {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    padding: 12px 14px !important;
+  }
+
+  .filters-bar input,
+  .filters-bar select {
+    width: 100% !important;
+    min-width: unset !important;
+    font-size: 14px !important;
+  }
+
+  /* Attendance controls — single column */
+  .attendance-controls {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .attendance-controls input,
+  .attendance-controls select,
+  .attendance-controls button {
+    width: 100% !important;
+  }
+
+  /* Attendance filter bar — single column */
+  .attendance-filter-bar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    padding: 12px 14px !important;
+  }
+
+  .attendance-filter-bar input,
+  .attendance-filter-bar select,
+  .attendance-filter-bar button {
+    width: 100% !important;
+  }
+
+  /* Table wrappers — horizontal scroll */
+  .table-wrapper,
+  .attendance-table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    border-radius: 12px !important;
+  }
+
+  .premium-table {
+    min-width: 760px !important;
+  }
+
+  .attendance-table {
+    min-width: 640px !important;
+  }
+
+  .attendance-table th,
+  .attendance-table td {
+    padding: 10px 12px !important;
+    font-size: 13px !important;
+  }
+
+  /* Summary cards — single column */
+  .attendance-summary-cards {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  .attendance-summary {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .summary-card {
+    flex-direction: row !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    padding: 14px 16px !important;
+    min-width: unset !important;
+    width: 100% !important;
+  }
+
+  .summary-card h3 {
+    font-size: 20px !important;
+  }
+
+  /* Month grid — 3 columns */
+  .month-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 6px !important;
+  }
+
+  .month-day {
+    padding: 8px !important;
+    font-size: 12px !important;
+  }
+
+  /* Attendance action buttons — wrap tightly */
+  .attendance-actions {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+
+  .att-btn {
+    padding: 5px 12px !important;
+    font-size: 12px !important;
+  }
+
+  /* Holiday banner — stack */
+  .holiday-banner {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    padding: 12px 16px !important;
+  }
+
+  .holiday-banner-icon {
+    font-size: 20px !important;
+  }
+
+  /* Pagination — stack vertically */
+  .attendance-pagination-container {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    padding: 12px 14px !important;
+  }
+
+  .pagination-left,
+  .pagination-right {
+    justify-content: center !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .page-btn {
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+  }
+
+  .page-summary {
+    text-align: center !important;
+    width: 100% !important;
+  }
+
+  /* Modal */
+  .modal-card {
+    width: 92vw !important;
+    max-width: 100% !important;
+    padding: 20px 18px !important;
+  }
+
+  .modal-card h3 {
+    font-size: 16px !important;
+  }
+
+  .modal-actions {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .modal-actions button {
+    width: 100% !important;
+  }
+
+  /* Dropdown menu */
+  .action-dropdown-menu {
+    right: auto !important;
+    left: 0 !important;
+    min-width: 160px !important;
+  }
+}
+
+/* ===============================
+   RESPONSIVE — SMALL MOBILE (≤ 480px)
+================================ */
+
+@media (max-width: 480px) {
+  /* Page wrapper */
+  .attendance-page {
+    gap: 10px !important;
+  }
+
+  /* Page header */
+  .page-header {
+    padding: 14px 14px !important;
+    border-radius: 12px !important;
+    gap: 10px !important;
+  }
+
+  .page-title {
+    font-size: 15px !important;
+  }
+
+  .page-subtitle {
+    font-size: 12px !important;
+    margin-top: 2px !important;
+  }
+
+  .date-badge {
+    font-size: 11px !important;
+    padding: 4px 10px !important;
+  }
+
+  /* Bulk action bar */
+  .bulk-action-bar {
+    padding: 10px 12px !important;
+    gap: 8px !important;
+    border-radius: 10px !important;
+  }
+
+  .bulk-btn {
+    font-size: 13px !important;
+    padding: 9px 14px !important;
+  }
+
+  /* Filters bar */
+  .filters-bar {
+    padding: 10px 12px !important;
+    gap: 8px !important;
+    border-radius: 10px !important;
+  }
+
+  .filters-bar input,
+  .filters-bar select {
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+  }
+
+  /* Attendance filter bar */
+  .attendance-filter-bar {
+    padding: 10px 12px !important;
+    gap: 8px !important;
+  }
+
+  /* Table */
+  .attendance-table th,
+  .attendance-table td {
+    padding: 8px 10px !important;
+    font-size: 12px !important;
+  }
+
+  .premium-table {
+    min-width: 640px !important;
+  }
+
+  .attendance-table {
+    min-width: 560px !important;
+  }
+
+  /* Summary cards */
+  .summary-card {
+    padding: 12px 14px !important;
+    border-radius: 10px !important;
+  }
+
+  .summary-card h3 {
+    font-size: 18px !important;
+  }
+
+  .summary-card span {
+    font-size: 11px !important;
+  }
+
+  /* Month grid — 2 columns */
+  .month-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 5px !important;
+  }
+
+  .month-day {
+    padding: 6px !important;
+    font-size: 11px !important;
+    border-radius: 6px !important;
+  }
+
+  /* Attendance action buttons */
+  .attendance-actions {
+    gap: 5px !important;
+  }
+
+  .att-btn {
+    padding: 5px 10px !important;
+    font-size: 11px !important;
+    border-radius: 6px !important;
+  }
+
+  /* Holiday banner */
+  .holiday-banner {
+    padding: 10px 12px !important;
+    border-radius: 10px !important;
+    margin-bottom: 14px !important;
+    font-size: 13px !important;
+  }
+
+  /* Pagination */
+  .attendance-pagination-container {
+    padding: 10px 12px !important;
+    border-radius: 10px !important;
+    gap: 8px !important;
+  }
+
+  .pagination-left {
+    font-size: 12px !important;
+    gap: 6px !important;
+  }
+
+  .pagination-right {
+    gap: 6px !important;
+  }
+
+  .page-btn {
+    padding: 5px 10px !important;
+    font-size: 11px !important;
+    border-radius: 5px !important;
+  }
+
+  .items-per-page-select {
+    padding: 5px 10px !important;
+    font-size: 12px !important;
+  }
+
+  .page-summary {
+    font-size: 11px !important;
+  }
+
+  /* Modal */
+  .modal-card {
+    width: 96vw !important;
+    padding: 16px 14px !important;
+    border-radius: 10px !important;
+  }
+
+  .modal-card h3 {
+    font-size: 15px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .modal-info p {
+    font-size: 13px !important;
+  }
+
+  .unlock-btn {
+    font-size: 11px !important;
+    padding: 4px 10px !important;
+  }
+
+  /* Status badges */
+  .status-badge {
+    font-size: 11px !important;
+    padding: 3px 8px !important;
+  }
+
+  /* Lock / Countdown labels */
+  .lock-label,
+  .countdown-label {
+    font-size: 11px !important;
+    padding: 3px 7px !important;
+  }
+
+  /* Action dropdown */
+  .action-dropdown-menu {
+    min-width: 140px !important;
+  }
+
+  .dropdown-item {
+    padding: 8px 14px !important;
+    font-size: 12px !important;
+  }
+}

@@ -478,3 +478,249 @@
   }
 }
 
+/* ==================== PREMIUM SAAS BILLING DASHBOARD ==================== */
+.settings-page.billing-active {
+  max-width: 1200px !important;
+  background: #f8fafc;
+}
+
+.billing-dashboard-wrap {
+  animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.subscription-panel {
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.08) !important;
+}
+
+.subscription-gradient-header {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  padding: 36px 40px !important;
+}
+
+.sub-badge-pill {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(37, 99, 235, 0.2)) !important;
+  color: #60a5fa !important;
+  border: 1px solid rgba(96, 165, 250, 0.25) !important;
+  font-size: 11px !important;
+  letter-spacing: 0.8px !important;
+  padding: 5px 12px !important;
+}
+
+.sub-status-badge.active {
+  background: rgba(22, 163, 74, 0.1) !important;
+  color: #4ade80 !important;
+  border: 1px solid rgba(74, 222, 128, 0.2) !important;
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.1) !important;
+}
+
+.sub-status-badge.expired {
+  background: rgba(220, 38, 38, 0.1) !important;
+  color: #f87171 !important;
+  border: 1px solid rgba(239, 68, 68, 0.2) !important;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.1) !important;
+}
+
+.sub-detail-tile {
+  border: 1px solid #f1f5f9 !important;
+  padding: 28px !important;
+  border-radius: 16px !important;
+  background: #f8fafc !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.sub-detail-tile:hover {
+  background: #ffffff !important;
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -5px rgba(15, 23, 42, 0.04) !important;
+  border-color: #cbd5e1 !important;
+}
+
+/* Pricing Grid */
+#pricing-plans-section {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.06) !important;
+}
+
+.pricing-card-wrapper {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.pricing-card-wrapper:hover {
+  transform: translateY(-8px) !important;
+  box-shadow: 0 30px 60px -15px rgba(15, 23, 42, 0.12) !important;
+}
+
+/* Payment History Table & Invoices */
+.table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.table th {
+  background: #f8fafc;
+  color: #475569;
+  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 16px 24px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.table td {
+  padding: 18px 24px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+  font-size: 14px;
+  vertical-align: middle;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tr {
+  transition: background-color 0.2s ease;
+}
+
+.table tr:hover td {
+  background-color: #f8fafc;
+}
+
+
+/* ==========================================
+   SETTINGS PAGE — FULL MOBILE RESPONSIVE
+   ========================================== */
+@media (max-width: 1024px) {
+  .settings-page {
+    padding: 20px !important;
+    max-width: 100% !important;
+  }
+
+  .billing-dashboard-wrap {
+    gap: 20px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .settings-page {
+    padding: 14px !important;
+    max-width: 100% !important;
+  }
+
+  .settings-header h2 {
+    font-size: 22px !important;
+  }
+
+  .settings-tabs {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    white-space: nowrap !important;
+    flex-wrap: nowrap !important;
+    gap: 0 !important;
+    padding-bottom: 2px !important;
+    scrollbar-width: none !important;
+  }
+
+  .settings-tabs::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .settings-tabs .tab {
+    padding: 10px 16px !important;
+    font-size: 13px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .settings-card {
+    padding: 18px !important;
+    border-radius: 10px !important;
+  }
+
+  .settings-card h3 {
+    font-size: 17px !important;
+  }
+
+  /* Subscription gradient header */
+  .subscription-gradient-header {
+    padding: 20px 18px !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+  }
+
+  /* Subscription details tiles */
+  .subscription-details-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .sub-detail-tile {
+    padding: 16px !important;
+  }
+
+  /* Billing dashboard */
+  .billing-dashboard-wrap {
+    gap: 18px !important;
+  }
+
+  .settings-page.billing-active {
+    max-width: 100% !important;
+    padding: 14px !important;
+  }
+
+  /* Pricing plans section */
+  #pricing-plans-section {
+    padding: 18px 14px !important;
+    border-radius: 14px !important;
+  }
+
+  /* Pricing cards — stack vertically */
+  .pricing-card-wrapper {
+    width: 100% !important;
+  }
+
+  /* Table in settings */
+  .table th,
+  .table td {
+    padding: 12px 14px !important;
+    font-size: 13px !important;
+  }
+
+  /* Form fields */
+  .form-field {
+    margin-bottom: 16px !important;
+  }
+
+  /* Save buttons */
+  .settings-save-btn,
+  button[type="submit"] {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .settings-page {
+    padding: 10px !important;
+  }
+
+  .settings-tabs .tab {
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+  }
+
+  .settings-card {
+    padding: 14px !important;
+  }
+
+  .subscription-gradient-header {
+    padding: 16px !important;
+  }
+}
