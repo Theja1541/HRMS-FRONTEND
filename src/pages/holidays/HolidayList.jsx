@@ -1,9 +1,15 @@
 import { useState, useEffect } from "react";
-import { getHolidays, deleteHoliday, bulkUploadHolidays } from "../../api/holidays";
+import { deleteHoliday, bulkUploadHolidays, getHolidays } from "../../api/holidays";
 import { useNavigate } from "react-router-dom";
 import "../../styles/dashboard.css"; // Reuse dashboard/table styles
+import { useCompanyPermissions } from "../../hooks/useCompanyPermissions";
 
 export default function HolidayList() {
+  const { hasPermission } = useCompanyPermissions();
+  const canCreate = hasPermission("holidays", "create", "view");
+  const canEdit = hasPermission("holidays", "edit", "view");
+  const canDelete = hasPermission("holidays", "delete", "view");
+
   const [holidays, setHolidays] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploadFile, setUploadFile] = useState(null);
@@ -59,7 +65,9 @@ export default function HolidayList() {
         <h2>Holiday Management</h2>
         <div style={{ display: 'flex', gap: '12px' }}>
           <button className="btn-secondary" onClick={() => navigate("/holidays/calendar")}>Calendar View</button>
-          <button className="btn-primary" onClick={() => navigate("/holidays/new")}>+ Add Holiday</button>
+          {canCreate && (
+            <button className="btn-primary" onClick={() => navigate("/holidays/new")}>+ Add Holiday</button>
+          )}
         </div>
       </div>
 
@@ -91,7 +99,6 @@ export default function HolidayList() {
                 <th style={{ padding: '12px' }}>Dates</th>
                 <th style={{ padding: '12px' }}>Name</th>
                 <th style={{ padding: '12px' }}>Type</th>
-                <th style={{ padding: '12px' }}>Payment</th>
                 <th style={{ padding: '12px' }}>State</th>
                 <th style={{ padding: '12px' }}>Actions</th>
               </tr>
@@ -116,22 +123,14 @@ export default function HolidayList() {
                           {h.holiday_type}
                         </span>
                       </td>
-                      <td style={{ padding: '12px' }}>
-                        <span style={{ 
-                          padding: '4px 8px', 
-                          borderRadius: '4px', 
-                          background: h.payment_type === 'UNPAID' ? '#ffedd5' : '#dcfce7', 
-                          color: h.payment_type === 'UNPAID' ? '#c2410c' : '#166534',
-                          fontSize: '12px',
-                          fontWeight: '600'
-                        }}>
-                          {h.payment_type || 'PAID'}
-                        </span>
-                      </td>
                       <td style={{ padding: '12px' }}>{h.state}</td>
                       <td style={{ padding: '12px' }}>
-                        <button onClick={() => navigate(`/holidays/${h.id}`)} style={{ marginRight: '8px', color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer' }}>Edit</button>
-                        <button onClick={() => handleDelete(h.id)} style={{ color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer' }}>Delete</button>
+                        {canEdit && (
+                          <button onClick={() => navigate(`/holidays/${h.id}`)} style={{ marginRight: '8px', color: '#3b82f6', background: 'none', border: 'none', cursor: 'pointer' }}>Edit</button>
+                        )}
+                        {canDelete && (
+                          <button onClick={() => handleDelete(h.id)} style={{ color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer' }}>Delete</button>
+                        )}
                       </td>
                     </tr>
                   )

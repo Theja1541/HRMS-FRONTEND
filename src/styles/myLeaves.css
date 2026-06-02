@@ -539,3 +539,48 @@
     align-items: stretch;
   }
 }
+/* ==========================================
+   MY LEAVES — MOBILE RESPONSIVE
+   ========================================== */
+@media (max-width: 768px) {
+  .my-leaves-page {
+    padding: 14px !important;
+  }
+  .my-leaves-header {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+  }
+  .my-leaves-header button {
+    width: 100% !important;
+  }
+  .leaves-balance-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+  .leaves-history-table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .leaves-history-table {
+    min-width: 580px !important;
+  }
+  .apply-leave-form {
+    padding: 16px !important;
+  }
+  .leave-form-row {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+  .leave-form-row input,
+  .leave-form-row select,
+  .leave-form-row textarea {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .leaves-balance-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

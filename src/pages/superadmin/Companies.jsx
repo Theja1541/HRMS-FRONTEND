@@ -16,6 +16,252 @@ import "../../styles/modal.css";
 
 const PLAN_LABELS = { BASIC: "Basic", PREMIUM: "Premium" };
 
+const ACTIONS = [
+  { key: "view", label: "View" },
+  { key: "create", label: "Create" },
+  { key: "edit", label: "Edit" },
+  { key: "delete", label: "Delete" },
+  { key: "export", label: "Export" },
+  { key: "approve", label: "Approve" }
+];
+
+const MODULE_ACTIONS = {
+  attendance: ["view", "create", "edit", "export"],
+  leave: ["view", "create", "edit", "delete", "approve"],
+  payroll: ["view", "create", "edit", "delete", "export", "approve"],
+  assets: ["view", "create", "edit", "delete", "approve"],
+  daybook: ["view", "create", "edit", "delete", "export"],
+  holidays: ["view", "create", "edit", "delete"],
+  notifications: ["view", "create", "delete"],
+  support: ["view", "create", "edit", "delete"],
+  billing: ["view", "create", "export"],
+};
+
+const ORIGINAL_MODULES_SCHEMA = [
+  {
+    key: "attendance",
+    label: "Attendance",
+    icon: "📅",
+    description: "Monitor check-in logs and monthly attendance statistics.",
+    pages: [
+      { key: "attendance", label: "Attendance Log", actions: ["view", "edit", "create"] },
+      { key: "monthly", label: "Monthly Report", actions: ["view", "edit", "create"] }
+    ]
+  },
+  {
+    key: "leave",
+    label: "Leaves",
+    icon: "🍃",
+    description: "Review and approve/reject employee leaves requests.",
+    pages: [
+      { key: "dashboard", label: "Dashboard", actions: ["view"] },
+      { key: "approvals", label: "Approvals", actions: ["view", "approve"] },
+      { key: "rejected", label: "Rejected", actions: ["view", "approve"] },
+      { key: "leave-calendar", label: "Calendar", actions: ["view"] },
+      { key: "leave-settings", label: "Settings", actions: ["view", "edit"] }
+    ]
+  },
+  {
+    key: "payroll",
+    label: "Payroll",
+    icon: "💰",
+    description: "Structure salaries, generate payslips and log payments.",
+    pages: [
+      { key: "payroll", label: "Generate Payslip", actions: ["view", "create", "delete", "approve"] },
+      { key: "payroll-summary", label: "Payroll Summary", actions: ["view", "edit"] },
+      { key: "salary-payment-summary", label: "Payment Summary", actions: ["view", "export"] },
+      { key: "email-dashboard", label: "Email Dashboard", actions: ["view", "create"] }
+    ]
+  },
+  {
+    key: "assets",
+    label: "Assets",
+    icon: "📦",
+    description: "Assign company assets and track returns history.",
+    pages: [
+      { key: "dashboard", label: "Dashboard", actions: ["view"] },
+      { key: "categories", label: "Categories", actions: ["view", "create", "edit", "delete"] },
+      { key: "assets", label: "Manage Assets", actions: ["view", "create", "edit", "delete"] },
+      { key: "assign", label: "Assign Assets", actions: ["view", "create", "edit", "delete"] },
+      { key: "returns", label: "Returns", actions: ["view", "create", "edit"] },
+      { key: "maintenance", label: "Maintenance", actions: ["view", "create", "edit", "delete"] },
+      { key: "history", label: "History", actions: ["view"] }
+    ]
+  },
+  {
+    key: "daybook",
+    label: "Day Book",
+    icon: "📘",
+    description: "Track financial transactions, categories, and categories reports.",
+    pages: [
+      { key: "dashboard", label: "Dashboard", actions: ["view"] },
+      { key: "transactions", label: "Transactions", actions: ["view", "create", "edit", "delete"] },
+      { key: "vendors", label: "Vendors", actions: ["view", "create", "edit", "delete"] },
+      { key: "categories", label: "Categories", actions: ["view", "create", "edit", "delete"] },
+      { key: "reports", label: "Reports", actions: ["view", "export"] }
+    ]
+  },
+  {
+    key: "holidays",
+    label: "Holidays",
+    icon: "🏖️",
+    description: "Configure active calendar company holidays list.",
+    pages: [
+      { key: "view", label: "Holidays List", actions: ["view", "create", "edit", "delete"] }
+    ]
+  },
+  {
+    key: "notifications",
+    label: "Notifications",
+    icon: "📧",
+    description: "Send company wide announcements and email reminders.",
+    pages: [
+      { key: "view", label: "Send Notifications", actions: ["view", "create", "delete"] }
+    ]
+  },
+  {
+    key: "support",
+    label: "Support",
+    icon: "🎫",
+    description: "Reply to employee queries and support help tickets.",
+    pages: [
+      { key: "view", label: "Support Tickets", actions: ["view", "create", "edit", "delete"] }
+    ]
+  },
+  {
+    key: "billing",
+    label: "Billing",
+    icon: "💳",
+    description: "Manage subscription plans and corporate billing invoices.",
+    pages: [
+      { key: "view", label: "Billing & Plans", actions: ["view", "create", "export"] }
+    ]
+  }
+];
+
+const getInitialModulesState = () => {
+  const state = {};
+  ORIGINAL_MODULES_SCHEMA.forEach(mod => {
+    state[mod.key] = {
+      enabled: true,
+      pages: {},
+      actions: {
+        view: true,
+        create: true,
+        edit: true,
+        delete: true,
+        export: true,
+        approve: true
+      },
+      page_actions: {}
+    };
+    mod.pages.forEach(p => {
+      state[mod.key].pages[p.key] = true;
+      state[mod.key].page_actions[p.key] = {};
+      const allowedActions = p.actions || ["view", "create", "edit", "delete", "export", "approve"];
+      allowedActions.forEach(act => {
+        state[mod.key].page_actions[p.key][act] = true;
+      });
+    });
+  });
+  return state;
+};
+
+const normalizeCompanyModules = (modules) => {
+  const normalized = {};
+  ORIGINAL_MODULES_SCHEMA.forEach(mod => {
+    const existing = modules?.[mod.key];
+    
+    // Initialize standard structure
+    normalized[mod.key] = {
+      enabled: true,
+      pages: {},
+      actions: {
+        view: true,
+        create: true,
+        edit: true,
+        delete: true,
+        export: true,
+        approve: true
+      },
+      page_actions: {}
+    };
+
+    // Initialize pages & page_actions defaults
+    mod.pages.forEach(p => {
+      normalized[mod.key].pages[p.key] = true;
+      normalized[mod.key].page_actions[p.key] = {};
+      const allowedActions = p.actions || ["view", "create", "edit", "delete", "export", "approve"];
+      allowedActions.forEach(act => {
+        normalized[mod.key].page_actions[p.key][act] = true;
+      });
+    });
+
+    if (existing !== undefined) {
+      if (typeof existing === "boolean") {
+        normalized[mod.key].enabled = existing;
+        mod.pages.forEach(p => {
+          normalized[mod.key].pages[p.key] = existing;
+          const allowedActions = p.actions || ["view", "create", "edit", "delete", "export", "approve"];
+          allowedActions.forEach(act => {
+            normalized[mod.key].page_actions[p.key][act] = existing;
+          });
+        });
+        Object.keys(normalized[mod.key].actions).forEach(act => {
+          normalized[mod.key].actions[act] = existing;
+        });
+      } else if (typeof existing === "object" && existing !== null) {
+        if (existing.enabled !== undefined) {
+          normalized[mod.key].enabled = (existing.enabled === true);
+          
+          mod.pages.forEach(p => {
+            normalized[mod.key].pages[p.key] = (existing.pages?.[p.key] !== false);
+            
+            normalized[mod.key].page_actions[p.key] = {};
+            const allowedActions = p.actions || ["view", "create", "edit", "delete", "export", "approve"];
+            allowedActions.forEach(act => {
+              if (existing.page_actions?.[p.key]?.[act] !== undefined) {
+                normalized[mod.key].page_actions[p.key][act] = (existing.page_actions[p.key][act] === true);
+              } else if (existing.actions?.[act] !== undefined) {
+                normalized[mod.key].page_actions[p.key][act] = (existing.actions[act] === true);
+              } else {
+                normalized[mod.key].page_actions[p.key][act] = true;
+              }
+            });
+          });
+          
+          Object.keys(normalized[mod.key].actions).forEach(act => {
+            normalized[mod.key].actions[act] = (existing.actions?.[act] !== false);
+          });
+        } else {
+          // Legacy format
+          const hasAny = Object.values(existing).some(val => val === true);
+          normalized[mod.key].enabled = hasAny;
+
+          mod.pages.forEach(p => {
+            normalized[mod.key].pages[p.key] = (existing[p.key] === true || existing[p.key] === undefined);
+            
+            normalized[mod.key].page_actions[p.key] = {};
+            const allowedActions = p.actions || ["view", "create", "edit", "delete", "export", "approve"];
+            allowedActions.forEach(act => {
+              normalized[mod.key].page_actions[p.key][act] = hasAny;
+            });
+          });
+
+          Object.keys(normalized[mod.key].actions).forEach(act => {
+            if (existing[act] !== undefined) {
+              normalized[mod.key].actions[act] = (existing[act] === true);
+            } else {
+              normalized[mod.key].actions[act] = hasAny;
+            }
+          });
+        }
+      }
+    }
+  });
+  return normalized;
+};
+
 export default function Companies() {
   const navigate = useNavigate();
   const [companies, setCompanies] = useState([]);
@@ -26,7 +272,11 @@ export default function Companies() {
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
   const [pricingPlans, setPricingPlans] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 5;
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [itemsPerPage]);
   const [form, setForm] = useState({
     name: "",
     company_code: "",
@@ -34,6 +284,12 @@ export default function Companies() {
     email: "",
     phone: "",
     address: "",
+    gstin: "",
+    state: "",
+    state_code: "",
+    bank_account_no: "",
+    bank_ifsc: "",
+    bank_branch: "",
     plan: "BASIC",
     is_active: true,
     pricing_plan: "",
@@ -42,24 +298,11 @@ export default function Companies() {
     admin_first_name: "",
     admin_last_name: "",
     admin_email: "",
-    enabled_modules: {
-      attendance: true,
-      leave: true,
-      payroll: true,
-      assets: true,
-      support: true,
-      notifications: true,
-      billing: true,
-      daybook: true,
-      holidays: true,
-    },
+    enabled_modules: getInitialModulesState(),
   });
 
 
   const [currentStep, setCurrentStep] = useState(1);
-  const [editFeaturesOpen, setEditFeaturesOpen] = useState(false);
-  const [editFeaturesCompany, setEditFeaturesCompany] = useState(null);
-  const [editingFeatures, setEditingFeatures] = useState({});
 
   const [markPaidOpen, setMarkPaidOpen] = useState(false);
   const [markPaidCompany, setMarkPaidCompany] = useState(null);
@@ -76,7 +319,6 @@ export default function Companies() {
       alert("Failed to stop company actions");
     }
   };
-
   const openMarkPaidModal = (c) => {
     setOpenMenuId(null);
     setMarkPaidCompany(c);
@@ -85,22 +327,6 @@ export default function Companies() {
     const defaultDateStr = defaultDate.toISOString().slice(0, 10);
     setMarkPaidDate(defaultDateStr);
     setMarkPaidOpen(true);
-  };
-
-
-  const handleSaveFeatures = async (e) => {
-    e.preventDefault();
-    if (!editFeaturesCompany) return;
-    try {
-      await updateCompany(editFeaturesCompany.id, {
-        enabled_modules: editingFeatures
-      });
-      alert("Features updated successfully");
-      setEditFeaturesOpen(false);
-      fetchCompanies();
-    } catch(err) {
-      alert("Failed to update features");
-    }
   };
 
   const handleMarkPaidSubmit = async (e) => {
@@ -143,7 +369,7 @@ export default function Companies() {
             return {
               ...c,
               pricing_plan_name: p.name,
-              pricing_plan_price: p.price_monthly || p.price,
+              pricing_plan_price: p.monthly_price,
             };
           }
         }
@@ -175,6 +401,12 @@ export default function Companies() {
       email: "",
       phone: "",
       address: "",
+      gstin: "",
+      state: "",
+      state_code: "",
+      bank_account_no: "",
+      bank_ifsc: "",
+      bank_branch: "",
       plan: "BASIC",
       is_active: true,
       pricing_plan: "",
@@ -183,17 +415,7 @@ export default function Companies() {
       admin_first_name: "",
       admin_last_name: "",
       admin_email: "",
-      enabled_modules: {
-        attendance: true,
-        leave: true,
-        payroll: true,
-        assets: true,
-        support: true,
-        notifications: true,
-        billing: true,
-        daybook: true,
-        holidays: true,
-      },
+      enabled_modules: getInitialModulesState(),
     });
     setCurrentStep(1);
     setModalOpen(true);
@@ -209,25 +431,21 @@ export default function Companies() {
       email: c.email || "",
       phone: c.phone || "",
       address: c.address || "",
+      gstin: c.gstin || "",
+      state: c.state || "",
+      state_code: c.state_code || "",
+      bank_account_no: c.bank_account_no || "",
+      bank_ifsc: c.bank_ifsc || "",
+      bank_branch: c.bank_branch || "",
       plan: c.plan || "BASIC",
       is_active: c.is_active !== false,
-      pricing_plan: c.pricing_plan ?? "",
+      pricing_plan: c.pricing_plan_id ?? c.pricing_plan ?? "",
       subscription_period_start: c.subscription_period_start ? c.subscription_period_start.slice(0,10) : new Date().toISOString().slice(0,10),
       subscription_period_end: c.subscription_period_end ? c.subscription_period_end.slice(0, 10) : "",
-      admin_first_name: "",
-      admin_last_name: "",
-      admin_email: "",
-      enabled_modules: {
-        attendance: true,
-        leave: true,
-        payroll: true,
-        assets: true,
-        support: true,
-        notifications: true,
-        billing: true,
-        daybook: true,
-        holidays: true,
-      },
+      admin_first_name: c.admin_first_name || "",
+      admin_last_name: c.admin_last_name || "",
+      admin_email: c.admin_email || "",
+      enabled_modules: normalizeCompanyModules(c.enabled_modules),
     });
     setCurrentStep(1);
     setModalOpen(true);
@@ -251,9 +469,6 @@ export default function Companies() {
       if (!payload.subscription_period_start) payload.subscription_period_start = null;
 
       if (editing) {
-        delete payload.admin_first_name;
-        delete payload.admin_last_name;
-        delete payload.admin_email;
         const res = await updateCompany(editing.id, payload);
         alert("Company updated");
         // Optimistically update local companies list with the pricing plan selected (if any)
@@ -267,7 +482,7 @@ export default function Companies() {
               ...res.data,
               pricing_plan: planId,
               pricing_plan_name: planObj ? planObj.name : c.pricing_plan_name,
-              pricing_plan_price: planObj ? (planObj.price_monthly || planObj.price) : c.pricing_plan_price,
+              pricing_plan_price: planObj ? planObj.monthly_price : c.pricing_plan_price,
             };
           }));
         }
@@ -365,7 +580,97 @@ export default function Companies() {
   if (loading) return <p>Loading companies...</p>;
 
   return (
-    <div>
+    <div className="companies-page">
+      <style>{`
+        .sac-permissions-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+          gap: 16px;
+          margin-top: 12px;
+          margin-bottom: 24px;
+        }
+        .sac-module-card {
+          background: #f8fafc;
+          border-radius: 12px;
+          border: 1px solid #e2e8f0;
+          padding: 16px;
+          transition: all 0.2s ease;
+        }
+        .sac-module-card.active {
+          border-color: #3b82f6;
+          background: #faf5ff;
+        }
+        .sac-module-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 8px;
+          padding-bottom: 8px;
+          border-bottom: 1px dashed #cbd5e1;
+        }
+        .sac-module-title-wrapper {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .sac-module-icon {
+          font-size: 18px;
+        }
+        .sac-module-title {
+          font-weight: 600;
+          color: #1e293b;
+          font-size: 14px;
+        }
+        .sac-module-desc {
+          font-size: 11px;
+          color: #64748b;
+          line-height: 1.4;
+          margin-bottom: 12px;
+          height: 32px;
+          overflow: hidden;
+        }
+        .sac-subpages-list {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+        }
+        .sac-subpage-item {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 12px;
+          color: #334155;
+          cursor: pointer;
+          padding: 4px 6px;
+          border-radius: 4px;
+          transition: background 0.15s ease;
+        }
+        .sac-subpage-item:hover {
+          background: rgba(59, 130, 246, 0.05);
+        }
+        .sac-checkbox {
+          width: 16px;
+          height: 16px;
+          border-radius: 4px;
+          border: 2px solid #cbd5e1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          background: #ffffff;
+        }
+        .sac-checkbox.checked {
+          border-color: #3b82f6;
+          background: #3b82f6;
+        }
+        .sac-checkbox.checked::after {
+          content: "✓";
+          color: #ffffff;
+          font-size: 10px;
+          font-weight: bold;
+        }
+      `}</style>
       <div className="page-header">
         <h2 className="page-title">Company Management</h2>
         <button type="button" className="btn primary" onClick={openCreate}>
@@ -420,11 +725,13 @@ export default function Companies() {
                   <td style={{ padding: "16px", color: '#475569' }}>
                     <span style={{ background: '#f1f5f9', padding: '6px 12px', borderRadius: '20px', fontSize: '13px', fontWeight: '500' }}>
                       {(() => {
-                        if (c.pricing_plan_name) return `${c.pricing_plan_name} - ₹${parseFloat(c.pricing_plan_price || 0).toLocaleString("en-IN")}/mo`;
+                        const planName = c.pricing_plan_name;
+                        const planPrice = c.pricing_plan_price || c.pricing_plan_price_monthly;
+                        if (planName) return `${planName} - ₹${parseFloat(planPrice || 0).toLocaleString("en-IN")}/mo`;
                         const planId = c.pricing_plan ?? c.pricing_plan_id ?? null;
                         if (planId && pricingPlans && pricingPlans.length > 0) {
-                          const plan = pricingPlans.find((p) => Number(p.id) === Number(planId));
-                          if (plan) return `${plan.name} - ₹${parseFloat(plan.price_monthly || plan.price || 0).toLocaleString('en-IN')}/mo`;
+                          const planObj = pricingPlans.find((p) => Number(p.id) === Number(planId));
+                          if (planObj) return `${planObj.name} - ₹${parseFloat(planObj.monthly_price || 0).toLocaleString('en-IN')}/mo`;
                         }
                         return PLAN_LABELS[c.plan] ?? c.plan ?? "—";
                       })()}
@@ -467,54 +774,49 @@ export default function Companies() {
         </div>
         
         {companies.length > 0 && (
-          <div className="pagination" style={{ 
-            marginTop: 0, 
-            padding: '16px 24px', 
-            background: '#f8fafc', 
-            borderTop: '1px solid #e2e8f0',
-            borderBottomLeftRadius: '16px',
-            borderBottomRightRadius: '16px',
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center'
-          }}>
-            <span className="page-summary" style={{ color: '#64748b', fontSize: '14px', fontWeight: '500', margin: 0 }}>
-              Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, companies.length)} of {companies.length} companies
-            </span>
-            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <div className="attendance-pagination-container" style={{ margin: 0, borderTop: '1px solid #e2e8f0', borderTopLeftRadius: 0, borderTopRightRadius: 0, borderBottomLeftRadius: '16px', borderBottomRightRadius: '16px' }}>
+            <div className="pagination-left">
+              <span>Show</span>
+              <select
+                value={itemsPerPage}
+                onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                className="items-per-page-select"
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={20}>20</option>
+                <option value={50}>50</option>
+              </select>
+              <span>entries per page</span>
+            </div>
+
+            <div className="pagination-right">
               <button
-                style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #e2e8f0', background: currentPage === 1 ? '#f1f5f9' : '#fff', color: currentPage === 1 ? '#94a3b8' : '#334155', cursor: currentPage === 1 ? 'not-allowed' : 'pointer', fontWeight: '500', fontSize: '14px', transition: 'all 0.2s' }}
+                className="page-btn"
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage(currentPage - 1)}
-                onMouseEnter={(e) => { if (currentPage !== 1) { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#cbd5e1'; } }}
-                onMouseLeave={(e) => { if (currentPage !== 1) { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e2e8f0'; } }}
               >
                 Previous
               </button>
-              
-              <div style={{ display: 'flex', gap: '4px' }}>
+              <div className="page-number-group" style={{ display: 'flex', gap: '4px' }}>
                 {Array.from({ length: Math.min(totalPages, 5) }, (_, idx) => {
                   const start = Math.max(1, currentPage - 2);
                   return start + idx <= totalPages ? start + idx : null;
                 }).filter(Boolean).map((pg) => (
                   <button
                     key={pg}
-                    style={{ width: '36px', height: '36px', borderRadius: '8px', border: pg === currentPage ? 'none' : '1px solid #e2e8f0', background: pg === currentPage ? 'linear-gradient(135deg, #3b82f6, #2563eb)' : '#fff', color: pg === currentPage ? '#fff' : '#334155', cursor: 'pointer', fontWeight: pg === currentPage ? '600' : '500', fontSize: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: pg === currentPage ? '0 2px 4px rgba(37,99,235,0.2)' : 'none', transition: 'all 0.2s' }}
+                    className={`page-btn ${pg === currentPage ? "active" : ""}`}
                     onClick={() => setCurrentPage(pg)}
-                    onMouseEnter={(e) => { if (pg !== currentPage) { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#cbd5e1'; } }}
-                    onMouseLeave={(e) => { if (pg !== currentPage) { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e2e8f0'; } }}
                   >
                     {pg}
                   </button>
                 ))}
               </div>
-
+              <span className="page-summary">Page {currentPage} of {totalPages}</span>
               <button
-                style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #e2e8f0', background: currentPage >= totalPages ? '#f1f5f9' : '#fff', color: currentPage >= totalPages ? '#94a3b8' : '#334155', cursor: currentPage >= totalPages ? 'not-allowed' : 'pointer', fontWeight: '500', fontSize: '14px', transition: 'all 0.2s' }}
+                className="page-btn"
                 disabled={currentPage >= totalPages}
                 onClick={() => setCurrentPage(currentPage + 1)}
-                onMouseEnter={(e) => { if (currentPage < totalPages) { e.currentTarget.style.background = '#f8fafc'; e.currentTarget.style.borderColor = '#cbd5e1'; } }}
-                onMouseLeave={(e) => { if (currentPage < totalPages) { e.currentTarget.style.background = '#fff'; e.currentTarget.style.borderColor = '#e2e8f0'; } }}
               >
                 Next
               </button>
@@ -560,29 +862,7 @@ export default function Companies() {
             >
               Edit
             </button>
-            <button
-              type="button"
-              className="btn"
-              style={{ display: "block", width: "100%", textAlign: "left", marginBottom: 4 }}
-              onClick={() => {
-                setOpenMenuId(null);
-                setEditFeaturesCompany(activeCompany);
-                setEditingFeatures(activeCompany.enabled_modules || {
-                  attendance: true, leave: true, payroll: true, assets: true,
-                  support: true, notifications: true, billing: true, daybook: true, holidays: true
-                });
-                setEditFeaturesOpen(true);
-              }}
-            >
-              Edit Features
-            </button>
-            <Link
-              to={`/super-admin/create-user?company_id=${activeCompany.id}`}
-              style={{ display: "block", padding: "8px 12px", marginBottom: 4, borderRadius: 8 }}
-              onClick={() => setOpenMenuId(null)}
-            >
-              Create Admin for this company
-            </Link>
+
             <Link
               to={`/super-admin/companies/${activeCompany.id}/employees`}
               style={{ display: "block", padding: "8px 12px", marginBottom: 4, borderRadius: 8 }}
@@ -670,12 +950,11 @@ export default function Companies() {
           >
             <h3>{editing ? "Edit company" : "Create company"}</h3>
             <div style={{display: 'flex', gap: '8px', marginBottom: '20px', paddingBottom: '10px', borderBottom: '1px solid #e2e8f0'}}>
-              <div style={{flex: 1, padding: '8px', textAlign: 'center', background: currentStep === 1 ? '#eff6ff' : 'transparent', color: currentStep === 1 ? '#1d4ed8' : '#64748b', borderRadius: '8px', fontWeight: currentStep === 1 ? '600' : '400'}}>Step 1: Company</div>
-              {!editing && <div style={{flex: 1, padding: '8px', textAlign: 'center', background: currentStep === 2 ? '#eff6ff' : 'transparent', color: currentStep === 2 ? '#1d4ed8' : '#64748b', borderRadius: '8px', fontWeight: currentStep === 2 ? '600' : '400'}}>Step 2: Admin</div>}
-              <div style={{flex: 1, padding: '8px', textAlign: 'center', background: currentStep === 3 ? '#eff6ff' : 'transparent', color: currentStep === 3 ? '#1d4ed8' : '#64748b', borderRadius: '8px', fontWeight: currentStep === 3 ? '600' : '400'}}>Step {editing ? '2' : '3'}: Features</div>
+              <div style={{flex: 1, padding: '8px', textAlign: 'center', background: currentStep === 1 ? '#eff6ff' : 'transparent', color: currentStep === 1 ? '#1d4ed8' : '#64748b', borderRadius: '8px', fontWeight: currentStep === 1 ? '600' : '400'}}>Step 1: Company Details</div>
+              <div style={{flex: 1, padding: '8px', textAlign: 'center', background: currentStep === 2 ? '#eff6ff' : 'transparent', color: currentStep === 2 ? '#1d4ed8' : '#64748b', borderRadius: '8px', fontWeight: currentStep === 2 ? '600' : '400'}}>Step 2: Admin Details</div>
             </div>
             <form onSubmit={(e) => {
-              if ((currentStep === 3 && !editing) || (currentStep === 2 && editing)) {
+              if (currentStep === 2) {
                 handleSubmit(e);
               } else {
                 e.preventDefault();
@@ -712,9 +991,86 @@ export default function Companies() {
                   >
                     <option value="">— No plan —</option>
                     {pricingPlans.filter((p) => p.is_active).map((p) => (
-                      <option key={p.id} value={p.id}>{p.name} – ₹{p.price_monthly}/mo</option>
+                      <option key={p.id} value={p.id}>{p.name} – ₹{p.monthly_price}/mo</option>
                     ))}
                   </select>
+
+                  {(() => {
+                    const selectedPlan = pricingPlans.find((p) => Number(p.id) === Number(form.pricing_plan));
+                    if (!selectedPlan) return null;
+
+                    const normalized = normalizeCompanyModules(selectedPlan.features_json);
+                    const activeModules = ORIGINAL_MODULES_SCHEMA.filter((m) => normalized[m.key]?.enabled === true);
+
+                    return (
+                      <div style={{
+                        marginTop: "16px",
+                        marginBottom: "16px",
+                        padding: "16px",
+                        borderRadius: "12px",
+                        background: "#f0fdf4",
+                        border: "1px solid #bbf7d0",
+                        boxShadow: "0 4px 12px rgba(22,101,52,0.04)"
+                      }}>
+                        <h4 style={{ margin: "0 0 10px 0", fontSize: "14px", fontWeight: "750", color: "#166534", display: "flex", alignItems: "center", gap: "6px" }}>
+                          <span>📦</span> Plan Features Preview: {selectedPlan.name}
+                        </h4>
+                        {selectedPlan.description && (
+                          <p style={{ margin: "0 0 12px 0", fontSize: "12px", color: "#1b5e20", fontStyle: "italic" }}>
+                            {selectedPlan.description}
+                          </p>
+                        )}
+
+                        {activeModules.length === 0 ? (
+                          <p style={{ margin: 0, fontSize: "12px", color: "#166534" }}>No modules included in this plan.</p>
+                        ) : (
+                          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: "10px", marginTop: "10px" }}>
+                            {activeModules.map((m) => (
+                              <div
+                                key={m.key}
+                                style={{
+                                  background: "#ffffff",
+                                  padding: "10px",
+                                  borderRadius: "8px",
+                                  border: "1px solid #dcfce7",
+                                  display: "flex",
+                                  flexDirection: "column",
+                                  gap: "4px"
+                                }}
+                              >
+                                <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                                  <span>{m.icon}</span>
+                                  <strong style={{ fontSize: "13px", color: "#14532d" }}>{m.label}</strong>
+                                </div>
+                                {m.pages && m.pages.filter(p => normalized[m.key]?.pages?.[p.key] === true).length > 0 && (
+                                  <div style={{ display: "flex", flexWrap: "wrap", gap: "4px", marginTop: "4px" }}>
+                                    {m.pages
+                                      .filter(p => normalized[m.key]?.pages?.[p.key] === true)
+                                      .map(p => (
+                                        <span
+                                          key={p.key}
+                                          style={{
+                                            fontSize: "9px",
+                                            fontWeight: "700",
+                                            background: "#dcfce7",
+                                            color: "#166534",
+                                            padding: "2px 6px",
+                                            borderRadius: "4px"
+                                          }}
+                                        >
+                                          {p.label}
+                                        </span>
+                                      ))
+                                    }
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
                   <label>Subscription start date</label>
                   <input
                     type="date"
@@ -743,6 +1099,117 @@ export default function Companies() {
                     value={form.address}
                     onChange={(e) => setForm({ ...form, address: e.target.value })}
                   />
+
+                  {/* GST & Billing Details */}
+                  <div style={{ 
+                    marginTop: "20px", 
+                    marginBottom: "20px",
+                    padding: "20px", 
+                    borderRadius: "12px", 
+                    background: "#f8fafc", 
+                    border: "1px solid #e2e8f0" 
+                  }}>
+                    <h4 style={{ 
+                      margin: "0 0 16px 0", 
+                      fontSize: "14px", 
+                      fontWeight: "700", 
+                      color: "#1e293b", 
+                      borderBottom: "1px solid #cbd5e1", 
+                      paddingBottom: "8px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px"
+                    }}>
+                      <span>💼</span> GST & Billing Details
+                    </h4>
+                    
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                      <div>
+                        <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#475569", marginBottom: "6px" }}>GSTIN</label>
+                        <input
+                          value={form.gstin}
+                          onChange={(e) => setForm({ ...form, gstin: e.target.value.toUpperCase() })}
+                          placeholder="e.g. 22AAAAA0000A1Z5"
+                          style={{ margin: 0 }}
+                        />
+                      </div>
+                      
+                      <div>
+                        <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#475569", marginBottom: "6px" }}>State</label>
+                        <input
+                          value={form.state}
+                          onChange={(e) => setForm({ ...form, state: e.target.value })}
+                          placeholder="e.g. Maharashtra"
+                          style={{ margin: 0 }}
+                        />
+                      </div>
+
+                      <div style={{ gridColumn: "span 2" }}>
+                        <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#475569", marginBottom: "6px" }}>State Code</label>
+                        <input
+                          value={form.state_code}
+                          onChange={(e) => setForm({ ...form, state_code: e.target.value })}
+                          placeholder="e.g. 27"
+                          style={{ margin: 0 }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bank Details */}
+                  <div style={{ 
+                    marginBottom: "20px",
+                    padding: "20px", 
+                    borderRadius: "12px", 
+                    background: "#f8fafc", 
+                    border: "1px solid #e2e8f0" 
+                  }}>
+                    <h4 style={{ 
+                      margin: "0 0 16px 0", 
+                      fontSize: "14px", 
+                      fontWeight: "700", 
+                      color: "#1e293b", 
+                      borderBottom: "1px solid #cbd5e1", 
+                      paddingBottom: "8px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "6px"
+                    }}>
+                      <span>🏦</span> Bank Details (for Receipts)
+                    </h4>
+                    
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
+                      <div style={{ gridColumn: "span 2" }}>
+                        <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#475569", marginBottom: "6px" }}>A/c (Bank Account No)</label>
+                        <input
+                          value={form.bank_account_no}
+                          onChange={(e) => setForm({ ...form, bank_account_no: e.target.value })}
+                          placeholder="e.g. 918020012345678"
+                          style={{ margin: 0 }}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#475569", marginBottom: "6px" }}>IFSC Code</label>
+                        <input
+                          value={form.bank_ifsc}
+                          onChange={(e) => setForm({ ...form, bank_ifsc: e.target.value.toUpperCase() })}
+                          placeholder="e.g. UTIB0000123"
+                          style={{ margin: 0 }}
+                        />
+                      </div>
+
+                      <div>
+                        <label style={{ display: "block", fontSize: "12px", fontWeight: "600", color: "#475569", marginBottom: "6px" }}>Bank Branch</label>
+                        <input
+                          value={form.bank_branch}
+                          onChange={(e) => setForm({ ...form, bank_branch: e.target.value })}
+                          placeholder="e.g. Mumbai Main Branch"
+                          style={{ margin: 0 }}
+                        />
+                      </div>
+                    </div>
+                  </div>
                   {editing && (
                     <>
                       <label>
@@ -760,11 +1227,11 @@ export default function Companies() {
                 </>
               )}
               
-              {currentStep === 2 && !editing && (
+              {currentStep === 2 && (
                 <>
                   <h4 style={{ marginBottom: 8 }}>Company Admin</h4>
                   <p className="muted-text" style={{ marginTop: 0 }}>
-                    Create the first company admin now. A temporary password will be emailed automatically.
+                    {editing ? "Update the company admin details below. If no admin exists, one will be created." : "Create the first company admin now. A temporary password will be emailed automatically."}
                   </p>
                   <label>Admin first name</label>
                   <input
@@ -788,29 +1255,6 @@ export default function Companies() {
                   />
                 </>
               )}
-
-              {((currentStep === 3 && !editing) || (currentStep === 2 && editing)) && (
-                <>
-                  <h4 style={{ marginBottom: 8 }}>Enabled Modules</h4>
-                  <p className="muted-text" style={{ marginTop: 0, marginBottom: 16 }}>
-                    Select which modules this company has access to.
-                  </p>
-                  <div style={{display: 'flex', flexDirection: 'column', gap: '12px'}}>
-                    {['attendance', 'leave', 'payroll', 'assets', 'support', 'notifications', 'billing', 'daybook', 'holidays'].map(mod => (
-                      <label key={mod} style={{display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', margin: 0}}>
-                        <input
-                          type="checkbox"
-                          checked={!!form.enabled_modules[mod]}
-                          onChange={(e) => setForm({...form, enabled_modules: {...form.enabled_modules, [mod]: e.target.checked}})}
-                          style={{width: 'auto', margin: 0}}
-                        />
-                        <span style={{textTransform: 'capitalize', fontWeight: '500', fontSize: '14px'}}>{mod}</span>
-                      </label>
-                    ))}
-                  </div>
-                </>
-              )}
-
               <div className="modal-actions" style={{marginTop: '24px', display: 'flex', justifyContent: 'space-between', width: '100%'}}>
                 <div>
                   {currentStep > 1 && (
@@ -821,7 +1265,7 @@ export default function Companies() {
                 </div>
                 <div style={{display: 'flex', gap: '12px'}}>
                   <button type="button" className="btn-cancel" onClick={() => setModalOpen(false)}>Cancel</button>
-                  {((currentStep === 3 && !editing) || (currentStep === 2 && editing)) ? (
+                  {currentStep === 2 ? (
                     <button type="button" className="btn primary" onClick={handleSubmit}>Save</button>
                   ) : (
                     <button type="submit" className="btn primary">
@@ -888,40 +1332,7 @@ export default function Companies() {
         </div>
       )}
 
-      {editFeaturesOpen && editFeaturesCompany && (
-        <div className="modal-overlay" onClick={() => setEditFeaturesOpen(false)}>
-          <div
-            className="modal-card"
-            onClick={(e) => e.stopPropagation()}
-            style={{
-              width: "min(480px, 90vw)",
-              padding: "24px",
-              borderRadius: "16px",
-            }}
-          >
-            <h3>Edit Features: {editFeaturesCompany.name}</h3>
-            <form onSubmit={handleSaveFeatures}>
-              <div style={{display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px'}}>
-                {['attendance', 'leave', 'payroll', 'assets', 'support', 'notifications', 'billing', 'daybook', 'holidays'].map(mod => (
-                  <label key={mod} style={{display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', margin: 0}}>
-                    <input
-                      type="checkbox"
-                      checked={!!editingFeatures[mod]}
-                      onChange={(e) => setEditingFeatures({...editingFeatures, [mod]: e.target.checked})}
-                      style={{width: 'auto', margin: 0}}
-                    />
-                    <span style={{textTransform: 'capitalize', fontWeight: '500', fontSize: '14px'}}>{mod}</span>
-                  </label>
-                ))}
-              </div>
-              <div className="modal-actions">
-                <button type="submit" className="btn primary">Save Features</button>
-                <button type="button" className="btn-cancel" onClick={() => setEditFeaturesOpen(false)}>Cancel</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+
     </div>
   );
 }

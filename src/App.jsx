@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useAuth } from "./auth/AuthContext";
 
 /* Auth */
 import { AuthProvider } from "./auth/AuthContext";
@@ -75,6 +76,11 @@ import LeaveDashboard from "./pages/leaves/LeaveDashboard";
 import LeaveCalendar from "./pages/leaves/LeaveCalendar";
 import AssetReturnManagement from "./pages/assets/AssetReturnManagement";
 import AssetManagement from "./pages/assets/AssetManagement";
+import AssignAssets from "./pages/assets/AssignAssets";
+import AssetsDashboard from "./pages/assets/AssetsDashboard";
+import AssetCategories from "./pages/assets/AssetCategories";
+import AssetMaintenance from "./pages/assets/AssetMaintenance";
+import AssetHistory from "./pages/assets/AssetHistory";
 import MyAssetReturns from "./pages/employee-portal/MyAssetReturns";
 import Support from "./pages/support/Support";
 import CompanyUsers from "./pages/CompanyUsers";
@@ -82,18 +88,22 @@ import Notifications from "./pages/notifications/Notifications";
 import HolidayList from "./pages/holidays/HolidayList";
 import HolidayCalendar from "./pages/holidays/HolidayCalendar";
 import HolidayCreate from "./pages/holidays/HolidayCreate";
+import InstallPWA from "./components/common/InstallPWA";
 
 /* Daybook / Finance */
-import DaybookDashboard from "./modules/daybook/pages/Dashboard";
+import DaybookDashboard from "./modules/daybook/pages/DaybookDashboard";
 import DaybookTransactions from "./modules/daybook/pages/Transactions";
-import DaybookTransactionForm from "./modules/daybook/pages/TransactionForm";
+import DaybookTransactionForm from "./modules/daybook/pages/AddTransaction";
 import DaybookVendors from "./modules/daybook/pages/Vendors";
 import DaybookCategories from "./modules/daybook/pages/Categories";
-import DaybookReports from "./modules/daybook/pages/Reports";
+import DaybookReports from "./modules/daybook/pages/DaybookReports";
 import DaybookInvoiceView from "./modules/daybook/pages/DaybookInvoiceView";
+import DaybookReceiptView from "./modules/daybook/pages/DaybookReceiptView";
 
-function ModuleRoute({ module, children }) {
+function ModuleRoute({ module, page = null, action = null, children }) {
   const [allowed, setAllowed] = useState(null);
+  const [companyFeatures, setCompanyFeatures] = useState({});
+  const { user } = useAuth();
 
   useEffect(() => {
     let cancelled = false;
@@ -101,10 +111,14 @@ function ModuleRoute({ module, children }) {
       .then((res) => {
         if (!cancelled) {
           setAllowed(res.data?.features?.[module] !== false);
+          setCompanyFeatures(res.data?.company_enabled_modules || {});
         }
       })
       .catch(() => {
-        if (!cancelled) setAllowed(true);
+        if (!cancelled) {
+          setAllowed(true);
+          setCompanyFeatures({});
+        }
       });
     return () => {
       cancelled = true;
@@ -113,6 +127,79 @@ function ModuleRoute({ module, children }) {
 
   if (allowed === null) return null;
   if (!allowed) return <Navigate to="/dashboard" replace />;
+
+  // Super Admin completely bypasses tenant company and HR permissions
+  if (user && user.role === "SUPER_ADMIN") return children;
+
+  // 1. Enforce Company-level dynamic permissions
+  if (companyFeatures && Object.keys(companyFeatures).length > 0) {
+    const compKey = module === "leave" ? "leave" : module;
+    const companyModObj = companyFeatures[compKey] || companyFeatures[module];
+    if (companyModObj !== undefined) {
+      if (typeof companyModObj === "boolean") {
+        if (!companyModObj) return <Navigate to="/dashboard" replace />;
+      } else if (typeof companyModObj === "object" && companyModObj !== null) {
+        // Check if module itself is disabled
+        if (companyModObj.enabled === false) {
+          return <Navigate to="/dashboard" replace />;
+        }
+
+        const actKey = action || "view";
+
+        if (page) {
+          // Check page visibility
+          if (companyModObj.pages && companyModObj.pages[page] === false) {
+            return <Navigate to="/dashboard" replace />;
+          }
+
+          // Check page-level actions permission (granular first, then module fallback)
+          let hasPageActionPerm = true;
+          if (companyModObj.page_actions && companyModObj.page_actions[page]) {
+            const pageActions = companyModObj.page_actions[page];
+            if (pageActions[actKey] !== undefined) {
+              hasPageActionPerm = pageActions[actKey] === true;
+            } else if (companyModObj.actions && companyModObj.actions[actKey] !== undefined) {
+              hasPageActionPerm = companyModObj.actions[actKey] === true;
+            }
+          } else if (companyModObj.actions && companyModObj.actions[actKey] !== undefined) {
+            hasPageActionPerm = companyModObj.actions[actKey] === true;
+          }
+
+          if (!hasPageActionPerm) {
+            return <Navigate to="/dashboard" replace />;
+          }
+        } else {
+          // Check module-level action permission
+          if (companyModObj.actions && companyModObj.actions[actKey] !== undefined) {
+            if (companyModObj.actions[actKey] === false) {
+              return <Navigate to="/dashboard" replace />;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 2. Enforce HR-level role permissions
+  if (user && user.role === "HR") {
+    const hr_perms = user.hr_permissions || {};
+    const hrModKey = module === "leave" ? "leaves" : (module === "leaves" ? "leaves" : module);
+    const modObj = hr_perms[hrModKey] || hr_perms[module];
+
+    if (!modObj) {
+      return <Navigate to="/dashboard" replace />;
+    }
+
+    if (typeof modObj === "boolean") {
+      if (!modObj) return <Navigate to="/dashboard" replace />;
+    } else {
+      const actKey = action || "view";
+      if (modObj[actKey] !== true) {
+        return <Navigate to="/dashboard" replace />;
+      }
+    }
+  }
+
   return children;
 }
 
@@ -222,6 +309,7 @@ function ModuleRoute({ module, children }) {
 export default function App() {
   return (
     <ToastProvider>
+      <InstallPWA />
       <AuthProvider>
         <Routes>
 
@@ -283,65 +371,69 @@ export default function App() {
             <Route path="dashboard" element={<Dashboard />} />
 
             {/* Employees */}
-            <Route path="employees" element={<Employees />} />
-            <Route path="employees/add" element={<AddEmployee />} />
-            <Route path="employees/edit/:id" element={<AddEmployee />} />
-            <Route path="employees/:id" element={<EmployeeProfile />} />
+            <Route path="employees" element={<ModuleRoute module="employees"><Employees /></ModuleRoute>} />
+            <Route path="employees/add" element={<ModuleRoute module="employees" action="create"><AddEmployee /></ModuleRoute>} />
+            <Route path="employees/edit/:id" element={<ModuleRoute module="employees" action="edit"><AddEmployee /></ModuleRoute>} />
+            <Route path="employees/:id" element={<ModuleRoute module="employees" action="view"><EmployeeProfile /></ModuleRoute>} />
 
             {/* Attendance */}
-            <Route path="attendance" element={<ModuleRoute module="attendance"><Attendance /></ModuleRoute>} />
-            <Route path="monthly" element={<ModuleRoute module="attendance"><MonthlyAttendance /></ModuleRoute>} />
+            <Route path="attendance" element={<ModuleRoute module="attendance" page="attendance"><Attendance /></ModuleRoute>} />
+            <Route path="monthly" element={<ModuleRoute module="attendance" page="monthly"><MonthlyAttendance /></ModuleRoute>} />
 
             {/* Leaves */}
-            <Route path="leave-dashboard" element={<ModuleRoute module="leave"><LeaveDashboard /></ModuleRoute>} />
-            <Route path="leave-calendar" element={<ModuleRoute module="leave"><LeaveCalendar /></ModuleRoute>} />
+            <Route path="leave-dashboard" element={<ModuleRoute module="leave" page="dashboard"><LeaveDashboard /></ModuleRoute>} />
+            <Route path="leave-calendar" element={<ModuleRoute module="leave" page="leave-calendar"><LeaveCalendar /></ModuleRoute>} />
             <Route path="leaves" element={<ModuleRoute module="leave"><Leaves /></ModuleRoute>} />
-            <Route path="approvals" element={<ModuleRoute module="leave"><LeaveApproval /></ModuleRoute>} />
-            <Route path="rejected" element={<ModuleRoute module="leave"><LeaveRejected /></ModuleRoute>} />
+            <Route path="approvals" element={<ModuleRoute module="leave" page="approvals"><LeaveApproval /></ModuleRoute>} />
+            <Route path="rejected" element={<ModuleRoute module="leave" page="rejected"><LeaveRejected /></ModuleRoute>} />
             <Route path="history" element={<ModuleRoute module="leave"><LeaveHistory /></ModuleRoute>} />
-            <Route path="leave-settings" element={<ModuleRoute module="leave"><LeaveSettings /></ModuleRoute>} />
+            <Route path="leave-settings" element={<ModuleRoute module="leave" page="leave-settings"><LeaveSettings /></ModuleRoute>} />
 
             {/* Payroll */}
-            <Route path="payroll" element={<ModuleRoute module="payroll"><Payroll /></ModuleRoute>} />
-            {/* <Route path="payroll/salary-structure" element={<SalaryStructure />} /> */}
-            {/* <Route path="salary" element={<SalaryStructure />} /> */}
-            <Route path="payroll-summary" element={<ModuleRoute module="payroll"><PayrollSummary /></ModuleRoute>} />
-            <Route path="salary-payment-summary" element={<ModuleRoute module="payroll"><SalaryPaymentSummary /></ModuleRoute>} />
-            <Route path="payroll/full-final" element={<ModuleRoute module="payroll"><Payroll /></ModuleRoute>} />
-            <Route path="employees/:id/salary-revision" element={<ModuleRoute module="payroll"><AddSalaryRevision /></ModuleRoute>}/>
+            <Route path="payroll" element={<ModuleRoute module="payroll" page="payroll"><Payroll /></ModuleRoute>} />
+            <Route path="payroll-summary" element={<ModuleRoute module="payroll" page="payroll-summary"><PayrollSummary /></ModuleRoute>} />
+            <Route path="salary-payment-summary" element={<ModuleRoute module="payroll" page="salary-payment-summary"><SalaryPaymentSummary /></ModuleRoute>} />
+            <Route path="payroll/full-final" element={<ModuleRoute module="payroll" page="payroll"><Payroll /></ModuleRoute>} />
+            <Route path="employees/:id/salary-revision" element={<ModuleRoute module="payroll" page="payroll-summary"><AddSalaryRevision /></ModuleRoute>}/>
 
             {/* Email */}
-            <Route path="email-dashboard" element={<ModuleRoute module="payroll"><EmailDashboard /></ModuleRoute>} />
+            <Route path="email-dashboard" element={<ModuleRoute module="payroll" page="email-dashboard"><EmailDashboard /></ModuleRoute>} />
             
             {/* Assets */}
-            <Route path="assets" element={<ModuleRoute module="assets"><AssetManagement /></ModuleRoute>} />
-            <Route path="asset-returns" element={<ModuleRoute module="assets"><AssetReturnManagement /></ModuleRoute>} />
+            <Route path="assets/dashboard" element={<ModuleRoute module="assets" page="dashboard"><AssetsDashboard /></ModuleRoute>} />
+            <Route path="assets/categories" element={<ModuleRoute module="assets" page="categories"><AssetCategories /></ModuleRoute>} />
+            <Route path="assets" element={<ModuleRoute module="assets" page="assets"><AssetManagement /></ModuleRoute>} />
+            <Route path="assets/assign" element={<ModuleRoute module="assets" page="assign"><AssignAssets /></ModuleRoute>} />
+            <Route path="assets/returns" element={<ModuleRoute module="assets" page="returns"><AssetReturnManagement /></ModuleRoute>} />
+            <Route path="assets/maintenance" element={<ModuleRoute module="assets" page="maintenance"><AssetMaintenance /></ModuleRoute>} />
+            <Route path="assets/history" element={<ModuleRoute module="assets" page="history"><AssetHistory /></ModuleRoute>} />
 
             {/* Support */}
             <Route path="support" element={<ModuleRoute module="support"><Support /></ModuleRoute>} />
 
             {/* Company users */}
-            <Route path="company-users" element={<CompanyUsers />} />
+            <Route path="company-users" element={<ProtectedRoute allowedRoles={["ADMIN"]}><CompanyUsers /></ProtectedRoute>} />
 
             {/* Notifications */}
             <Route path="notifications" element={<ModuleRoute module="notifications"><Notifications /></ModuleRoute>} />
 
             {/* Holidays */}
-            <Route path="holidays" element={<HolidayList />} />
-            <Route path="holidays/calendar" element={<HolidayCalendar />} />
-            <Route path="holidays/new" element={<HolidayCreate />} />
-            <Route path="holidays/:id" element={<HolidayCreate />} />
+            <Route path="holidays" element={<ModuleRoute module="holidays"><HolidayList /></ModuleRoute>} />
+            <Route path="holidays/calendar" element={<ModuleRoute module="holidays"><HolidayCalendar /></ModuleRoute>} />
+            <Route path="holidays/new" element={<ModuleRoute module="holidays"><HolidayCreate /></ModuleRoute>} />
+            <Route path="holidays/:id" element={<ModuleRoute module="holidays"><HolidayCreate /></ModuleRoute>} />
 
             {/* Daybook / Finance */}
             <Route path="daybook" element={<Navigate to="dashboard" replace />} />
-            <Route path="daybook/dashboard" element={<ModuleRoute module="daybook"><DaybookDashboard /></ModuleRoute>} />
-            <Route path="daybook/transactions" element={<ModuleRoute module="daybook"><DaybookTransactions /></ModuleRoute>} />
-            <Route path="daybook/transactions/add" element={<ModuleRoute module="daybook"><DaybookTransactionForm /></ModuleRoute>} />
-            <Route path="daybook/transactions/edit/:id" element={<ModuleRoute module="daybook"><DaybookTransactionForm /></ModuleRoute>} />
-            <Route path="daybook/transactions/invoice/:id" element={<ModuleRoute module="daybook"><DaybookInvoiceView /></ModuleRoute>} />
-            <Route path="daybook/vendors" element={<ModuleRoute module="daybook"><DaybookVendors /></ModuleRoute>} />
-            <Route path="daybook/categories" element={<ModuleRoute module="daybook"><DaybookCategories /></ModuleRoute>} />
-            <Route path="daybook/reports" element={<ModuleRoute module="daybook"><DaybookReports /></ModuleRoute>} />
+            <Route path="daybook/dashboard" element={<ModuleRoute module="daybook" page="dashboard"><DaybookDashboard /></ModuleRoute>} />
+            <Route path="daybook/transactions" element={<ModuleRoute module="daybook" page="transactions"><DaybookTransactions /></ModuleRoute>} />
+            <Route path="daybook/transactions/add" element={<ModuleRoute module="daybook" page="transactions" action="create"><DaybookTransactionForm /></ModuleRoute>} />
+            <Route path="daybook/transactions/edit/:id" element={<ModuleRoute module="daybook" page="transactions" action="edit"><DaybookTransactionForm /></ModuleRoute>} />
+            <Route path="daybook/transactions/invoice/:id" element={<ModuleRoute module="daybook" page="transactions"><DaybookInvoiceView /></ModuleRoute>} />
+            <Route path="daybook/transactions/receipt/:id" element={<ModuleRoute module="daybook" page="transactions"><DaybookReceiptView /></ModuleRoute>} />
+            <Route path="daybook/vendors" element={<ModuleRoute module="daybook" page="vendors"><DaybookVendors /></ModuleRoute>} />
+            <Route path="daybook/categories" element={<ModuleRoute module="daybook" page="categories"><DaybookCategories /></ModuleRoute>} />
+            <Route path="daybook/reports" element={<ModuleRoute module="daybook" page="reports"><DaybookReports /></ModuleRoute>} />
 
             {/* Settings */}
             <Route path="settings" element={<Settings />} />
@@ -367,7 +459,7 @@ export default function App() {
             <Route path="/employee/salary-timeline" element={<ModuleRoute module="payroll"><SalaryGrowthTimeline /></ModuleRoute>} />
             <Route path="profile" element={<MyProfile />} />
             <Route path="my-documents" element={<MyDocuments />} />
-            <Route path="asset-returns" element={<ModuleRoute module="assets"><MyAssetReturns /></ModuleRoute>} />
+            <Route path="asset-requests" element={<ModuleRoute module="assets"><MyAssetReturns /></ModuleRoute>} />
             <Route path="settings" element={<Settings />} />
           </Route>
 

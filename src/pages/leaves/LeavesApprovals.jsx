@@ -118,6 +118,7 @@ export default function LeaveApprovals() {
                 <th>End Date</th>
                 <th>Days</th>
                 <th>Reason</th>
+                <th>Document</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -131,6 +132,15 @@ export default function LeaveApprovals() {
                   <td>{l.end_date}</td>
                   <td>{l.days}</td>
                   <td>{l.reason}</td>
+                  <td>
+                    {l.document ? (
+                      <a href={l.document} target="_blank" rel="noopener noreferrer" style={{ color: "#2563eb", textDecoration: "underline" }}>
+                        View
+                      </a>
+                    ) : (
+                      "-"
+                    )}
+                  </td>
                   <td>
                     <span className="status-badge approved">
                       Approved

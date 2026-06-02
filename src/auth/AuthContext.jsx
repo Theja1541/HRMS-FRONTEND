@@ -84,6 +84,7 @@ export function AuthProvider({ children }) {
       employeeProfileId: data.user.employee_profile_id,
       companyId: data.user.company_id ?? data.user.company?.id ?? null,
       company: data.user.company || null,
+      hr_permissions: data.user.hr_permissions || {},
       isAuthenticated: true,
     };
 

@@ -159,7 +159,7 @@
   align-items: stretch;
 }
 
-.card {
+.charts-grid .card {
   background: white;
   border-radius: 16px;
   padding: 20px 24px;
@@ -171,19 +171,19 @@
   overflow: hidden;
 }
 
-.card h3 {
+.charts-grid .card h3 {
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 12px;
   color: #0f172a;
 }
 
-.card .recharts-responsive-container {
+.charts-grid .card .recharts-responsive-container {
   flex: 1;
 }
 
-.card canvas,
-.card svg {
+.charts-grid .card canvas,
+.charts-grid .card svg {
   max-height: 100% !important;
 }
 
@@ -404,7 +404,7 @@
     grid-template-columns: 1fr;
   }
 
-  .card {
+  .charts-grid .card {
     height: 300px;
   }
 
@@ -440,4 +440,46 @@
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================
+   MONTHLY ATTENDANCE — MOBILE RESPONSIVE
+   ========================================== */
+@media (max-width: 1024px) {
+  .monthly-attendance-page .filters-row {
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .monthly-calendar-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .monthly-calendar-grid {
+    min-width: 640px !important;
+  }
+  .monthly-header {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+  }
+  .month-nav {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+  .monthly-summary-cards {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+  .attendance-detail-cell {
+    font-size: 10px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .monthly-summary-cards {
+    grid-template-columns: 1fr !important;
+  }
 }

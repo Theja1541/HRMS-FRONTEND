@@ -145,3 +145,68 @@
   border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
 }
+
+/* ==========================================
+   MODALS — MOBILE RESPONSIVE (BOTTOM SHEET)
+   ========================================== */
+@media (max-width: 768px) {
+  .modal-overlay {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+
+  .modal-card,
+  .modal-content,
+  .modal-box,
+  .modal-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 20px 20px 0 0 !important;
+    max-height: 92vh !important;
+    overflow-y: auto !important;
+    padding: 20px !important;
+    margin: 0 !important;
+  }
+
+  .modal-header {
+    margin-bottom: 16px !important;
+  }
+
+  .modal-header h3,
+  .modal-title {
+    font-size: 17px !important;
+  }
+
+  .modal-body {
+    padding: 0 !important;
+  }
+
+  .modal-form-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .modal-actions,
+  .modal-footer {
+    flex-direction: column !important;
+    gap: 10px !important;
+    margin-top: 16px !important;
+  }
+
+  .modal-actions button,
+  .modal-footer button,
+  .modal-actions .btn,
+  .modal-footer .btn {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-card,
+  .modal-content,
+  .modal-box {
+    padding: 16px !important;
+    max-height: 88vh !important;
+  }
+}

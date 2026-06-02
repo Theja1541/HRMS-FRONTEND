@@ -66,6 +66,71 @@ export default function Sidebar({ variant = "admin", isOpen, onClose, lockoutAct
   const navigate = useNavigate();
   const isSuperAdmin = variant === "superadmin";
 
+  const [companyFeatures, setCompanyFeatures] = useState({});
+
+  const hasPermission = (moduleName, pageName = null) => {
+    if (!user) return false;
+
+    // Enforce Company-level granular permissions first
+    if (companyFeatures && Object.keys(companyFeatures).length > 0) {
+      const compKey = moduleName === "leaves" ? "leave" : moduleName;
+      const companyModObj = companyFeatures[compKey] || companyFeatures[moduleName];
+      if (companyModObj !== undefined) {
+        if (typeof companyModObj === "boolean") {
+          if (!companyModObj) return false;
+        } else if (typeof companyModObj === "object" && companyModObj !== null) {
+          // Check if module itself is disabled
+          if (companyModObj.enabled === false) return false;
+
+          // If a pageName is specified, check both page-level visibility and action-level rights
+          if (pageName) {
+            // Check page-level permission
+            if (companyModObj.pages && companyModObj.pages[pageName] === false) {
+              return false;
+            }
+
+            // For menu visibility, we only require "view" action permission!
+            const actionKey = "view";
+
+            // Check action-level permission (granular first, then module fallback)
+            let hasPageActionPerm = true;
+            if (companyModObj.page_actions && companyModObj.page_actions[pageName]) {
+              const pageActions = companyModObj.page_actions[pageName];
+              if (pageActions[actionKey] !== undefined) {
+                hasPageActionPerm = pageActions[actionKey] === true;
+              } else if (companyModObj.actions && companyModObj.actions[actionKey] !== undefined) {
+                hasPageActionPerm = companyModObj.actions[actionKey] === true;
+              }
+            } else if (companyModObj.actions && companyModObj.actions[actionKey] !== undefined) {
+              hasPageActionPerm = companyModObj.actions[actionKey] === true;
+            }
+
+            if (!hasPageActionPerm) {
+              return false;
+            }
+          }
+        }
+      }
+    }
+
+    if (user.role !== "HR") return true;
+    if (!user.hr_permissions) return false;
+    
+    const hrModKey = moduleName === "leave" ? "leaves" : (moduleName === "leaves" ? "leaves" : moduleName);
+    const modObj = user.hr_permissions[hrModKey] || user.hr_permissions[moduleName];
+    if (!modObj) return false;
+    
+    if (!pageName) {
+      if (typeof modObj === "boolean") return modObj;
+      return Object.values(modObj).some(val => val === true);
+    }
+    
+    if (typeof modObj === "boolean") return modObj;
+
+    // For sidebar menu visibility, we check if the HR user has "view" permission
+    return modObj["view"] === true;
+  };
+
   const handleLogout = async () => {
     clearSidebarBrandingCache();
     await logout();
@@ -103,6 +168,7 @@ export default function Sidebar({ variant = "admin", isOpen, onClose, lockoutAct
       .then((res) => {
         if (!cancelled) {
           setFeatures((prev) => ({ ...prev, ...(res.data?.features || {}) }));
+          setCompanyFeatures(res.data?.company_enabled_modules || {});
         }
       })
       .catch(() => {
@@ -118,6 +184,7 @@ export default function Sidebar({ variant = "admin", isOpen, onClose, lockoutAct
             holidays: true,
             daybook: true,
           });
+          setCompanyFeatures({});
         }
       });
     return () => {
@@ -232,132 +299,219 @@ export default function Sidebar({ variant = "admin", isOpen, onClose, lockoutAct
             <NavLink to="/dashboard" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
               🏠 {!collapsed && "Dashboard"}
             </NavLink>
-            <NavLink to="/employees" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
-              👥 {!collapsed && "Employees"}
-            </NavLink>
-            <NavLink to="/company-users" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
-              🧑 {!collapsed && "Company Users"}
-            </NavLink>
-            <NavLink to="/attendance" className="sidebar-item" style={getBlockedStyle(features.attendance ? undefined : "none")} onClick={onClose}>
-              📅 {!collapsed && "Attendance"}
-            </NavLink>
-            <NavLink to="/monthly" className="sidebar-item" style={getBlockedStyle(features.attendance ? undefined : "none")} onClick={onClose}>
-              📊 {!collapsed && "Monthly"}
-            </NavLink>
-            <NavLink to="/holidays" className="sidebar-item" style={getBlockedStyle(features.holidays ? undefined : "none")} onClick={onClose}>
-              🏖️ {!collapsed && "Holidays"}
-            </NavLink>
-            <div
-              className="sidebar-item dropdown"
-              style={getBlockedStyle(features.leave ? undefined : "none")}
-              onClick={() => !lockoutActive && setOpenLeaves(!openLeaves)}
-            >
-              🍃 {!collapsed && "Leaves"}
-              {!collapsed && (
-                <span className="dropdown-arrow">{openLeaves ? "▲" : "▼"}</span>
-              )}
-            </div>
-            {features.leave && openLeaves && !collapsed && (
-              <div className="sidebar-dropdown-menu">
-                <NavLink to="/leave-dashboard" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
-                  📊 Dashboard
-                </NavLink>
-                <NavLink to="/approvals" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
-                  ✅ Approvals
-                </NavLink>
-                <NavLink to="/rejected" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
-                  ❌ Rejected
-                </NavLink>
-                <NavLink to="/leave-calendar" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
-                  📅 Calendar
-                </NavLink>
-                <NavLink to="/leave-settings" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
-                  ⚙️ Settings
-                </NavLink>
-              </div>
+            {hasPermission("employees") && (
+              <NavLink to="/employees" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
+                👥 {!collapsed && "Employees"}
+              </NavLink>
             )}
-            <div
-              className="sidebar-item dropdown"
-              style={getBlockedStyle(features.payroll ? undefined : "none")}
-              onClick={() => !lockoutActive && setOpenPayroll(!openPayroll)}
-            >
-              💰 {!collapsed && "Payroll"}
-              {!collapsed && (
-                <span className="dropdown-arrow">{openPayroll ? "▲" : "▼"}</span>
-              )}
-            </div>
-            {features.payroll && openPayroll && !collapsed && (
-              <div className="sidebar-dropdown-menu">
-                <NavLink to="/payroll" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
-                  📄 Generate Payslip
-                </NavLink>
-                <NavLink to="/payroll-summary" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
-                  📊 Payroll Summary
-                </NavLink>
-                <NavLink to="/salary-payment-summary" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
-                  💳 Payment Summary
-                </NavLink>
-                <NavLink to="/email-dashboard" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
-                  📧 Email Dashboard
-                </NavLink>
-              </div>
+            {user?.role === "ADMIN" && (
+              <NavLink to="/company-users" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
+                🧑 {!collapsed && "Company Users"}
+              </NavLink>
             )}
-            <div
-              className="sidebar-item dropdown"
-              style={getBlockedStyle(features.assets ? undefined : "none")}
-              onClick={() => !lockoutActive && setOpenAssets(!openAssets)}
-            >
-              📦 {!collapsed && "Assets"}
-              {!collapsed && (
-                <span className="dropdown-arrow">{openAssets ? "▲" : "▼"}</span>
-              )}
-            </div>
-            {features.assets && openAssets && !collapsed && (
-              <div className="sidebar-dropdown-menu">
-                <NavLink to="/assets" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
-                  📋 Manage Assets
-                </NavLink>
-                <NavLink to="/asset-returns" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
-                  🔄 Asset Returns
-                </NavLink>
-              </div>
+            {features.attendance && hasPermission("attendance", "attendance") && (
+              <NavLink to="/attendance" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
+                📅 {!collapsed && "Attendance"}
+              </NavLink>
+            )}
+            {features.attendance && hasPermission("attendance", "monthly") && (
+              <NavLink to="/monthly" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
+                📊 {!collapsed && "Monthly"}
+              </NavLink>
+            )}
+            {features.holidays && hasPermission("holidays") && (
+              <NavLink to="/holidays" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
+                🏖️ {!collapsed && "Holidays"}
+              </NavLink>
+            )}
+            {features.leave && hasPermission("leaves") && (
+              <>
+                <div
+                  className="sidebar-item dropdown"
+                  style={getBlockedStyle()}
+                  onClick={() => !lockoutActive && setOpenLeaves(!openLeaves)}
+                >
+                  🍃 {!collapsed && "Leaves"}
+                  {!collapsed && (
+                    <span className="dropdown-arrow">{openLeaves ? "▲" : "▼"}</span>
+                  )}
+                </div>
+                {openLeaves && !collapsed && (
+                  <div className="sidebar-dropdown-menu">
+                    {hasPermission("leaves", "dashboard") && (
+                      <NavLink to="/leave-dashboard" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        📊 Dashboard
+                      </NavLink>
+                    )}
+                    {hasPermission("leaves", "approvals") && (
+                      <NavLink to="/approvals" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        ✅ Approvals
+                      </NavLink>
+                    )}
+                    {hasPermission("leaves", "rejected") && (
+                      <NavLink to="/rejected" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        ❌ Rejected
+                      </NavLink>
+                    )}
+                    {hasPermission("leaves", "leave-calendar") && (
+                      <NavLink to="/leave-calendar" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        📅 Calendar
+                      </NavLink>
+                    )}
+                    {hasPermission("leaves", "leave-settings") && (
+                      <NavLink to="/leave-settings" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        ⚙️ Settings
+                      </NavLink>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+            {features.payroll && hasPermission("payroll") && (
+              <>
+                <div
+                  className="sidebar-item dropdown"
+                  style={getBlockedStyle()}
+                  onClick={() => !lockoutActive && setOpenPayroll(!openPayroll)}
+                >
+                  💰 {!collapsed && "Payroll"}
+                  {!collapsed && (
+                    <span className="dropdown-arrow">{openPayroll ? "▲" : "▼"}</span>
+                  )}
+                </div>
+                {openPayroll && !collapsed && (
+                  <div className="sidebar-dropdown-menu">
+                    {hasPermission("payroll", "payroll") && (
+                      <NavLink to="/payroll" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        📄 Generate Payslip
+                      </NavLink>
+                    )}
+                    {hasPermission("payroll", "payroll-summary") && (
+                      <NavLink to="/payroll-summary" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        📊 Payroll Summary
+                      </NavLink>
+                    )}
+                    {hasPermission("payroll", "salary-payment-summary") && (
+                      <NavLink to="/salary-payment-summary" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        💳 Payment Summary
+                      </NavLink>
+                    )}
+                    {hasPermission("payroll", "email-dashboard") && (
+                      <NavLink to="/email-dashboard" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        📧 Email Dashboard
+                      </NavLink>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+            {features.assets && hasPermission("assets") && (
+              <>
+                <div
+                  className="sidebar-item dropdown"
+                  style={getBlockedStyle()}
+                  onClick={() => !lockoutActive && setOpenAssets(!openAssets)}
+                >
+                  📦 {!collapsed && "Assets"}
+                  {!collapsed && (
+                    <span className="dropdown-arrow">{openAssets ? "▲" : "▼"}</span>
+                  )}
+                </div>
+                {openAssets && !collapsed && (
+                  <div className="sidebar-dropdown-menu">
+                    {hasPermission("assets", "dashboard") && (
+                      <NavLink to="/assets/dashboard" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        📊 Dashboard
+                      </NavLink>
+                    )}
+                    {hasPermission("assets", "categories") && (
+                      <NavLink to="/assets/categories" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        📂 Categories
+                      </NavLink>
+                    )}
+                    {hasPermission("assets", "assets") && (
+                      <NavLink to="/assets" end className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        📋 Manage Assets
+                      </NavLink>
+                    )}
+                    {hasPermission("assets", "assign") && (
+                      <NavLink to="/assets/assign" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        🤝 Assign Assets
+                      </NavLink>
+                    )}
+                    {hasPermission("assets", "returns") && (
+                      <NavLink to="/assets/returns" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        ↩️ Returns
+                      </NavLink>
+                    )}
+                    {hasPermission("assets", "maintenance") && (
+                      <NavLink to="/assets/maintenance" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        🔧 Maintenance
+                      </NavLink>
+                    )}
+                    {hasPermission("assets", "history") && (
+                      <NavLink to="/assets/history" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        🕒 History
+                      </NavLink>
+                    )}
+                  </div>
+                )}
+              </>
             )}
             
-            <div
-              className="sidebar-item dropdown"
-              style={getBlockedStyle(features.daybook ? undefined : "none")}
-              onClick={() => !lockoutActive && setOpenDaybook(!openDaybook)}
-            >
-              📘 {!collapsed && "Day Book"}
-              {!collapsed && (
-                <span className="dropdown-arrow">{openDaybook ? "▲" : "▼"}</span>
-              )}
-            </div>
-            {openDaybook && !collapsed && (
-              <div className="sidebar-dropdown-menu">
-                <NavLink to="/daybook/dashboard" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
-                  📊 Dashboard
-                </NavLink>
-                <NavLink to="/daybook/transactions" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
-                  💸 Transactions
-                </NavLink>
-                <NavLink to="/daybook/vendors" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
-                  🏢 Vendors
-                </NavLink>
-                <NavLink to="/daybook/categories" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
-                  📂 Categories
-                </NavLink>
-                <NavLink to="/daybook/reports" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
-                  📈 Reports
-                </NavLink>
-              </div>
+            {features.daybook && hasPermission("daybook") && (
+              <>
+                <div
+                  className="sidebar-item dropdown"
+                  style={getBlockedStyle()}
+                  onClick={() => !lockoutActive && setOpenDaybook(!openDaybook)}
+                >
+                  📘 {!collapsed && "Day Book"}
+                  {!collapsed && (
+                    <span className="dropdown-arrow">{openDaybook ? "▲" : "▼"}</span>
+                  )}
+                </div>
+                {openDaybook && !collapsed && (
+                  <div className="sidebar-dropdown-menu">
+                    {hasPermission("daybook", "dashboard") && (
+                      <NavLink to="/daybook/dashboard" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        📊 Dashboard
+                      </NavLink>
+                    )}
+                    {hasPermission("daybook", "transactions") && (
+                      <NavLink to="/daybook/transactions" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        💸 Transactions
+                      </NavLink>
+                    )}
+                    {hasPermission("daybook", "vendors") && (
+                      <NavLink to="/daybook/vendors" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        🏢 Vendors
+                      </NavLink>
+                    )}
+                    {hasPermission("daybook", "categories") && (
+                      <NavLink to="/daybook/categories" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        📂 Categories
+                      </NavLink>
+                    )}
+                    {hasPermission("daybook", "reports") && (
+                      <NavLink to="/daybook/reports" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        📈 Reports
+                      </NavLink>
+                    )}
+                  </div>
+                )}
+              </>
             )}
-            <NavLink to="/support" className="sidebar-item" style={{ display: features.support ? undefined : "none" }} onClick={onClose}>
-              🎫 {!collapsed && "Support"}
-            </NavLink>
-            <NavLink to="/notifications" className="sidebar-item" style={getBlockedStyle(features.notifications ? undefined : "none")} onClick={onClose}>
-              📧 {!collapsed && "Notifications"}
-            </NavLink>
+            {features.support && hasPermission("support") && (
+              <NavLink to="/support" className="sidebar-item" onClick={onClose}>
+                🎫 {!collapsed && "Support"}
+              </NavLink>
+            )}
+            {features.notifications && hasPermission("notifications") && (
+              <NavLink to="/notifications" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
+                📧 {!collapsed && "Notifications"}
+              </NavLink>
+            )}
             <NavLink to="/settings?tab=subscription-plan" className="sidebar-item" style={{ display: features.billing ? undefined : "none" }} onClick={onClose}>
               💳 {!collapsed && "Billing"}
             </NavLink>

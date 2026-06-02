@@ -501,8 +501,14 @@ import {
 } from "../../api/payroll";
 
 import "../../styles/payroll.css";
+import { useCompanyPermissions } from "../../hooks/useCompanyPermissions";
 
 export default function Payroll() {
+  const { hasPermission } = useCompanyPermissions();
+  const canCreate = hasPermission("payroll", "create", "payroll");
+  const canApprove = hasPermission("payroll", "approve", "payroll");
+  const canExport = hasPermission("payroll", "export", "payroll");
+
   const [month, setMonth] = useState(
     new Date().toISOString().slice(0, 7)
   );
@@ -761,21 +767,21 @@ export default function Payroll() {
      Full & Final
   ============================================ */
 
-  const handleGenerateFNF = async () => {
-    try {
-      const res = await generateFullFinal({
-        employee_id: selectedEmployee,
-        ...fnfData,
-      });
+  // const handleGenerateFNF = async () => {
+  //   try {
+  //     const res = await generateFullFinal({
+  //       employee_id: selectedEmployee,
+  //       ...fnfData,
+  //     });
 
-      setFnfResult(res.data);
-      toast.success("Full & Final generated successfully 💼");
-    } catch (err) {
-      toast.error(
-        err.response?.data?.error || "FNF generation failed"
-      );
-    }
-  };
+  //     setFnfResult(res.data);
+  //     toast.success("Full & Final generated successfully 💼");
+  //   } catch (err) {
+  //     toast.error(
+  //       err.response?.data?.error || "FNF generation failed"
+  //     );
+  //   }
+  // };
 
   /* ============================================
      Export Bank Salary File
@@ -822,29 +828,39 @@ export default function Payroll() {
       <div className="page-header">
 
         <div className="bulk-actions">
-          <button className="btn-bulk" onClick={handleBulkGenerate}>
-            Generate All
-          </button>
+          {canCreate && (
+            <button className="btn-bulk" onClick={handleBulkGenerate}>
+              Generate All
+            </button>
+          )}
 
-          <button className="btn-approve" onClick={handleBulkApprove}>
-            Bulk Approve
-          </button>
+          {canApprove && (
+            <button className="btn-approve" onClick={handleBulkApprove}>
+              Bulk Approve
+            </button>
+          )}
 
-          <button className="btn-zip" onClick={handleDownloadAll}>
-            Download All (ZIP)
-          </button>
+          {canExport && (
+            <button className="btn-zip" onClick={handleDownloadAll}>
+              Download All (ZIP)
+            </button>
+          )}
 
-          <button
-            className="btn-email"
-            onClick={handleBulkEmail}
-            disabled={loadingBulkEmail}
-          >
-            {loadingBulkEmail ? "Sending..." : "Send Payslips"}
-          </button>
+          {canCreate && (
+            <button
+              className="btn-email"
+              onClick={handleBulkEmail}
+              disabled={loadingBulkEmail}
+            >
+              {loadingBulkEmail ? "Sending..." : "Send Payslips"}
+            </button>
+          )}
 
-          <button className="btn-bank" onClick={handleExportBankFile}>
-            Bank Upload File
-          </button>
+          {canExport && (
+            <button className="btn-bank" onClick={handleExportBankFile}>
+              Bank Upload File
+            </button>
+          )}
         </div>
 
         <div>
@@ -961,9 +977,10 @@ export default function Payroll() {
                   <td>{formatCurrency(emp.ctc)}</td>
 
                   <td>
+                    <div className="action-buttons" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                     {emp.salary_set ? (
                       <>
-                        {!emp.payslip_generated && (
+                        {!emp.payslip_generated && canCreate && (
                           <button
                             className="btn-payslip"
                             disabled={loadingId === emp.employee_id}
@@ -989,12 +1006,14 @@ export default function Payroll() {
                                   Preview
                                 </button>
 
-                                <button
-                                  className="btn-approve"
-                                  onClick={() => handleApprove(emp.payslip_id)}
-                                >
-                                  Approve
-                                </button>
+                                {canApprove && (
+                                  <button
+                                    className="btn-approve"
+                                    onClick={() => handleApprove(emp.payslip_id)}
+                                  >
+                                    Approve
+                                  </button>
+                                )}
                               </>
                             )}
 
@@ -1008,52 +1027,72 @@ export default function Payroll() {
                                   PDF
                                 </button>
 
-                                <button
-                                  className="btn-email-single"
-                                  onClick={() =>
-                                    handleSendSingleEmail(emp.employee_id)
-                                  }
-                                >
-                                  Email
-                                </button>
+                                {canCreate && (
+                                  <button
+                                    className="btn-email-single"
+                                    onClick={() =>
+                                      handleSendSingleEmail(emp.employee_id)
+                                    }
+                                  >
+                                    Email
+                                  </button>
+                                )}
 
-                                <button
-                                  className="btn-paid"
-                                  onClick={() => handleMarkPaid(emp.payslip_id)}
-                                >
-                                  Mark Paid
-                                </button>
+                                {canApprove && (
+                                  <button
+                                    className="btn-paid"
+                                    onClick={() => handleMarkPaid(emp.payslip_id)}
+                                  >
+                                    Mark Paid
+                                  </button>
+                                )}
                               </>
                             )}
 
                             {/* PAID STATUS */}
                             {emp.payslip_status === "PAID" && (
-                              <button
-                                className="btn-payslip"
-                                onClick={() => handleDownload(emp.payslip_id)}
-                              >
-                                Download
-                              </button>
+                              <>
+                                <button
+                                  className="btn-payslip"
+                                  onClick={() => handleDownload(emp.payslip_id)}
+                                >
+                                  Download
+                                </button>
+
+                                {canCreate && (
+                                  <button
+                                    className="btn-email-single"
+                                    onClick={() =>
+                                      handleSendSingleEmail(emp.employee_id)
+                                    }
+                                  >
+                                    Email
+                                  </button>
+                                )}
+                              </>
                             )}
                           </>
                         )}
 
-                        <button
-                          className="btn-fnf"
-                          onClick={() => {
-                            setSelectedEmployee(emp.employee_id);
-                            setShowFNFModal(true);
-                            setFnfResult(null);
-                          }}
-                        >
-                          FNF
-                        </button>
+                        {/* {canCreate && (
+                          <button
+                            className="btn-fnf"
+                            onClick={() => {
+                              setSelectedEmployee(emp.employee_id);
+                              setShowFNFModal(true);
+                              setFnfResult(null);
+                            }}
+                          >
+                            FNF
+                          </button>
+                        )} */}
                       </>
                     ) : (
                       <button disabled className="btn-disabled">
                         Set Salary First
                       </button>
                     )}
+                    </div>
                   </td>
                 </tr>
               ))
@@ -1086,62 +1125,79 @@ export default function Payroll() {
       )}
 
       {/* ================= FNF MODAL ================= */}
-      {showFNFModal && (
-        <div className="modal-overlay">
-          <div className="modal-card">
-            <h3>Full & Final Settlement</h3>
+      {/* {showFNFModal && (
+        <div className="modal-overlay" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 1000 }}>
+          <div className="modal-card" style={{ background: '#fff', padding: '24px', borderRadius: '12px', width: '90%', maxWidth: '400px' }}>
+            <h3 style={{ marginBottom: '16px', marginTop: 0 }}>Full & Final Settlement</h3>
 
-            <input
-              type="date"
-              value={fnfData.last_working_date}
-              onChange={(e) =>
-                setFnfData({
-                  ...fnfData,
-                  last_working_date: e.target.value,
-                })
-              }
-            />
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: 600 }}>Last Working Date</label>
+              <input
+                type="date"
+                value={fnfData.last_working_date}
+                onChange={(e) =>
+                  setFnfData({
+                    ...fnfData,
+                    last_working_date: e.target.value,
+                  })
+                }
+                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+              />
+            </div>
 
-            <input
-              type="number"
-              placeholder="Notice Recovery"
-              value={fnfData.notice_recovery}
-              onChange={(e) =>
-                setFnfData({
-                  ...fnfData,
-                  notice_recovery: e.target.value,
-                })
-              }
-            />
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: 600 }}>Notice Recovery</label>
+              <input
+                type="number"
+                placeholder="Notice Recovery"
+                value={fnfData.notice_recovery}
+                onChange={(e) =>
+                  setFnfData({
+                    ...fnfData,
+                    notice_recovery: e.target.value,
+                  })
+                }
+                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+              />
+            </div>
 
-            <input
-              type="number"
-              placeholder="Loan Recovery"
-              value={fnfData.loan_recovery}
-              onChange={(e) =>
-                setFnfData({
-                  ...fnfData,
-                  loan_recovery: e.target.value,
-                })
-              }
-            />
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: 600 }}>Loan Recovery</label>
+              <input
+                type="number"
+                placeholder="Loan Recovery"
+                value={fnfData.loan_recovery}
+                onChange={(e) =>
+                  setFnfData({
+                    ...fnfData,
+                    loan_recovery: e.target.value,
+                  })
+                }
+                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+              />
+            </div>
 
-            <input
-              type="number"
-              placeholder="Bonus"
-              value={fnfData.bonus}
-              onChange={(e) =>
-                setFnfData({
-                  ...fnfData,
-                  bonus: e.target.value,
-                })
-              }
-            />
+            <div style={{ marginBottom: '16px' }}>
+              <label style={{ display: 'block', marginBottom: '6px', fontSize: '13px', fontWeight: 600 }}>Bonus</label>
+              <input
+                type="number"
+                placeholder="Bonus"
+                value={fnfData.bonus}
+                onChange={(e) =>
+                  setFnfData({
+                    ...fnfData,
+                    bonus: e.target.value,
+                  })
+                }
+                style={{ width: '100%', padding: '10px', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+              />
+            </div>
 
-            <div style={{ marginTop: "12px" }}>
+            <div style={{ display: "flex", gap: "12px", marginTop: "16px" }}>
               <button
                 className="btn-payslip"
                 onClick={handleGenerateFNF}
+                style={{ flex: 1, padding: '10px', display: 'flex', justifyContent: 'center' }}
               >
                 Generate
               </button>
@@ -1149,7 +1205,7 @@ export default function Payroll() {
               <button
                 className="btn-disabled"
                 onClick={() => setShowFNFModal(false)}
-                style={{ marginLeft: "10px" }}
+                style={{ flex: 1, padding: '10px', display: 'flex', justifyContent: 'center', background: '#e2e8f0', color: '#475569' }}
               >
                 Close
               </button>
@@ -1173,7 +1229,7 @@ export default function Payroll() {
             )}
           </div>
         </div>
-      )}
+      )} */}
 
     </div>
   );

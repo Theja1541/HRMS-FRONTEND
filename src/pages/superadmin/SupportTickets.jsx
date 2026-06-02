@@ -132,41 +132,50 @@ export default function SupportTickets() {
         <p className="muted-text" style={{ color: "#b91c1c", marginTop: 8 }}>{fetchError}</p>
       )}
 
-      <div className="filters-row" style={{ marginTop: 16, marginBottom: 16 }}>
-        <label style={{ marginRight: 8 }}>Company:</label>
-        <select
-          value={filters.company_id}
-          onChange={(e) => setFilters({ ...filters, company_id: e.target.value })}
-          style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e5e7eb" }}
-        >
-          <option value="">All companies</option>
-          {companies.map((c) => (
-            <option key={c.id} value={c.id}>{c.name}</option>
-          ))}
-        </select>
-        <label style={{ marginLeft: 16, marginRight: 8 }}>Status:</label>
-        <select
-          value={filters.status}
-          onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-          style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e5e7eb" }}
-        >
-          <option value="">All</option>
-          {Object.entries(STATUS_LABELS).map(([value, label]) => (
-            <option key={value} value={value}>{label}</option>
-          ))}
-        </select>
-        <label style={{ marginLeft: 16, marginRight: 8 }}>Priority:</label>
-        <select
-          value={filters.priority}
-          onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
-          style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e5e7eb" }}
-        >
-          <option value="">All</option>
-          {Object.entries(PRIORITY_LABELS).map(([value, label]) => (
-            <option key={value} value={value}>{label}</option>
-          ))}
-        </select>
-        <button type="button" className="btn primary" onClick={applyFilters} style={{ marginLeft: 16 }}>
+      <div className="filters-row" style={{ marginTop: 16, marginBottom: 16, display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 200px' }}>
+          <label style={{ margin: 0 }}>Company:</label>
+          <select
+            value={filters.company_id}
+            onChange={(e) => setFilters({ ...filters, company_id: e.target.value })}
+            style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e5e7eb", flex: 1, minWidth: 0 }}
+          >
+            <option value="">All companies</option>
+            {companies.map((c) => (
+              <option key={c.id} value={c.id}>{c.name}</option>
+            ))}
+          </select>
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 200px' }}>
+          <label style={{ margin: 0 }}>Status:</label>
+          <select
+            value={filters.status}
+            onChange={(e) => setFilters({ ...filters, status: e.target.value })}
+            style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e5e7eb", flex: 1, minWidth: 0 }}
+          >
+            <option value="">All</option>
+            {Object.entries(STATUS_LABELS).map(([value, label]) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
+          </select>
+        </div>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 200px' }}>
+          <label style={{ margin: 0 }}>Priority:</label>
+          <select
+            value={filters.priority}
+            onChange={(e) => setFilters({ ...filters, priority: e.target.value })}
+            style={{ padding: "8px 12px", borderRadius: 8, border: "1px solid #e5e7eb", flex: 1, minWidth: 0 }}
+          >
+            <option value="">All</option>
+            {Object.entries(PRIORITY_LABELS).map(([value, label]) => (
+              <option key={value} value={value}>{label}</option>
+            ))}
+          </select>
+        </div>
+        
+        <button type="button" className="btn primary" onClick={applyFilters} style={{ flex: '0 0 auto' }}>
           Apply
         </button>
       </div>
@@ -175,7 +184,8 @@ export default function SupportTickets() {
         <p>Loading...</p>
       ) : (
         <div className="card" style={{ marginTop: 16 }}>
-          <table className="table">
+          <div className="responsive-table-container">
+            <table className="table">
             <thead>
               <tr>
                 <th>Ticket</th>
@@ -248,6 +258,7 @@ export default function SupportTickets() {
               ))}
             </tbody>
           </table>
+          </div>
           {tickets.length === 0 && !fetchError && (
             <p className="muted-text" style={{ padding: 24 }}>No support tickets found.</p>
           )}

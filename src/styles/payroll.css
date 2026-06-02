@@ -1153,3 +1153,573 @@ color:#dc2626;
   transform: translateY(-2px);
   box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
 }
+
+
+/* ===================================================
+   MOBILE RESPONSIVE — 1024px (Tablet)
+=================================================== */
+
+@media (max-width: 1024px) {
+
+  /* Page Header */
+  .payroll-page .page-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+    padding: 22px 24px !important;
+  }
+
+  .payroll-page .page-header h2 {
+    font-size: 20px !important;
+  }
+
+  .payroll-page .page-header input[type="month"] {
+    width: 100% !important;
+  }
+
+  .filter-select {
+    width: 100% !important;
+  }
+
+  /* Bulk Actions */
+  .bulk-actions {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .btn-bulk,
+  .btn-approve,
+  .btn-zip,
+  .btn-email,
+  .btn-bank {
+    flex: 1 1 auto !important;
+    text-align: center !important;
+  }
+
+  /* Summary / Stats Cards */
+  .payslip-summary-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .payroll-summary {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  .compensation-dashboard {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Comparison Grid */
+  .comparison-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Payslip Modal */
+  .payslip-modal.professional {
+    width: 90vw !important;
+    padding: 22px !important;
+  }
+
+  /* Payslip Grid (Earnings / Deductions) */
+  .payslip-grid {
+    gap: 24px !important;
+  }
+
+  /* Table wrapper — ensure horizontal scroll */
+  .table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .payroll-table {
+    min-width: 950px !important;
+  }
+
+  /* Revision table */
+  .revision-card {
+    overflow-x: auto !important;
+  }
+
+  .revision-table {
+    min-width: 600px !important;
+  }
+}
+
+
+/* ===================================================
+   MOBILE RESPONSIVE — 768px (Mobile)
+=================================================== */
+
+@media (max-width: 768px) {
+
+  /* Page Header */
+  .payroll-page .page-header {
+    padding: 18px 16px !important;
+    border-radius: 16px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .payroll-page .page-header h2 {
+    font-size: 18px !important;
+  }
+
+  .payroll-page .page-header p {
+    font-size: 12px !important;
+  }
+
+  .payroll-page .page-header input[type="month"] {
+    width: 100% !important;
+    font-size: 13px !important;
+  }
+
+  .filter-select {
+    width: 100% !important;
+    font-size: 13px !important;
+  }
+
+  /* Bulk Actions — stack full-width */
+  .bulk-actions {
+    flex-direction: column !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .btn-bulk,
+  .btn-approve,
+  .btn-zip,
+  .btn-email,
+  .btn-bank {
+    width: 100% !important;
+    text-align: center !important;
+    padding: 10px 14px !important;
+    font-size: 13px !important;
+  }
+
+  /* Summary / Stats Cards — single column */
+  .payslip-summary-grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .payroll-summary {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+    margin-top: 20px !important;
+  }
+
+  .compensation-dashboard {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .payslip-summary-grid .summary-card,
+  .payroll-summary .card,
+  .comp-card {
+    padding: 16px !important;
+  }
+
+  .payroll-summary .card p {
+    font-size: 22px !important;
+  }
+
+  /* Payroll Table — horizontal scroll */
+  .table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    border-radius: 14px !important;
+  }
+
+  .payroll-table {
+    min-width: 800px !important;
+    font-size: 13px !important;
+  }
+
+  .payroll-table th,
+  .payroll-table td {
+    padding: 12px 14px !important;
+    font-size: 13px !important;
+    white-space: nowrap !important;
+  }
+
+  /* Action buttons in table cells */
+  .btn-payslip,
+  .btn-view,
+  .btn-preview,
+  .btn-paid,
+  .btn-disabled {
+    padding: 6px 10px !important;
+    font-size: 12px !important;
+    margin-right: 4px !important;
+  }
+
+  /* Modals */
+  .modal-card {
+    width: 92vw !important;
+    padding: 20px !important;
+    border-radius: 14px !important;
+  }
+
+  .modal-card h3 {
+    font-size: 16px !important;
+  }
+
+  .modal-card input {
+    font-size: 13px !important;
+  }
+
+  /* Payslip modal */
+  .payslip-modal,
+  .payslip-modal.professional {
+    width: 92vw !important;
+    max-height: 88vh !important;
+    padding: 18px !important;
+    border-radius: 14px !important;
+  }
+
+  /* Payslip Header */
+  .payslip-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+  }
+
+  .payslip-header img {
+    width: 50px !important;
+  }
+
+  .payslip-header h3 {
+    font-size: 16px !important;
+  }
+
+  /* Payslip Meta */
+  .payslip-meta {
+    flex-direction: column !important;
+    gap: 6px !important;
+    font-size: 13px !important;
+  }
+
+  /* Payslip Grid — stack earnings & deductions */
+  .payslip-grid {
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+    flex-direction: column !important;
+  }
+
+  .payslip-column {
+    font-size: 13px !important;
+  }
+
+  /* Net Pay Box */
+  .net-pay-box {
+    font-size: 18px !important;
+    padding: 14px !important;
+    margin-top: 20px !important;
+  }
+
+  /* Modal Actions */
+  .modal-actions {
+    flex-direction: column !important;
+    gap: 8px !important;
+  }
+
+  .modal-actions button,
+  .btn-print,
+  .btn-close {
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  /* Comparison Grid — 2 cols → 1 col */
+  .comparison-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+  }
+
+  .comparison-row {
+    flex-direction: column !important;
+    gap: 2px !important;
+    font-size: 13px !important;
+  }
+
+  /* Timeline */
+  .timeline-card {
+    padding: 14px !important;
+  }
+
+  .timeline-breakdown {
+    flex-direction: column !important;
+    gap: 4px !important;
+  }
+
+  /* Revision Table — scrollable */
+  .revision-card {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 14px !important;
+  }
+
+  .revision-table {
+    min-width: 500px !important;
+    font-size: 13px !important;
+  }
+
+  .revision-table th,
+  .revision-table td {
+    padding: 8px !important;
+  }
+
+  /* Trend Card */
+  .trend-card {
+    padding: 14px !important;
+  }
+
+  .trend-card h3 {
+    font-size: 15px !important;
+  }
+
+  /* Preview modal */
+  .preview-content {
+    width: 96vw !important;
+    height: 88vh !important;
+    border-radius: 10px !important;
+  }
+
+  .preview-header {
+    padding: 10px 14px !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  /* Loading */
+  .loading-text {
+    padding: 40px 20px !important;
+    font-size: 14px !important;
+  }
+
+  /* Payroll closed banner */
+  .payroll-closed-banner {
+    font-size: 13px !important;
+    padding: 8px 12px !important;
+  }
+}
+
+
+/* ===================================================
+   MOBILE RESPONSIVE — 480px (Small Mobile)
+=================================================== */
+
+@media (max-width: 480px) {
+
+  /* Page Header */
+  .payroll-page .page-header {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+    margin-bottom: 16px !important;
+  }
+
+  .payroll-page .page-header h2 {
+    font-size: 16px !important;
+  }
+
+  .payroll-page .page-header p {
+    font-size: 11px !important;
+    margin-top: 4px !important;
+  }
+
+  /* Bulk Actions */
+  .btn-bulk,
+  .btn-approve,
+  .btn-zip,
+  .btn-email,
+  .btn-bank {
+    font-size: 12px !important;
+    padding: 9px 12px !important;
+  }
+
+  /* Summary Cards */
+  .payslip-summary-grid .summary-card,
+  .payroll-summary .card {
+    padding: 14px !important;
+    border-radius: 12px !important;
+  }
+
+  .payslip-summary-grid h4,
+  .payroll-summary .card h4 {
+    font-size: 12px !important;
+  }
+
+  .payslip-summary-grid p,
+  .payroll-summary .card p {
+    font-size: 18px !important;
+  }
+
+  .comp-card {
+    padding: 12px !important;
+    border-radius: 10px !important;
+  }
+
+  .comp-card h4 {
+    font-size: 13px !important;
+  }
+
+  .comp-card p {
+    font-size: 18px !important;
+  }
+
+  /* Payroll Table */
+  .payroll-table {
+    min-width: 700px !important;
+    font-size: 12px !important;
+  }
+
+  .payroll-table th,
+  .payroll-table td {
+    padding: 10px 12px !important;
+    font-size: 12px !important;
+  }
+
+  /* Status badge */
+  .status,
+  .status-badge {
+    font-size: 11px !important;
+    padding: 4px 10px !important;
+  }
+
+  /* Buttons in rows */
+  .btn-payslip,
+  .btn-view,
+  .btn-preview,
+  .btn-paid,
+  .btn-disabled {
+    font-size: 11px !important;
+    padding: 5px 8px !important;
+    border-radius: 8px !important;
+  }
+
+  /* Modal card */
+  .modal-card {
+    width: 96vw !important;
+    padding: 16px !important;
+    border-radius: 12px !important;
+  }
+
+  .modal-card h3 {
+    font-size: 15px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .modal-card input {
+    font-size: 12px !important;
+    padding: 8px !important;
+  }
+
+  /* Payslip modal */
+  .payslip-modal,
+  .payslip-modal.professional {
+    width: 96vw !important;
+    max-height: 90vh !important;
+    padding: 14px !important;
+    border-radius: 12px !important;
+  }
+
+  .payslip-header h3 {
+    font-size: 15px !important;
+  }
+
+  .payslip-header p {
+    font-size: 12px !important;
+  }
+
+  .payslip-column {
+    font-size: 12px !important;
+  }
+
+  .payslip-column h4 {
+    font-size: 13px !important;
+  }
+
+  /* Net Pay */
+  .net-pay-box {
+    font-size: 16px !important;
+    padding: 12px !important;
+    border-radius: 10px !important;
+  }
+
+  /* Watermark — scale down on tiny screens */
+  .payslip-watermark {
+    font-size: 50px !important;
+  }
+
+  /* Comparison grid */
+  .comparison-box strong {
+    font-size: 14px !important;
+  }
+
+  .comparison-box span {
+    font-size: 12px !important;
+  }
+
+  /* Timeline */
+  .timeline-content h4 {
+    font-size: 13px !important;
+  }
+
+  .timeline-breakdown {
+    font-size: 12px !important;
+  }
+
+  /* Revision table */
+  .revision-table {
+    min-width: 420px !important;
+    font-size: 12px !important;
+  }
+
+  .revision-table th,
+  .revision-table td {
+    padding: 7px !important;
+    font-size: 12px !important;
+  }
+
+  /* Preview modal */
+  .preview-content {
+    width: 98vw !important;
+    height: 92vh !important;
+    border-radius: 8px !important;
+  }
+
+  /* Loading */
+  .loading-text {
+    padding: 30px 14px !important;
+    font-size: 13px !important;
+  }
+
+  /* Payroll closed banner */
+  .payroll-closed-banner {
+    font-size: 12px !important;
+    padding: 7px 10px !important;
+    border-radius: 4px !important;
+  }
+
+  /* LOP badge */
+  .lop-badge {
+    font-size: 11px !important;
+    padding: 3px 6px !important;
+  }
+
+  .lop-info {
+    font-size: 11px !important;
+  }
+
+  /* Trend / Timeline cards */
+  .trend-card,
+  .timeline-card {
+    padding: 12px !important;
+    border-radius: 8px !important;
+  }
+
+  .trend-card h3 {
+    font-size: 14px !important;
+    margin-bottom: 10px !important;
+  }
+}

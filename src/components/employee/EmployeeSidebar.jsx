@@ -26,8 +26,8 @@ export default function EmployeeSidebar() {
         Documents
       </NavLink>
 
-      <NavLink to="/employee/asset-returns">
-        Asset Returns
+      <NavLink to="/employee/asset-requests">
+        Assets
       </NavLink>
     </aside>
   );

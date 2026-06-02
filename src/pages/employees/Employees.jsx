@@ -12,9 +12,14 @@ import {
   getEmployeeRoles,
 } from "../../api/employees";
 import "../../styles/employees.css";
+import { useCompanyPermissions } from "../../hooks/useCompanyPermissions";
 
 export default function Employees() {
   const navigate = useNavigate();
+  const { hasPermission } = useCompanyPermissions();
+  const canCreate = hasPermission("employees", "create");
+  const canEdit = hasPermission("employees", "edit");
+  const canDelete = hasPermission("employees", "delete");
 
   const {
     employees,
@@ -23,10 +28,12 @@ export default function Employees() {
     search,
     department,
     role,
+    pageSize,
     loading,
     setSearch,
     setDepartment,
     setRole,
+    setPageSize,
     fetchEmployees,
     deactivateEmployee,
   } = useEmployees();
@@ -42,13 +49,14 @@ export default function Employees() {
   const [newDepartment, setNewDepartment] = useState("");
   const [availableDepartments, setAvailableDepartments] = useState([]);
 
-  const totalPages = Math.ceil(count / 10);
-  const pageNumbers = Array.from({ length: Math.min(totalPages, 5) }, (_, idx) => {
-    const start = Math.max(1, page - 2);
+  const totalPages = Number.isFinite(Math.ceil((count || 0) / (pageSize || 10))) ? Math.ceil((count || 0) / (pageSize || 10)) : 0;
+  const pageNumbers = Array.from({ length: Math.min(totalPages || 0, 5) }, (_, idx) => {
+    const start = Math.max(1, (page || 1) - 2);
     return start + idx <= totalPages ? start + idx : null;
   }).filter(Boolean);
 
   const getInitials = (emp) => {
+    if (!emp) return "NA";
     const fullName = (emp.full_name || "").trim();
     if (!fullName) return "NA";
     const parts = fullName.split(" ").filter(Boolean);
@@ -57,8 +65,8 @@ export default function Employees() {
   };
 
   useEffect(() => {
-    fetchEmployees(1, search, department, role);
-  }, [search, department, role]);
+    fetchEmployees(1, search, department, role, pageSize);
+  }, [search, department, role, pageSize]);
 
   useEffect(() => {
     fetchAvailableRoles();
@@ -100,7 +108,7 @@ export default function Employees() {
     try {
       await activateEmployeeById(id);
       fetchDeactivatedEmployees();
-      fetchEmployees(page, search, department, role);
+      fetchEmployees(page, search, department, role, pageSize);
 
     } catch (err) {
       console.error('Failed to activate employee', err);
@@ -178,16 +186,18 @@ export default function Employees() {
           <p className="page-subtitle">Manage your workforce</p>
         </div>
         <div className="header-actions">
-          <button
-            className="settings-btn"
-            onClick={() => {
-              setShowSettings(true);
-              fetchRoles();
-              fetchDepartments();
-            }}
-          >
-            ⚙️ Settings
-          </button>
+          {canEdit && (
+            <button
+              className="settings-btn"
+              onClick={() => {
+                setShowSettings(true);
+                fetchRoles();
+                fetchDepartments();
+              }}
+            >
+              ⚙️ Settings
+            </button>
+          )}
           <button
             className="deactivated-btn"
             onClick={() => {
@@ -197,12 +207,14 @@ export default function Employees() {
           >
             View Deactivated
           </button>
-          <button
-            className="add-employee-btn"
-            onClick={() => navigate("/employees/add")}
-          >
-            + Add Employee
-          </button>
+          {canCreate && (
+            <button
+              className="add-employee-btn"
+              onClick={() => navigate("/employees/add")}
+            >
+              + Add Employee
+            </button>
+          )}
         </div>
       </div>
 
@@ -222,7 +234,7 @@ export default function Employees() {
           onChange={(e) => setDepartment(e.target.value)}
         >
           <option value="">All Departments</option>
-          {availableDepartments.map((dept, index) => (
+          {Array.isArray(availableDepartments) && availableDepartments.map((dept, index) => (
             <option key={index} value={dept}>{dept}</option>
           ))}
         </select>
@@ -233,9 +245,20 @@ export default function Employees() {
           onChange={(e) => setRole(e.target.value)}
         >
           <option value="">All Roles</option>
-          {availableRoles.map((r, index) => (
+          {Array.isArray(availableRoles) && availableRoles.map((r, index) => (
             <option key={index} value={r}>{r}</option>
           ))}
+        </select>
+        
+        <select
+          className="filter-select"
+          value={pageSize}
+          onChange={(e) => setPageSize(Number(e.target.value))}
+        >
+          <option value={10}>10 entries</option>
+          <option value={20}>20 entries</option>
+          <option value={50}>50 entries</option>
+          <option value={100}>100 entries</option>
         </select>
       </div>
 
@@ -259,58 +282,65 @@ export default function Employees() {
             </thead>
 
             <tbody>
-              {employees.map((emp) => (
-                <tr key={emp.id}>
-                  <td><strong>{emp.employee_id}</strong></td>
-                  <td>
-                    <div className="employee-cell">
-                      {emp.profile_photo ? (
-                        <img src={emp.profile_photo} alt={emp.full_name} className="employee-avatar-img" />
-                      ) : (
-                        <span className="employee-avatar">{getInitials(emp)}</span>
-                      )}
-                      <div className="employee-meta">
-                        <strong>{emp.full_name}</strong>
-                        <span className="employee-meta-sub">{emp.department || "N/A"}</span>
+              {employees.map((emp) => {
+                if (!emp) return null;
+                return (
+                  <tr key={emp.id}>
+                    <td><strong>{emp.employee_id}</strong></td>
+                    <td>
+                      <div className="employee-cell">
+                        {emp.profile_photo ? (
+                          <img src={emp.profile_photo} alt={emp.full_name} className="employee-avatar-img" />
+                        ) : (
+                          <span className="employee-avatar">{getInitials(emp)}</span>
+                        )}
+                        <div className="employee-meta">
+                          <strong>{emp.full_name}</strong>
+                          <span className="employee-meta-sub">{emp.department || "N/A"}</span>
+                        </div>
                       </div>
-                    </div>
-                  </td>
-                  <td>{emp.email}</td>
-                  <td>{emp.mobile}</td>
-                  <td className="actions-cell">
-                    <div className="action-buttons">
-                      <button
-                        type="button"
-                        className="action-btn action-btn-view"
-                        onClick={() => navigate(`/employees/${emp.id}`)}
-                        title="View profile"
-                      >
-                        View
-                      </button>
-                      <button
-                        type="button"
-                        className="action-btn action-btn-edit"
-                        onClick={() => navigate(`/employees/edit/${emp.id}`)}
-                        title="Edit employee"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        type="button"
-                        className="action-btn action-btn-deactivate"
-                        onClick={() => {
-                          if (window.confirm("Deactivate this employee?")) {
-                            deactivateEmployee(emp.id);
-                          }
-                        }}
-                        title="Deactivate employee"
-                      >
-                        Deactivate
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td>{emp.email}</td>
+                    <td>{emp.mobile}</td>
+                    <td className="actions-cell">
+                      <div className="action-buttons">
+                        <button
+                          type="button"
+                          className="action-btn action-btn-view"
+                          onClick={() => navigate(`/employees/${emp.id}`)}
+                          title="View profile"
+                        >
+                          View
+                        </button>
+                        {canEdit && (
+                          <button
+                            type="button"
+                            className="action-btn action-btn-edit"
+                            onClick={() => navigate(`/employees/edit/${emp.id}`)}
+                            title="Edit employee"
+                          >
+                            Edit
+                          </button>
+                        )}
+                        {canDelete && (
+                          <button
+                            type="button"
+                            className="action-btn action-btn-deactivate"
+                            onClick={() => {
+                              if (window.confirm("Deactivate this employee?")) {
+                                deactivateEmployee(emp.id);
+                              }
+                            }}
+                            title="Deactivate employee"
+                          >
+                            Deactivate
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )}
@@ -322,16 +352,16 @@ export default function Employees() {
           <button
             className="page-btn"
             disabled={page === 1}
-            onClick={() => fetchEmployees(page - 1, search, department, role)}
+            onClick={() => fetchEmployees(page - 1, search, department, role, pageSize)}
           >
             Previous
           </button>
           <div className="page-number-group">
-            {pageNumbers.map((pg) => (
+            {Array.isArray(pageNumbers) && pageNumbers.map((pg) => (
               <button
                 key={pg}
                 className={`page-btn ${pg === page ? "active" : ""}`}
-                onClick={() => fetchEmployees(pg, search, department, role)}
+                onClick={() => fetchEmployees(pg, search, department, role, pageSize)}
               >
                 {pg}
               </button>
@@ -341,7 +371,7 @@ export default function Employees() {
           <button
             className="page-btn"
             disabled={page >= totalPages}
-            onClick={() => fetchEmployees(page + 1, search, department, role)}
+            onClick={() => fetchEmployees(page + 1, search, department, role, pageSize)}
           >
             Next
           </button>
@@ -379,24 +409,26 @@ export default function Employees() {
                     </tr>
                   </thead>
                   <tbody>
-                    {deactivatedEmployees.map((emp) => (
+                    {Array.isArray(deactivatedEmployees) && deactivatedEmployees.map((emp) => (
                       <tr key={emp.id}>
                         <td>{emp.employee_id}</td>
                         <td>{emp.full_name}</td>
                         <td>{emp.email}</td>
                         <td>{emp.department}</td>
                         <td>
-                          <button
-                            className="btn"
-                            onClick={() => {
-                              if (window.confirm('Activate this employee?')) {
-                                activateEmployee(emp.id);
-                              }
-                            }}
-                            style={{ background: '#16a34a', color: 'white', padding: '6px 16px', fontSize: '13px' }}
-                          >
-                            Activate
-                          </button>
+                          {canEdit && (
+                            <button
+                              className="btn"
+                              onClick={() => {
+                                if (window.confirm('Activate this employee?')) {
+                                  activateEmployee(emp.id);
+                                }
+                              }}
+                              style={{ background: '#16a34a', color: 'white', padding: '6px 16px', fontSize: '13px' }}
+                            >
+                              Activate
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -463,7 +495,7 @@ export default function Employees() {
                   <p style={{ color: '#64748b', textAlign: 'center' }}>No custom roles added</p>
                 ) : (
                   <ul style={{ listStyle: 'none', padding: 0 }}>
-                    {roles.map((role, index) => (
+                    {Array.isArray(roles) && roles.map((role, index) => (
                       <li key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', background: 'white', marginBottom: '8px', borderRadius: '6px' }}>
                         <span>{role}</span>
                         <button
@@ -509,7 +541,7 @@ export default function Employees() {
                   <p style={{ color: '#64748b', textAlign: 'center' }}>No custom departments added</p>
                 ) : (
                   <ul style={{ listStyle: 'none', padding: 0 }}>
-                    {departments.map((dept, index) => (
+                    {Array.isArray(departments) && departments.map((dept, index) => (
                       <li key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', background: 'white', marginBottom: '8px', borderRadius: '6px' }}>
                         <span>{dept}</span>
                         <button

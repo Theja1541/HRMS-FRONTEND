@@ -7,6 +7,7 @@ import App from "./App.jsx";
 import { Toaster } from "react-hot-toast";
 
 import "./index.css";
+import "./styles/mobile.css";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

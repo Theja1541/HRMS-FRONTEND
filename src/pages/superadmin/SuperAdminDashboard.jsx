@@ -131,70 +131,76 @@ export default function SuperAdminDashboard() {
       {companiesSummary.length > 0 && (
         <div className="dashboard-card" style={{ marginBottom: 24 }}>
           <h3 style={{ marginBottom: 12 }}>Companies (Tenants)</h3>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Code</th>
-                <th>Users</th>
-                <th>Employees</th>
-              </tr>
-            </thead>
-            <tbody>
-              {companiesSummary.map((c) => (
-                <tr key={c.id}>
-                  <td>{c.name}</td>
-                  <td>{c.company_code}</td>
-                  <td>{c.user_count}</td>
-                  <td>{c.employee_count}</td>
+          <div className="responsive-table-container">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Code</th>
+                  <th>Users</th>
+                  <th>Employees</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {companiesSummary.map((c) => (
+                  <tr key={c.id}>
+                    <td>{c.name}</td>
+                    <td>{c.company_code}</td>
+                    <td>{c.user_count}</td>
+                    <td>{c.employee_count}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
           <p><Link to="/super-admin/companies">Manage companies →</Link></p>
         </div>
       )}
 
       <div className="dashboard-card" style={{ marginBottom: 24 }}>
         <h3 style={{ marginBottom: 12 }}>Monthly Growth Trend</h3>
-      <ResponsiveContainer width="100%" height={350}>
-        <LineChart data={monthlyData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="month" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
+      <div className="responsive-chart-container" style={{ height: 350 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={monthlyData}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="month" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
 
-          <Line type="monotone" dataKey="users" stroke="#2563eb" />
-          <Line type="monotone" dataKey="employees" stroke="#16a34a" />
-          <Line type="monotone" dataKey="leaves" stroke="#f97316" />
-          <Line type="monotone" dataKey="payslips" stroke="#7c3aed" />
-        </LineChart>
-      </ResponsiveContainer>
+            <Line type="monotone" dataKey="users" stroke="#2563eb" />
+            <Line type="monotone" dataKey="employees" stroke="#16a34a" />
+            <Line type="monotone" dataKey="leaves" stroke="#f97316" />
+            <Line type="monotone" dataKey="payslips" stroke="#7c3aed" />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
       </div>
 
       <div className="dashboard-card">
         <h3 style={{ marginBottom: 12 }}>Role Distribution</h3>
-        <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
-            <Pie
-              data={data.role_distribution}
-              dataKey="count"
-              nameKey="role"
-              outerRadius={100}
-              label
-            >
-              {data.role_distribution.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
-                />
-              ))}
-            </Pie>
-            <Tooltip />
-            <Legend />
-          </PieChart>
-        </ResponsiveContainer>
+        <div className="responsive-chart-container" style={{ height: 300 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={data.role_distribution}
+                dataKey="count"
+                nameKey="role"
+                outerRadius={100}
+                label
+              >
+                {data.role_distribution.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );

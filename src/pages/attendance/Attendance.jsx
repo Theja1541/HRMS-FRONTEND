@@ -5,10 +5,13 @@ import { usePayroll } from "../../context/PayrollContext";
 import PayrollLockBanner from "../../components/common/PayrollLockBanner";
 import axios from "../../api/axios";
 import "../../styles/attendance.css";
+import { useCompanyPermissions } from "../../hooks/useCompanyPermissions";
 
 export default function Attendance() {
   const { payrollStatus } = usePayroll();
   const isLocked = payrollStatus === "CLOSED";
+  const { hasPermission } = useCompanyPermissions();
+  const canEdit = hasPermission("attendance", "edit", "attendance");
 
   const {
     employees = [],
@@ -25,6 +28,9 @@ export default function Attendance() {
   const [loadingBulk, setLoadingBulk] = useState(false);
   const [dayStatus, setDayStatus] = useState(null);
   const [fetchingDayStatus, setFetchingDayStatus] = useState(true);
+  const [openDropdownId, setOpenDropdownId] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Filters
   const [searchTerm, setSearchTerm] = useState("");
@@ -33,8 +39,22 @@ export default function Attendance() {
   const [designationFilter, setDesignationFilter] = useState("ALL");
 
   useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter, departmentFilter, designationFilter, itemsPerPage]);
+
+  useEffect(() => {
     refreshEmployees();
     fetchDayStatus();
+  }, []);
+
+  useEffect(() => {
+    const handleOutsideClick = () => {
+      setOpenDropdownId(null);
+    };
+    document.addEventListener("click", handleOutsideClick);
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+    };
   }, []);
 
   const fetchDayStatus = async () => {
@@ -68,8 +88,8 @@ export default function Attendance() {
 
     const filtered = employees.filter((emp) => {
       // Collect unique departments and designations for dropdowns
-      if (emp.department_name) deps.add(emp.department_name);
-      if (emp.designation_name) desigs.add(emp.designation_name);
+      if (emp.department) deps.add(emp.department);
+      if (emp.designation) desigs.add(emp.designation);
 
       const record = getRecord(emp.id);
       const status = record?.status || "UNMARKED";
@@ -85,8 +105,8 @@ export default function Attendance() {
       const matchSearch = emp.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           emp.employee_id?.toLowerCase().includes(searchTerm.toLowerCase());
       const matchStatus = statusFilter === "ALL" || status === statusFilter;
-      const matchDep = departmentFilter === "ALL" || emp.department_name === departmentFilter;
-      const matchDesig = designationFilter === "ALL" || emp.designation_name === designationFilter;
+      const matchDep = departmentFilter === "ALL" || emp.department === departmentFilter;
+      const matchDesig = designationFilter === "ALL" || emp.designation === designationFilter;
 
       return matchSearch && matchStatus && matchDep && matchDesig;
     });
@@ -98,6 +118,15 @@ export default function Attendance() {
       summary: sum 
     };
   }, [employees, attendance, searchTerm, statusFilter, departmentFilter, designationFilter, today]);
+
+  /* ===============================
+     PAGINATION CALCULATION
+  =============================== */
+  const totalItems = filteredEmployees.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage) || 1;
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentEmployees = filteredEmployees.slice(indexOfFirstItem, indexOfLastItem);
 
   /* ===============================
      BULK ATTENDANCE
@@ -121,7 +150,7 @@ export default function Attendance() {
   };
 
   const isHolidayActive = dayStatus?.is_holiday;
-  const disableControls = isLocked || isHolidayActive;
+  const disableControls = isLocked || isHolidayActive || !canEdit;
 
   return (
     <div className="attendance-page">
@@ -140,6 +169,15 @@ export default function Attendance() {
         </div>
       )}
 
+      {/* ================= HEADER ================= */}
+      <div className="page-header">
+        <div>
+          <h2 className="page-title">Daily Attendance</h2>
+          <p className="page-subtitle">HR marks employee attendance</p>
+        </div>
+        <span className="date-badge">{today}</span>
+      </div>
+
       {/* ================= SUMMARY CARDS ================= */}
       <div className="attendance-summary-cards">
         <div className="summary-card present">
@@ -150,27 +188,10 @@ export default function Attendance() {
           <h3>{summary.ABSENT}</h3>
           <span>Absent</span>
         </div>
-        <div className="summary-card holiday">
-          <h3>{summary.HOLIDAY}</h3>
-          <span>Holiday</span>
-        </div>
-        <div className="summary-card weekoff">
-          <h3>{summary.WEEK_OFF}</h3>
-          <span>Week Off</span>
-        </div>
         <div className="summary-card leave">
           <h3>{summary.LEAVE}</h3>
           <span>Leave</span>
         </div>
-      </div>
-
-      {/* ================= HEADER ================= */}
-      <div className="page-header">
-        <div>
-          <h2 className="page-title">Daily Attendance</h2>
-          <p className="page-subtitle">HR marks employee attendance</p>
-        </div>
-        <span className="date-badge">{today}</span>
       </div>
 
       {/* ================= FILTERS & BULK ACTION ================= */}
@@ -193,11 +214,9 @@ export default function Attendance() {
           <option value="ALL">All Statuses</option>
           <option value="PRESENT">Present</option>
           <option value="ABSENT">Absent</option>
-          <option value="HOLIDAY">Holiday</option>
-          <option value="WEEK_OFF">Week Off</option>
+          <option value="HALF_DAY">Half Day</option>
           <option value="PAID_LEAVE">Paid Leave</option>
           <option value="UNPAID_LEAVE">Unpaid Leave</option>
-          <option value="UNMARKED">Unmarked</option>
         </select>
       </div>
 
@@ -237,15 +256,16 @@ export default function Attendance() {
           </thead>
 
           <tbody>
-            {filteredEmployees.map((emp) => {
+            {currentEmployees.map((emp, idx) => {
               const record = getRecord(emp.id);
               const status = record?.status || "";
+              const isLastRow = idx === currentEmployees.length - 1;
 
               return (
                 <tr key={emp.id}>
                   <td className="employee-name">{emp.full_name || "-"}</td>
                   <td>{emp.employee_id || "-"}</td>
-                  <td>{emp.department_name || "-"}</td>
+                  <td>{emp.department || "-"}</td>
                   <td>
                     {status ? (
                       <span className={`status-badge ${status.toLowerCase().replace(/_/g, '-')}`}>
@@ -263,7 +283,8 @@ export default function Attendance() {
                         <>
                           <button
                             className={`att-btn present ${status === "PRESENT" ? "active" : ""}`}
-                            onClick={async () => {
+                            onClick={async (e) => {
+                              e.stopPropagation();
                               try {
                                 await markAttendance(today, emp.id, "PRESENT");
                                 toast.success("Marked Present");
@@ -271,27 +292,14 @@ export default function Attendance() {
                                 toast.error("Failed to mark attendance");
                               }
                             }}
-                            disabled={isLocked}
+                            disabled={isLocked || !canEdit}
                           >
                             Present
                           </button>
                           <button
-                            className={`att-btn leave ${status === "HALF_DAY" ? "active" : ""}`}
-                            onClick={async () => {
-                              try {
-                                await markAttendance(today, emp.id, "HALF_DAY");
-                                toast.success("Marked Half Day");
-                              } catch {
-                                toast.error("Failed to mark attendance");
-                              }
-                            }}
-                            disabled={isLocked}
-                          >
-                            Half Day
-                          </button>
-                          <button
                             className={`att-btn absent ${status === "ABSENT" ? "active" : ""}`}
-                            onClick={async () => {
+                            onClick={async (e) => {
+                              e.stopPropagation();
                               try {
                                 await markAttendance(today, emp.id, "ABSENT");
                                 toast.success("Marked Absent");
@@ -299,15 +307,78 @@ export default function Attendance() {
                                 toast.error(err.response?.data?.error || "Failed to mark attendance");
                               }
                             }}
-                            disabled={isLocked}
+                            disabled={isLocked || !canEdit}
                           >
                             Absent
                           </button>
+
+                          <div className="action-dropdown-container">
+                            <button
+                              className={`att-btn more-actions-btn ${["HALF_DAY", "PAID_LEAVE", "UNPAID_LEAVE"].includes(status) ? "active" : ""}`}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setOpenDropdownId(openDropdownId === emp.id ? null : emp.id);
+                              }}
+                              disabled={isLocked || !canEdit}
+                            >
+                              •••
+                            </button>
+                            {openDropdownId === emp.id && (
+                              <div className={`action-dropdown-menu ${isLastRow ? "open-upwards" : ""}`}>
+                                <button
+                                  className={`dropdown-item ${status === "HALF_DAY" ? "active" : ""}`}
+                                  onClick={async (e) => {
+                                    e.stopPropagation();
+                                    setOpenDropdownId(null);
+                                    try {
+                                      await markAttendance(today, emp.id, "HALF_DAY");
+                                      toast.success("Marked Half Day");
+                                    } catch {
+                                      toast.error("Failed to mark attendance");
+                                    }
+                                  }}
+                                >
+                                  Half Day
+                                </button>
+                                <button
+                                  className={`dropdown-item ${status === "PAID_LEAVE" ? "active" : ""}`}
+                                  onClick={async (e) => {
+                                    e.stopPropagation();
+                                    setOpenDropdownId(null);
+                                    try {
+                                      await markAttendance(today, emp.id, "PAID_LEAVE");
+                                      toast.success("Marked Paid Leave");
+                                    } catch {
+                                      toast.error("Failed to mark attendance");
+                                    }
+                                  }}
+                                >
+                                  Paid Leave
+                                </button>
+                                <button
+                                  className={`dropdown-item ${status === "UNPAID_LEAVE" ? "active" : ""}`}
+                                  onClick={async (e) => {
+                                    e.stopPropagation();
+                                    setOpenDropdownId(null);
+                                    try {
+                                      await markAttendance(today, emp.id, "UNPAID_LEAVE");
+                                      toast.success("Marked Unpaid Leave");
+                                    } catch {
+                                      toast.error("Failed to mark attendance");
+                                    }
+                                  }}
+                                >
+                                  Unpaid Leave
+                                </button>
+                              </div>
+                            )}
+                          </div>
                         </>
                       ) : (
                         <button
                           className={`att-btn present-holiday ${status === "PRESENT_ON_HOLIDAY" ? "active" : ""}`}
-                          onClick={async () => {
+                          onClick={async (e) => {
+                            e.stopPropagation();
                             try {
                               await markAttendance(today, emp.id, "PRESENT_ON_HOLIDAY");
                               toast.success("Marked Present on Holiday");
@@ -315,7 +386,7 @@ export default function Attendance() {
                               toast.error("Failed to mark attendance");
                             }
                           }}
-                          disabled={isLocked}
+                          disabled={isLocked || !canEdit}
                         >
                           Present (Holiday Override)
                         </button>
@@ -336,6 +407,55 @@ export default function Attendance() {
           </tbody>
         </table>
       </div>
+
+      {/* ================= PAGINATION ================= */}
+      {filteredEmployees.length > 0 && (
+        <div className="attendance-pagination-container">
+          <div className="pagination-left">
+            <span>Show</span>
+            <select
+              value={itemsPerPage}
+              onChange={(e) => setItemsPerPage(Number(e.target.value))}
+              className="items-per-page-select"
+            >
+              <option value={5}>5</option>
+              <option value={10}>10</option>
+              <option value={20}>20</option>
+              <option value={50}>50</option>
+            </select>
+            <span>entries per page</span>
+          </div>
+
+          <div className="pagination-right">
+            <button
+              className="page-btn"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+            >
+              Previous
+            </button>
+            <div className="page-number-group">
+              {Array.from({ length: totalPages }, (_, idx) => idx + 1).map((pg) => (
+                <button
+                  key={pg}
+                  className={`page-btn ${pg === currentPage ? "active" : ""}`}
+                  onClick={() => setCurrentPage(pg)}
+                >
+                  {pg}
+                </button>
+              ))}
+            </div>
+            <span className="page-summary">Page {currentPage} of {totalPages}</span>
+            <button
+              className="page-btn"
+              disabled={currentPage >= totalPages}
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

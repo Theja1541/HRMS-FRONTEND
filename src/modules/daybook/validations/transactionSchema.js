@@ -6,8 +6,8 @@ export const transactionSchema = yup.object().shape({
   category: yup.number().required("Category is required"),
   payment_mode: yup.string().required("Payment mode is required"),
   
-  debit_amount: yup.number().transform((value) => (isNaN(value) ? 0 : value)).min(0),
-  credit_amount: yup.number().transform((value) => (isNaN(value) ? 0 : value)).min(0),
+  transaction_type: yup.string().oneOf(['DEBIT', 'CREDIT']).required("Transaction type is required"),
+  amount: yup.number().transform((value) => (isNaN(value) ? 0 : value)).min(0.01, "Amount must be greater than 0").required("Amount is required"),
 
   from_vendor: yup.number().nullable(),
   to_vendor: yup.number().nullable(),
@@ -45,27 +45,4 @@ export const transactionSchema = yup.object().shape({
     then: () => yup.string().required("Cheque Number is required"),
     otherwise: () => yup.string().nullable(),
   }),
-}).test(
-  'debit-or-credit',
-  'Either debit or credit amount must be provided, but not both',
-  function (value) {
-    const debit = parseFloat(value.debit_amount) || 0;
-    const credit = parseFloat(value.credit_amount) || 0;
-    
-    if (debit === 0 && credit === 0) {
-      return this.createError({
-        path: 'debit_amount',
-        message: 'Either debit or credit amount must be provided',
-      });
-    }
-    
-    if (debit > 0 && credit > 0) {
-      return this.createError({
-        path: 'credit_amount',
-        message: 'Cannot have both debit and credit amounts',
-      });
-    }
-    
-    return true;
-  }
-);
+});

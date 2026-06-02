@@ -53,7 +53,7 @@ function SettingRow({ setting, value, onChange, saving }) {
   const isInt  = setting.value_type === "integer";
 
   return (
-    <div style={{
+    <div className="ss-row" style={{
       display: "flex", justifyContent: "space-between", alignItems: "flex-start",
       padding: "18px 0", borderBottom: "1px solid #f1f5f9", gap: 20,
     }}>
@@ -74,7 +74,7 @@ function SettingRow({ setting, value, onChange, saving }) {
       </div>
 
       {/* Control */}
-      <div style={{ flexShrink: 0 }}>
+      <div className="ss-input-wrap" style={{ flexShrink: 0 }}>
         {isBool ? (
           <Toggle
             checked={value === "true"}
@@ -88,6 +88,7 @@ function SettingRow({ setting, value, onChange, saving }) {
             onChange={(e) => onChange(setting.key, e.target.value)}
             disabled={saving}
             placeholder={setting.is_sensitive && !value ? "••••••  (saved, click to change)" : ""}
+            className="ss-input"
             style={{
               width: 280, padding: "9px 12px",
               border: "1.5px solid #cbd5e1", borderRadius: 8,
@@ -232,8 +233,18 @@ export default function SystemSettings() {
 
   return (
     <div>
+      <style>{`
+        @media (max-width: 767px) {
+          .ss-hero { flex-direction: column !important; align-items: flex-start !important; gap: 16px; }
+          .ss-layout { flex-direction: column !important; }
+          .ss-sidebar { width: 100% !important; position: static !important; }
+          .ss-row { flex-direction: column !important; gap: 8px !important; }
+          .ss-input-wrap { width: 100%; }
+          .ss-input { width: 100% !important; max-width: 100% !important; }
+        }
+      `}</style>
       {/* ── Hero ── */}
-      <div style={{
+      <div className="ss-hero" style={{
         background: "linear-gradient(135deg, #020617, #2563eb)",
         borderRadius: 18, padding: "26px 32px", marginBottom: 28, color: "white",
         display: "flex", justifyContent: "space-between", alignItems: "center",
@@ -286,10 +297,10 @@ export default function SystemSettings() {
           <p style={{ margin: 0, fontSize: 15 }}>Loading settings…</p>
         </div>
       ) : (
-        <div style={{ display: "flex", gap: 20, alignItems: "flex-start" }}>
+        <div className="ss-layout" style={{ display: "flex", gap: 20, alignItems: "flex-start" }}>
 
           {/* ── Sidebar ── */}
-          <div style={{ width: 220, flexShrink: 0, position: "sticky", top: 20 }}>
+          <div className="ss-sidebar" style={{ width: 220, flexShrink: 0, position: "sticky", top: 20 }}>
             <div style={{ ...CARD, padding: 8 }}>
               {TABS.map((tab) => {
                 const m      = CATEGORY_META[tab];

@@ -969,8 +969,561 @@ padding:4px 10px;
   .header-controls {
     flex-wrap: wrap;
   }
-  
+
   .view-switcher {
     width: 100%;
   }
 }
+
+/* =================================================
+   COMPREHENSIVE MOBILE RESPONSIVE — LEAVES MODULE
+   Breakpoints: 1024px | 768px | 480px
+   ================================================= */
+
+/* ───────────── 1024 px  (Tablet) ───────────── */
+@media (max-width: 1024px) {
+
+  /* Header */
+  .leaves-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 14px !important;
+    padding: 20px 22px !important;
+  }
+
+  .export-actions {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .export-actions button,
+  .export-actions a {
+    flex: 1 1 auto !important;
+    min-width: 120px !important;
+  }
+
+  /* Summary / stat grids */
+  .leaves-summary-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 16px !important;
+  }
+
+  .dashboard-cards {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 16px !important;
+  }
+
+  /* Tabs */
+  .leave-tabs {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+
+  /* Calendar header */
+  .leave-calendar-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 14px !important;
+    padding: 16px !important;
+  }
+
+  /* Calendar filters */
+  .calendar-filters {
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+  }
+
+  .filter-box {
+    flex: 1 1 calc(50% - 12px) !important;
+    min-width: 140px !important;
+  }
+
+  .filter-item {
+    flex: 1 1 calc(50% - 12px) !important;
+    min-width: 140px !important;
+  }
+
+  /* Header controls */
+  .header-controls {
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+  }
+
+  .date-picker-box {
+    flex: 1 1 auto !important;
+    min-width: 140px !important;
+  }
+
+  /* Department legend */
+  .department-legend,
+  .leave-legend,
+  .calendar-legend {
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+  }
+
+  /* Day panel */
+  .leave-day-panel {
+    width: 300px !important;
+  }
+}
+
+/* ───────────── 768 px  (Mobile) ───────────── */
+@media (max-width: 768px) {
+
+  /* Header */
+  .leaves-header {
+    padding: 16px !important;
+    border-radius: 12px !important;
+    margin-bottom: 18px !important;
+    gap: 12px !important;
+  }
+
+  .leaves-header h2 {
+    font-size: 18px !important;
+  }
+
+  .leaves-header p {
+    font-size: 13px !important;
+  }
+
+  /* Export buttons — full width stack */
+  .export-actions {
+    flex-direction: column !important;
+    width: 100% !important;
+  }
+
+  .export-actions button,
+  .export-actions a {
+    width: 100% !important;
+    text-align: center !important;
+  }
+
+  /* Summary & stat cards — single column */
+  .leaves-summary-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .dashboard-cards {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .leave-card,
+  .stat-card {
+    padding: 16px !important;
+  }
+
+  .leave-card h3 {
+    font-size: 22px !important;
+  }
+
+  .stat-card p {
+    font-size: 22px !important;
+  }
+
+  /* Tabs — horizontal scroll */
+  .leave-tabs {
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    gap: 0 !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    padding-bottom: 2px !important;
+  }
+
+  .leave-tabs::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .tab-btn {
+    padding: 10px 16px !important;
+    font-size: 13px !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Table — horizontal scroll */
+  .leave-table-card {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .leave-table,
+  .table-card table,
+  table {
+    min-width: 600px !important;
+  }
+
+  .leave-table th,
+  .leave-table td {
+    padding: 12px 14px !important;
+    font-size: 13px !important;
+  }
+
+  /* Filter dropdowns — full width, stacked */
+  .calendar-filters {
+    flex-direction: column !important;
+    gap: 10px !important;
+    padding: 12px !important;
+  }
+
+  .filter-box,
+  .filter-item {
+    flex: 1 1 100% !important;
+    width: 100% !important;
+  }
+
+  .filter-box select,
+  .filter-item select,
+  .calendar-filters select {
+    width: 100% !important;
+    font-size: 14px !important;
+  }
+
+  /* Calendar header */
+  .leave-calendar-header {
+    padding: 14px !important;
+    border-radius: 12px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .leave-calendar-header h2 {
+    font-size: 18px !important;
+  }
+
+  .calendar-title h2 {
+    font-size: 18px !important;
+  }
+
+  /* View switcher — full width, wrap */
+  .view-switcher {
+    width: 100% !important;
+    flex-wrap: wrap !important;
+    justify-content: stretch !important;
+  }
+
+  .view-switcher button {
+    flex: 1 !important;
+    padding: 8px 10px !important;
+    font-size: 13px !important;
+    text-align: center !important;
+  }
+
+  /* Header controls */
+  .header-controls {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    width: 100% !important;
+  }
+
+  .date-picker-box {
+    width: 100% !important;
+  }
+
+  .date-input {
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .quick-nav,
+  .today-btn {
+    width: 100% !important;
+  }
+
+  /* Day panel — full width overlay */
+  .leave-day-panel {
+    width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    border-left: none !important;
+    border-top: 1px solid #e5e7eb !important;
+    top: auto !important;
+    bottom: 0 !important;
+    height: 65vh !important;
+    border-radius: 16px 16px 0 0 !important;
+  }
+
+  /* Modal */
+  .leave-modal-overlay {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+
+  .leave-modal {
+    width: 100% !important;
+    border-radius: 16px 16px 0 0 !important;
+    padding: 20px !important;
+    max-height: 80vh !important;
+    overflow-y: auto !important;
+  }
+
+  /* Leave form — single column */
+  .leave-form,
+  form.leave-form {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .leave-form input,
+  .leave-form select,
+  .leave-form textarea,
+  .leave-form button {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    font-size: 14px !important;
+  }
+
+  /* Approval cards — single column */
+  .approval-cards,
+  .leave-approval-grid,
+  .approvals-grid {
+    grid-template-columns: 1fr !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  /* Dashboard header */
+  .dashboard-header h2 {
+    font-size: 20px !important;
+  }
+
+  /* Legend */
+  .department-legend,
+  .leave-legend,
+  .calendar-legend {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    font-size: 12px !important;
+  }
+
+  /* RBC toolbar */
+  .rbc-toolbar {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .rbc-toolbar button {
+    font-size: 12px !important;
+    padding: 4px 8px !important;
+  }
+
+  /* Calendar container */
+  .calendar-container {
+    padding: 10px !important;
+    border-radius: 8px !important;
+  }
+
+  /* Chart card / table card */
+  .chart-card,
+  .table-card {
+    padding: 14px !important;
+    overflow-x: auto !important;
+  }
+}
+
+/* ───────────── 480 px  (Small Mobile) ───────────── */
+@media (max-width: 480px) {
+
+  /* Header */
+  .leaves-header {
+    padding: 12px 14px !important;
+    border-radius: 10px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .leaves-header h2 {
+    font-size: 16px !important;
+  }
+
+  .leaves-header p {
+    font-size: 12px !important;
+  }
+
+  /* Cards */
+  .leave-card,
+  .stat-card {
+    padding: 14px !important;
+    border-radius: 10px !important;
+  }
+
+  .leave-card h3 {
+    font-size: 20px !important;
+  }
+
+  .leave-card span,
+  .stat-card h3 {
+    font-size: 12px !important;
+  }
+
+  .stat-card p {
+    font-size: 20px !important;
+    margin-top: 6px !important;
+  }
+
+  /* Tabs */
+  .tab-btn {
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+  }
+
+  /* Table cells */
+  .leave-table th,
+  .leave-table td,
+  th, td {
+    padding: 10px 10px !important;
+    font-size: 12px !important;
+  }
+
+  .leave-table,
+  .table-card table,
+  table {
+    min-width: 520px !important;
+  }
+
+  /* Status badge */
+  .leave-status,
+  .status {
+    font-size: 11px !important;
+    padding: 3px 8px !important;
+  }
+
+  /* Modal */
+  .leave-modal {
+    padding: 16px !important;
+    max-height: 90vh !important;
+  }
+
+  .leave-modal h3 {
+    font-size: 16px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .modal-close {
+    width: 100% !important;
+    padding: 10px !important;
+    font-size: 14px !important;
+  }
+
+  /* Calendar header */
+  .leave-calendar-header {
+    padding: 12px !important;
+  }
+
+  .calendar-title h2 {
+    font-size: 16px !important;
+  }
+
+  .calendar-title p {
+    font-size: 12px !important;
+  }
+
+  /* Filters */
+  .calendar-filters {
+    padding: 10px !important;
+    gap: 8px !important;
+  }
+
+  .filter-box select,
+  .filter-item select,
+  .calendar-filters select {
+    padding: 8px !important;
+    font-size: 13px !important;
+  }
+
+  /* View switcher */
+  .view-switcher button {
+    padding: 6px 8px !important;
+    font-size: 12px !important;
+  }
+
+  /* Today button */
+  .today-btn {
+    padding: 8px 12px !important;
+    font-size: 13px !important;
+  }
+
+  /* Date input */
+  .date-input {
+    padding: 8px 10px !important;
+    font-size: 13px !important;
+  }
+
+  /* Legend */
+  .department-legend,
+  .leave-legend,
+  .calendar-legend {
+    font-size: 11px !important;
+    gap: 6px !important;
+  }
+
+  /* Day panel */
+  .leave-day-panel {
+    padding: 14px !important;
+    height: 70vh !important;
+  }
+
+  .day-panel-header h3 {
+    font-size: 15px !important;
+  }
+
+  /* Dashboard header */
+  .dashboard-header h2 {
+    font-size: 18px !important;
+  }
+
+  .dashboard-header p {
+    font-size: 12px !important;
+  }
+
+  /* Leave dashboard padding */
+  .leave-dashboard {
+    padding: 12px !important;
+  }
+
+  .leave-calendar-page {
+    padding: 12px !important;
+  }
+
+  /* RBC toolbar */
+  .rbc-toolbar {
+    justify-content: center !important;
+  }
+
+  .rbc-toolbar button {
+    font-size: 11px !important;
+    padding: 3px 7px !important;
+  }
+
+  /* Chart / table cards */
+  .chart-card,
+  .table-card {
+    padding: 10px !important;
+  }
+
+  /* Form inputs */
+  .leave-form input,
+  .leave-form select,
+  .leave-form textarea {
+    padding: 10px !important;
+    font-size: 13px !important;
+    border-radius: 6px !important;
+  }
+
+  .leave-form button {
+    padding: 12px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+  }
+
+  /* Empty state */
+  .leave-empty {
+    padding: 24px 16px !important;
+    font-size: 13px !important;
+  }
+}
+

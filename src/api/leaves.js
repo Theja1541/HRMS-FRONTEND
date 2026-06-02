@@ -52,3 +52,12 @@ export const approveLeave = async (leaveId) => {
 export const rejectLeave = async (leaveId) => {
   return await api.post(`/leaves/reject/${leaveId}/`);
 };
+
+
+/* ===============================
+   LEAVE ANALYTICS (Optimized count)
+=============================== */
+
+export const getLeaveAnalytics = async () => {
+  return await api.get("/leaves/analytics/");
+};

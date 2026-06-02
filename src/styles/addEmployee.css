@@ -2,8 +2,9 @@
 
 .add-employee-page {
   width: 100%;
+  padding: 24px;
   padding-bottom: 60px;
-  background: linear-gradient(135deg, #f8fafc, #eef2ff);
+  background: #f8fafc;
   min-height: 100vh;
 }
 
@@ -85,11 +86,12 @@
 /* ================= FORM CARD ================= */
 
 .step-form-card {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
+  background: #ffffff;
   border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.02);
+  padding: 28px;
+  margin-bottom: 28px;
+  border: 1px solid #f0f2f5;
   transition: all 0.3s ease;
 }
 
@@ -98,30 +100,29 @@
 .stepper {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 28px;
+  gap: 8px;
+  margin-bottom: 32px;
   position: relative;
-  padding-bottom: 8px;
 }
 
 .step {
   flex: 1;
   text-align: center;
   position: relative;
-  opacity: 0.6;
+  opacity: 0.5;
   transition: all 0.3s ease;
 }
 
 .step::after {
   content: "";
   position: absolute;
-  top: 18px;
+  top: 17px;
   right: -50%;
   width: 100%;
   height: 3px;
   background: #e2e8f0;
   z-index: 0;
-  transition: all 0.4s ease;
+  transition: all 0.3s ease;
 }
 
 .step:last-child::after {
@@ -136,7 +137,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
+  font-weight: 700;
   color: #475569;
   position: relative;
   z-index: 1;
@@ -149,21 +150,20 @@
 }
 
 .step.active span {
-  background: linear-gradient(135deg, #2563eb, #4f46e5);
-  color: white;
-  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
 }
 
 .step.active::after {
-  background: linear-gradient(to right, #2563eb, #4f46e5);
+  background: #6366f1;
 }
 
 .step p {
-  font-size: 12px;
-  margin-top: 6px;
+  font-size: 11px;
+  margin-top: 8px;
   color: #64748b;
-  font-weight: 500;
-  min-height: 28px;
+  font-weight: 600;
 }
 
 .step.active p {
@@ -172,10 +172,11 @@
 
 /* ================= FORM GRID ================= */
 
-.form-grid {
+.employee-form-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-bottom: 24px;
 }
 
 /* ================= FORM FIELD ================= */
@@ -186,36 +187,39 @@
 }
 
 .form-field label {
-  font-size: 12px;
-  color: #334155;
-  margin-bottom: 5px;
   font-weight: 600;
+  font-size: 13px;
+  color: #475569;
+  margin-bottom: 6px;
   letter-spacing: 0.3px;
 }
 
 /* ================= INPUT / SELECT ================= */
 
 .form-field input,
-.form-field select {
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
-  font-size: 13px;
-  transition: all 0.25s ease;
+.form-field select,
+.form-field textarea {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+  transition: all 0.2s ease;
   background: #ffffff;
+  font-family: inherit;
 }
 
 .form-field input:hover,
-.form-field select:hover {
-  border-color: #cbd5e1;
+.form-field select:hover,
+.form-field textarea:hover {
+  border-color: #94a3b8;
 }
 
 .form-field input:focus,
-.form-field select:focus {
+.form-field select:focus,
+.form-field textarea:focus {
   outline: none;
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
-  transform: translateY(-1px);
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
 .current-file-text {
@@ -455,8 +459,8 @@
 
 /* ================= RESPONSIVE ================= */
 
-@media (max-width: 1024px) {
-  .form-grid {
+@media (max-width: 768px) {
+  .employee-form-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
@@ -471,7 +475,7 @@
     width: 100%;
   }
 
-  .form-grid {
+  .employee-form-grid {
     grid-template-columns: 1fr;
   }
 
@@ -555,36 +559,14 @@
 
 /* ================= FORCE STYLE FOR STEP 5 ================= */
 
-.form-grid > select,
-.form-grid > textarea {
+.form-field select,
+.form-field textarea {
   width: 100%;
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid #e2e8f0;
-  font-size: 13px;
-  background: #ffffff;
-  transition: all 0.25s ease;
-  font-family: inherit;
   box-sizing: border-box;
 }
 
-/* Hover */
-.form-grid > select:hover,
-.form-grid > textarea:hover {
-  border-color: #cbd5e1;
-}
-
-/* Focus */
-.form-grid > select:focus,
-.form-grid > textarea:focus {
-  outline: none;
-  border-color: #4f46e5;
-  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15);
-  transform: translateY(-1px);
-}
-
 /* Textarea specific */
-.form-grid > textarea {
+.form-field textarea {
   min-height: 100px;
   resize: vertical;
 }
@@ -641,6 +623,7 @@
   border: 1px solid #e2e8f0;
   border-radius: 12px;
   overflow: hidden;
+  table-layout: fixed;
 }
 
 .payroll-table th {
@@ -694,4 +677,64 @@
   margin-top: 5px;
   font-size: 12px;
   font-weight: 500;
+}
+
+/* ==========================================
+   ADD EMPLOYEE FORM — MOBILE RESPONSIVE
+   ========================================== */
+@media (max-width: 1024px) {
+  .employee-form-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  .stepper {
+    gap: 8px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .add-employee-container {
+    padding: 14px !important;
+  }
+  .employee-form-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+  .stepper {
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    padding-bottom: 8px !important;
+    gap: 4px !important;
+  }
+  .step-label {
+    display: none !important;
+  }
+  .step-circle {
+    width: 30px !important;
+    height: 30px !important;
+    font-size: 12px !important;
+  }
+  .step-actions {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  .step-actions button {
+    width: 100% !important;
+  }
+  .form-section-title {
+    font-size: 15px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .employee-form-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .form-group label {
+    font-size: 12px !important;
+  }
+  .step-circle {
+    width: 26px !important;
+    height: 26px !important;
+    font-size: 11px !important;
+  }
 }

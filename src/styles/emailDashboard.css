@@ -355,3 +355,45 @@
     font-size: 28px;
   }
 }
+
+/* ==========================================
+   EMAIL DASHBOARD — MOBILE RESPONSIVE
+   ========================================== */
+@media (max-width: 768px) {
+  .email-dashboard-page {
+    padding: 14px !important;
+  }
+  .email-header {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+  }
+  .email-stats {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+  .email-filters {
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  .email-filters select,
+  .email-filters input {
+    width: 100% !important;
+  }
+  .email-list-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .email-table {
+    min-width: 600px !important;
+  }
+  .email-compose-btn {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .email-stats {
+    grid-template-columns: 1fr !important;
+  }
+}

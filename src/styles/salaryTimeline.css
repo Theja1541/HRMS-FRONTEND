@@ -1,54 +1,499 @@
-.salary-timeline {
-  position: relative;
-  margin-top: 20px;
-  padding-left: 30px;
+/* ============================================================
+   📈 PREMIUM SALARY GROWTH JOURNEY - BRAND ISOLATED DESIGN SYSTEM
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --font-heading: 'Outfit', sans-serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  
+  --color-indigo: hsl(243, 75%, 59%);
+  --color-indigo-dark: hsl(243, 75%, 40%);
+  --color-indigo-light: hsl(243, 75%, 96%);
+  
+  --color-emerald: hsl(142, 70%, 45%);
+  --color-emerald-bg: hsl(142, 70%, 95%);
+  --color-emerald-text: hsl(142, 76%, 22%);
+
+  --color-rose: hsl(347, 87%, 60%);
+  --color-rose-bg: hsl(347, 87%, 96%);
+  --color-rose-text: hsl(347, 80%, 30%);
+
+  --color-violet: hsl(271, 91%, 65%);
+  --color-violet-bg: hsl(271, 91%, 96%);
+  --color-violet-text: hsl(271, 85%, 35%);
+
+  --slate-dark: #0f172a;
+  --slate-text: #334155;
+  --slate-muted: #64748b;
+  
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --glass-border: rgba(226, 232, 240, 0.8);
+  
+  --shadow-sm: 0 4px 10px rgba(0, 0, 0, 0.02);
+  --shadow-md: 0 10px 30px rgba(15, 23, 42, 0.05);
+  --shadow-lg: 0 20px 40px rgba(15, 23, 42, 0.08);
+  
+  --radius-lg: 20px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
 }
 
-.salary-timeline::before {
+.salary-growth-container {
+  font-family: var(--font-body);
+  color: var(--slate-dark);
+  background-color: #f8fafc;
+  min-height: 100vh;
+  padding: 10px 0;
+  animation: pageFadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ============================================================
+   💡 HEADER BANNER
+   ============================================================ */
+
+.salary-growth-container .page-header {
+  background: linear-gradient(135deg, #090d16 0%, #1e1b4b 50%, #4338ca 100%);
+  background-size: 200% 200%;
+  animation: headerShift 15s ease infinite;
+  color: white;
+  padding: 35px 40px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 35px;
+  box-shadow: 0 20px 40px rgba(30, 27, 75, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+.salary-growth-container .page-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.35) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.salary-growth-container h2 {
+  font-family: var(--font-heading);
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.salary-growth-container p {
+  font-size: 15px;
+  opacity: 0.85;
+  margin-top: 6px;
+  font-weight: 400;
+}
+
+/* ============================================================
+   🌲 PATHWAY VERTICAL TIMELINE
+   ============================================================ */
+
+.growth-timeline-card {
+  background: white !important;
+  border: 1px solid var(--glass-border);
+  padding: 35px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 35px;
+  position: relative;
+  transition: box-shadow 0.3s;
+}
+
+.growth-timeline-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.growth-timeline-card h3,
+.growth-trend-card h3,
+.growth-revision-card h3 {
+  font-family: var(--font-heading);
+  font-size: 19px;
+  font-weight: 700;
+  color: var(--slate-dark);
+  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.growth-timeline-tree {
+  position: relative;
+  margin-top: 30px;
+  padding-left: 45px;
+}
+
+/* Glowing Neon Vertical Path Track */
+.growth-timeline-tree::before {
   content: "";
   position: absolute;
-  left: 10px;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: #e0e0e0;
+  left: 14px;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  background: linear-gradient(to bottom, var(--color-indigo) 0%, var(--color-violet) 50%, var(--color-emerald) 100%);
+  border-radius: 4px;
 }
 
-.timeline-item {
+.growth-timeline-item {
   position: relative;
-  margin-bottom: 30px;
+  margin-bottom: 40px;
+  animation: itemFadeReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-.timeline-dot {
+.growth-timeline-item:last-child {
+  margin-bottom: 10px;
+}
+
+/* Alternate glowing node connector dots */
+.growth-timeline-dot {
   position: absolute;
-  left: -21px;
-  top: 4px;
-  width: 14px;
-  height: 14px;
-  background: #4f46e5;
-  border-radius: 50%;
+  left: -40px;
+  top: 6px;
+  width: 22px;
+  height: 22px;
+  background: white !important;
+  border: 4.5px solid var(--color-indigo) !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.15), 0 0 15px rgba(79, 70, 229, 0.3) !important;
+  z-index: 2;
+  transition: all 0.3s ease;
 }
 
-.timeline-content {
-  background: #f9fafc;
-  padding: 14px 16px;
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
+.growth-timeline-item:hover .growth-timeline-dot {
+  transform: scale(1.2);
+  border-color: var(--color-emerald) !important;
+  box-shadow: 0 0 0 5px rgba(16, 185, 129, 0.2), 0 0 20px rgba(16, 185, 129, 0.4) !important;
 }
 
-.timeline-date {
-  font-weight: 600;
-  color: #555;
+.growth-timeline-content {
+  background: white !important;
+  border: 1px solid rgba(226, 232, 240, 0.8) !important;
+  padding: 24px 28px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
 }
 
-.timeline-salary {
-  font-size: 18px;
+.growth-timeline-content:hover {
+  transform: translateX(4px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(79, 70, 229, 0.2) !important;
+}
+
+.growth-timeline-content-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.growth-timeline-date {
+  font-family: var(--font-heading);
+  font-size: 15.5px;
+  font-weight: 750;
+  color: var(--slate-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Glowing Hike Capsule */
+.growth-timeline-increment-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 50px;
+  font-size: 12px;
   font-weight: 700;
-  margin-top: 5px;
+  background: var(--color-emerald-bg);
+  color: var(--color-emerald-text);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.25);
 }
 
-.timeline-breakdown {
-  font-size: 13px;
-  color: #777;
+.growth-timeline-salary {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--slate-dark);
   margin-top: 4px;
+  letter-spacing: -0.02em;
+}
+
+.growth-timeline-salary-label {
+  font-size: 12.5px;
+  color: var(--slate-muted);
+  font-weight: 600;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.growth-timeline-breakdown {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px dashed var(--glass-border) !important;
+}
+
+.growth-timeline-breakdown-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #f8fafc;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(226, 232, 240, 0.5);
+}
+
+.growth-timeline-breakdown-item span:nth-child(1) {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--slate-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.growth-timeline-breakdown-item span:nth-child(2) {
+  font-family: var(--font-heading);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--slate-text);
+}
+
+/* ============================================================
+   📈 GROWTH TREND AreaChart
+   ============================================================ */
+
+.growth-trend-card {
+  background: white !important;
+  border: 1px solid var(--glass-border);
+  padding: 35px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 35px;
+  transition: box-shadow 0.3s;
+}
+
+.growth-trend-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+/* ============================================================
+   📋 REVISION HISTORY STATEMENT TABLE
+   ============================================================ */
+
+.growth-revision-card {
+  background: white !important;
+  border: 1px solid var(--glass-border);
+  padding: 35px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s;
+}
+
+.growth-revision-card:hover {
+  box-shadow: var(--shadow-lg);
+}
+
+.growth-revision-table-wrapper {
+  background: white;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.growth-revision-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.growth-revision-table thead {
+  background: rgba(248, 250, 252, 0.8);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+.growth-revision-table th {
+  padding: 16px 20px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--slate-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  text-align: left;
+}
+
+.growth-revision-table tbody tr {
+  border-bottom: 1px solid rgba(241, 245, 249, 0.8);
+  transition: all 0.2s;
+}
+
+.growth-revision-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.growth-revision-table td {
+  padding: 18px 20px;
+  font-size: 14px;
+  color: var(--slate-text);
+  font-weight: 500;
+}
+
+.revision-date-cell {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--slate-dark);
+}
+
+.revision-ctc-cell {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--slate-dark);
+}
+
+/* Increment/Hike Pill Badge in Table */
+.hike-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 50px;
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.hike-badge.positive {
+  background: var(--color-emerald-bg);
+  color: var(--color-emerald-text);
+}
+
+.hike-badge.negative {
+  background: var(--color-rose-bg);
+  color: var(--color-rose-text);
+}
+
+.hike-badge.neutral {
+  background: #f1f5f9;
+  color: var(--slate-muted);
+}
+
+.revision-reason-tag {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  background: var(--color-indigo-light);
+  color: var(--color-indigo-dark);
+}
+
+/* ============================================================
+   💫 KEYFRAMES ANIMATIONS
+   ============================================================ */
+
+@keyframes pageFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes itemFadeReveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes headerShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ============================================================
+   📱 DEVICE MEDIA LAYOUTS
+   ============================================================ */
+
+@media (max-width: 768px) {
+  .salary-growth-container .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 26px 30px;
+  }
+
+  .salary-growth-container h2 {
+    font-size: 24px;
+  }
+
+  .growth-timeline-card,
+  .growth-trend-card,
+  .growth-revision-card {
+    padding: 24px 20px;
+  }
+
+  .growth-timeline-tree {
+    padding-left: 30px;
+  }
+
+  .growth-timeline-tree::before {
+    left: 10px;
+  }
+
+  .growth-timeline-dot {
+    left: -29px;
+    width: 18px;
+    height: 18px;
+    border-width: 3.5px;
+  }
+
+  .growth-timeline-content {
+    padding: 16px 20px;
+  }
+
+  .growth-timeline-content-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .growth-timeline-salary {
+    font-size: 20px;
+  }
+
+  .growth-revision-table-wrapper {
+    overflow-x: auto;
+  }
+
+  .growth-revision-table {
+    min-width: 600px;
+  }
 }

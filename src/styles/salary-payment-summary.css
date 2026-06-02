@@ -712,3 +712,46 @@
     font-size: 12px;
   }
 }
+
+/* ==========================================
+   SALARY PAYMENT SUMMARY — MOBILE RESPONSIVE
+   ========================================== */
+@media (max-width: 768px) {
+  .salary-payment-page {
+    padding: 14px !important;
+  }
+  .payment-header {
+    flex-direction: column !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+  }
+  .payment-summary-stats {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+  .payment-table-wrapper {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .payment-summary-table {
+    min-width: 700px !important;
+  }
+  .payment-filters {
+    flex-direction: column !important;
+    gap: 10px !important;
+    align-items: stretch !important;
+  }
+  .payment-filters select,
+  .payment-filters input {
+    width: 100% !important;
+  }
+  .payment-export-btn {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .payment-summary-stats {
+    grid-template-columns: 1fr !important;
+  }
+}

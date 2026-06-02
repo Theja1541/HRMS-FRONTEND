@@ -45,69 +45,49 @@
   background: #f1f5f9;
 }
 
-
-.super-layout {
-  display: flex;
-  height: 100vh;
-}
-
-.super-sidebar {
-  width: 240px;
-  background: #0f172a;
-  color: white;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-}
-
-.super-sidebar h2 {
-  margin-bottom: 20px;
-}
-
-.super-sidebar a {
-  color: #cbd5e1;
-  text-decoration: none;
-  padding: 10px;
-  border-radius: 6px;
-  margin-bottom: 8px;
-}
-
-.super-sidebar a.active {
-  background: #2563eb;
-  color: white;
-}
-
-.super-main {
-  flex: 1;
-  padding: 30px;
-  background: #f8fafc;
-}
-
 .super-layout {
   display: flex;
   height: 100vh;
   background: #f1f5f9;
+  position: relative;
+  overflow: hidden;
 }
 
 .super-sidebar {
   width: 250px;
+  min-width: 250px;
   background: #0f172a;
   color: white;
   padding: 20px;
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
+  transition: left 0.3s ease;
+  z-index: 999;
 }
 
 .super-logo {
   margin-bottom: 30px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 1px;
 }
 
 .super-sidebar a {
   color: #cbd5e1;
   text-decoration: none;
-  padding: 10px;
-  border-radius: 6px;
-  margin-bottom: 10px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  display: block;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.super-sidebar a:hover {
+  background: rgba(59, 130, 246, 0.15);
+  color: #fff;
 }
 
 .super-sidebar a.active {
@@ -123,33 +103,47 @@
   color: white;
   border-radius: 6px;
   cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.2s ease;
+}
+
+.super-logout:hover {
+  background: #dc2626;
 }
 
 .super-content {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .super-header {
   background: white;
-  padding: 20px;
+  padding: 16px 20px;
   border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
 }
 
 .super-page {
-  padding: 30px;
+  flex: 1;
+  padding: 24px;
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .super-cards {
   display: flex;
   gap: 20px;
   margin-top: 20px;
+  flex-wrap: wrap;
 }
 
 .super-card {
   flex: 1;
+  min-width: 140px;
   padding: 20px;
   border-radius: 12px;
   color: white;
@@ -158,6 +152,8 @@
 .super-card.blue { background: #2563eb; }
 .super-card.green { background: #16a34a; }
 .super-card.orange { background: #f97316; }
+.super-card.purple { background: #7c3aed; }
+.super-card.dark { background: #1e293b; }
 
 .super-table {
   width: 100%;
@@ -171,7 +167,6 @@
   padding: 12px;
   border-bottom: 1px solid #e5e7eb;
 }
-
 
 .danger-btn {
   background: #ef4444;
@@ -190,11 +185,6 @@ select {
   padding: 6px;
   border-radius: 6px;
 }
-
-
-.super-card.purple { background: #7c3aed; }
-.super-card.dark { background: #1e293b; }
-
 
 .chart-container {
   background: white;
@@ -340,4 +330,172 @@ select {
 .notification-result {
   margin-top: 12px;
   color: #16a34a;
+}
+
+/* ===================================================
+   SEND NOTIFICATION — CSS GRID CLASSES
+   (replace inline style attributes for media-query control)
+   =================================================== */
+.sn-layout-grid {
+  display: grid;
+  grid-template-columns: 1fr 310px;
+  gap: 20px;
+  align-items: start;
+}
+
+.sn-target-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.sn-type-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+
+/* ===================================================
+   SUPER ADMIN MOBILE — HAMBURGER & OFF-CANVAS DRAWER
+   =================================================== */
+
+/* Hamburger toggle button — hidden on desktop */
+.sa-mobile-menu-btn {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 1001;
+  background: #2563eb;
+  color: white;
+  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  font-size: 20px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35);
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  transition: background 0.2s ease;
+}
+
+.sa-mobile-menu-btn:hover {
+  background: #1d4ed8;
+}
+
+/* Backdrop overlay — hidden by default */
+.sa-sidebar-overlay {
+  display: none;
+}
+
+/* Mobile-open class applied to sidebar */
+.super-sidebar.sa-mobile-open {
+  left: 0 !important;
+}
+
+
+/* ===================================================
+   RESPONSIVE BREAKPOINTS — SUPER ADMIN
+   =================================================== */
+@media (max-width: 768px) {
+  /* Show hamburger button */
+  .sa-mobile-menu-btn {
+    display: flex;
+  }
+
+  /* Show overlay backdrop */
+  .sa-sidebar-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 998;
+  }
+
+  /* Off-canvas sidebar drawer */
+  .super-sidebar {
+    position: fixed;
+    left: -260px;
+    top: 0;
+    height: 100vh;
+    width: 240px !important;
+    min-width: 240px !important;
+    z-index: 999;
+    transition: left 0.3s ease;
+    padding-top: 64px;
+  }
+
+  /* Layout no longer side-by-side */
+  .super-layout {
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Main content full width */
+  .super-content {
+    width: 100%;
+    height: 100vh;
+  }
+
+  /* Page content padding reduced */
+  .super-page {
+    padding: 16px;
+  }
+
+  /* Header has room for the hamburger on the left */
+  .super-header {
+    padding-left: 72px;
+  }
+
+  /* Cards wrap on small screens */
+  .super-cards {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* Stat cards full width */
+  .stat-card {
+    width: 100%;
+    box-sizing: border-box;
+    min-width: unset;
+  }
+
+  /* SendNotification: stack 2-col layout vertically */
+  .sn-layout-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Notification type grid: 3 cols on small screens */
+  .sn-type-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  /* Target audience grid: still 2 cols on mobile */
+  .sn-target-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .super-page {
+    padding: 12px;
+  }
+
+  .sn-target-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .sn-type-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+
+  .super-header {
+    padding-left: 68px;
+    padding-right: 12px;
+  }
 }

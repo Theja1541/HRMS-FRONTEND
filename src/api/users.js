@@ -20,6 +20,11 @@ export const createCompanyUser = (data) => {
   return api.post("/accounts/company-users/create/", data);
 };
 
+/** Company Admin: update HR user details & permissions */
+export const updateCompanyUser = (userId, data) => {
+  return api.patch(`/accounts/company-users/${userId}/update/`, data);
+};
+
 /** SuperAdmin: update user role */
 export const updateUserRole = (userId, role) => {
   return api.patch(`/accounts/users/${userId}/role/`, { role });

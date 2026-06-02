@@ -3,8 +3,12 @@ import api from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import "../../styles/leaves.css";
+import { useCompanyPermissions } from "../../hooks/useCompanyPermissions";
 
 export default function LeaveDashboard() {
+  const { hasPermission } = useCompanyPermissions();
+  const canApprove = hasPermission("leave", "approve", "approvals");
+
   const [pendingLeaves, setPendingLeaves] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedLeave, setSelectedLeave] = useState(null);
@@ -137,19 +141,23 @@ export default function LeaveDashboard() {
                     >
                       View
                     </button>
-                    <button
-                      className="btn primary"
-                      onClick={() => handleApprove(leave.id)}
-                      style={{ marginRight: '8px' }}
-                    >
-                      Approve
-                    </button>
-                    <button
-                      className="btn danger"
-                      onClick={() => handleReject(leave.id)}
-                    >
-                      Reject
-                    </button>
+                    {canApprove && (
+                      <button
+                        className="btn primary"
+                        onClick={() => handleApprove(leave.id)}
+                        style={{ marginRight: '8px' }}
+                      >
+                        Approve
+                      </button>
+                    )}
+                    {canApprove && (
+                      <button
+                        className="btn danger"
+                        onClick={() => handleReject(leave.id)}
+                      >
+                        Reject
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
@@ -181,11 +189,35 @@ export default function LeaveDashboard() {
             <div className="leave-detail">
               <strong>Reason:</strong> {selectedLeave.reason}
             </div>
+            {selectedLeave.document && (
+              <div className="leave-detail">
+                <strong>Attached Document:</strong>{" "}
+                <a href={selectedLeave.document} target="_blank" rel="noopener noreferrer" style={{ color: "#2563eb", textDecoration: "underline" }}>
+                  View Document
+                </a>
+              </div>
+            )}
             <div className="leave-detail">
               <strong>Applied On:</strong> {new Date(selectedLeave.applied_on).toLocaleString()}
             </div>
-            <div className="modal-actions">
-              <button className="modal-close" onClick={() => setSelectedLeave(null)}>
+            <div className="modal-actions" style={{ display: 'flex', gap: '8px', marginTop: '16px', justifyContent: 'flex-end' }}>
+              {canApprove && (
+                <button
+                  className="btn primary"
+                  onClick={() => handleApprove(selectedLeave.id)}
+                >
+                  Approve
+                </button>
+              )}
+              {canApprove && (
+                <button
+                  className="btn danger"
+                  onClick={() => handleReject(selectedLeave.id)}
+                >
+                  Reject
+                </button>
+              )}
+              <button className="modal-close" onClick={() => setSelectedLeave(null)} style={{ padding: '8px 16px', border: '1px solid #ccc', borderRadius: '4px', background: '#f9fafb', cursor: 'pointer' }}>
                 Close
               </button>
             </div>

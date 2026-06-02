@@ -24,6 +24,7 @@ import PayrollLockBanner from "../../components/common/PayrollLockBanner";
 import { useAuth } from "../../auth/AuthContext";
 import { reopenPayrollMonth } from "../../api/payroll";
 import EditedAttendanceModal from "../../components/attendance/EditedAttendanceModal";
+import { useCompanyPermissions } from "../../hooks/useCompanyPermissions";
 
 const STATUS_COLORS = {
   PRESENT: "#22c55e",
@@ -41,6 +42,7 @@ export default function MonthlyAttendance() {
   const { employees = [], attendance = {} } = useEmployees();
   const { showToast } = useToast();
   const { user } = useAuth();
+  const { hasPermission } = useCompanyPermissions();
   const { isLocked, payrollStatus, refreshPayrollStatus } = usePayroll();
 
   const [month, setMonth] = useState(
@@ -406,24 +408,36 @@ export default function MonthlyAttendance() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
           />
-          <div className="more-menu-wrapper">
-            <button
-              className="btn-more"
-              onClick={() => setShowMoreMenu(!showMoreMenu)}
-              disabled={isLocked}
-            >
-              ⋯ More
-            </button>
-            {showMoreMenu && (
-              <div className="more-dropdown">
-                <button onClick={() => { handleEditClick(); setShowMoreMenu(false); }}>Edit Attendance</button>
-                <button onClick={() => { handleBulkEditClick(); setShowMoreMenu(false); }}>Bulk Edit All</button>
-                <button onClick={handleViewEditHistory}>View Edited Attendance</button>
-                <button onClick={() => { setShowConfirmModal(true); setShowMoreMenu(false); }}>Send Monthly Emails</button>
-                <button onClick={() => { setShowGenerateModal(true); setShowMoreMenu(false); }}>Generate Today</button>
-              </div>
-            )}
-          </div>
+          { (hasPermission("attendance", "edit", "monthly") || hasPermission("attendance", "create", "monthly") || hasPermission("attendance", "view", "monthly")) && (
+            <div className="more-menu-wrapper">
+              <button
+                className="btn-more"
+                onClick={() => setShowMoreMenu(!showMoreMenu)}
+                disabled={isLocked}
+              >
+                ⋯ More
+              </button>
+              {showMoreMenu && (
+                <div className="more-dropdown">
+                  {hasPermission("attendance", "edit", "monthly") && (
+                    <button onClick={() => { handleEditClick(); setShowMoreMenu(false); }}>Edit Attendance</button>
+                  )}
+                  {hasPermission("attendance", "edit", "monthly") && (
+                    <button onClick={() => { handleBulkEditClick(); setShowMoreMenu(false); }}>Bulk Edit All</button>
+                  )}
+                  {hasPermission("attendance", "view", "monthly") && (
+                    <button onClick={handleViewEditHistory}>View Edited Attendance</button>
+                  )}
+                  {hasPermission("attendance", "create", "monthly") && (
+                    <button onClick={() => { setShowConfirmModal(true); setShowMoreMenu(false); }}>Send Monthly Emails</button>
+                  )}
+                  {hasPermission("attendance", "create", "monthly") && (
+                    <button onClick={() => { setShowGenerateModal(true); setShowMoreMenu(false); }}>Generate Today</button>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
@@ -441,52 +455,48 @@ export default function MonthlyAttendance() {
           <h3>{summary.absent}</h3>
           <span>Total Absent</span>
         </div>
-        <div className="summary-card holiday" style={{ background: '#eff6ff', border: '1px solid #bfdbfe', color: '#1e3a8a' }}>
-          <h3>{summary.holiday}</h3>
-          <span>Total Holiday</span>
-        </div>
-        <div className="summary-card weekoff" style={{ background: '#faf5ff', border: '1px solid #e9d5ff', color: '#581c87' }}>
-          <h3>{summary.weekOff}</h3>
-          <span>Total Week Off</span>
-        </div>
       </div>
 
       {/* ===== CHARTS ===== */}
 <div className="charts-grid">
-  <div className="card">
+  <div className="card" style={{ width: '100%', minWidth: 0 }}>
     <h3>Attendance Count</h3>
-    <ResponsiveContainer width="100%" height={260}>
-      <BarChart data={chartData}>
-        <XAxis dataKey="name" />
-        <YAxis allowDecimals={false} />
-        <Tooltip />
-        <Bar dataKey="value">
-          {chartData.map((entry) => (
-            <Cell
-              key={entry.name}
-              fill={STATUS_COLORS[entry.name]}
-            />
-          ))}
-        </Bar>
-      </BarChart>
-    </ResponsiveContainer>
+    <div className="responsive-chart-container">
+      <ResponsiveContainer width="100%" height={260}>
+        <BarChart data={chartData}>
+          <XAxis dataKey="name" />
+          <YAxis allowDecimals={false} />
+          <Tooltip />
+          <Bar dataKey="value">
+            {chartData.map((entry) => (
+              <Cell
+                key={entry.name}
+                fill={STATUS_COLORS[entry.name]}
+              />
+            ))}
+          </Bar>
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
   </div>
 
-  <div className="card">
+  <div className="card" style={{ width: '100%', minWidth: 0 }}>
     <h3>Attendance Distribution</h3>
-    <ResponsiveContainer width="100%" height={260}>
-      <PieChart>
-        <Pie data={chartData} dataKey="value">
-          {chartData.map((entry) => (
-            <Cell
-              key={entry.name}
-              fill={STATUS_COLORS[entry.name]}
-            />
-          ))}
-        </Pie>
-        <Legend />
-      </PieChart>
-    </ResponsiveContainer>
+    <div className="responsive-chart-container">
+      <ResponsiveContainer width="100%" height={260}>
+        <PieChart>
+          <Pie data={chartData} dataKey="value">
+            {chartData.map((entry) => (
+              <Cell
+                key={entry.name}
+                fill={STATUS_COLORS[entry.name]}
+              />
+            ))}
+          </Pie>
+          <Legend />
+        </PieChart>
+      </ResponsiveContainer>
+    </div>
   </div>
 </div>
 
