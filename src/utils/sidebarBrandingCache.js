@@ -13,6 +13,7 @@ export function clearSidebarBrandingCache() {
 }
 
 export async function fetchSidebarBranding(user) {
+  if (user?.role === "SUPER_ADMIN") return null;
   const key = sidebarBrandingCacheKey(user);
   if (!key) return null;
   if (sidebarBrandingCache.key === key && sidebarBrandingCache.promise === null) {

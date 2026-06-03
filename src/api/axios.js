@@ -84,6 +84,7 @@
 
 
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const api = axios.create({
   baseURL: "http://127.0.0.1:8000/api/",
@@ -118,6 +119,7 @@ api.interceptors.response.use(
     // 🚨 If backend is OFF
     if (!error.response) {
       console.error("Backend not reachable.");
+      toast.error("Backend not reachable. Please check your connection.");
       return Promise.reject(error);
     }
 
@@ -166,6 +168,12 @@ api.interceptors.response.use(
         forceLogout();
         return Promise.reject(refreshError);
       }
+    }
+
+    // Show toast for other errors (e.g. 400, 403, 404, 500)
+    if (error.response.status !== 401) {
+      const errorMsg = error.response.data?.error || error.response.data?.detail || "An unexpected error occurred.";
+      toast.error(errorMsg);
     }
 
     return Promise.reject(error);

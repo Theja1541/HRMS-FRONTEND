@@ -130,3 +130,12 @@ td {
 /* =========================
    MOBILE RESPONSIVENESS (in mobile.css, imported at top)
 ========================= */
+
+/* Fix checkbox blinking on hover */
+input[type="checkbox"], input[type="checkbox"]:hover, input[type="checkbox"]:focus, input[type="radio"], input[type="radio"]:hover, input[type="radio"]:focus {
+  transition: none !important;
+  background-color: initial !important;
+  border-color: initial !important;
+  padding: 0 !important;
+}
+

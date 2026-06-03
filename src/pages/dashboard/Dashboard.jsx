@@ -418,8 +418,46 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* Recent Hires Widget */}
+        <div className="dashboard-card">
+          <h3>Recent Hires</h3>
+          <div style={{ marginTop: '15px' }}>
+            {recentEmployees.length === 0 ? (
+              <p className="muted">No recent hires</p>
+            ) : (
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                {recentEmployees.slice(0, 4).map((emp) => (
+                  <li key={emp.id} style={{ display: 'flex', alignItems: 'center', padding: '12px 0', borderBottom: '1px solid #f1f5f9' }}>
+                    <div style={{
+                      width: '38px', height: '38px', borderRadius: '50%',
+                      background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
+                      color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontWeight: 'bold', fontSize: '14px', marginRight: '12px',
+                      boxShadow: '0 2px 8px rgba(59, 130, 246, 0.25)'
+                    }}>
+                      {getEmployeeName(emp).charAt(0).toUpperCase()}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: '600', color: '#1e293b', fontSize: '14px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {getEmployeeName(emp)}
+                      </div>
+                      <div style={{ color: '#64748b', fontSize: '12px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {emp.designation || 'New Employee'} • {emp.department || 'General'}
+                      </div>
+                    </div>
+                    <div style={{ color: '#94a3b8', fontSize: '11px', textAlign: 'right', marginLeft: '10px' }}>
+                      <div style={{ fontWeight: '600', color: '#64748b' }}>Joined</div>
+                      <div>{emp.date_joined ? new Date(emp.date_joined).toLocaleDateString(undefined, {month: 'short', day: 'numeric'}) : 'Recently'}</div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+
         {/* Leave Analytics */}
-        <div className="dashboard-card" style={{ gridColumn: '2' }}>
+        <div className="dashboard-card">
           <h3>Leave Analytics</h3>
           <div className="responsive-chart-container" style={{ width: '100%', height: 300 }}>
             {pendingLeaves === 0 && onLeaveToday === 0 ? (

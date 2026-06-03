@@ -18,7 +18,7 @@ export const getEffectiveSystemSettings = () =>
 export const updateSystemSettings = (data) =>
   api.patch("/superadmin/settings/update/", data);
 
-export const getReportsOverview = () => api.get("/superadmin/reports/");
+export const getReportsOverview = (months = 12) => api.get(`/superadmin/reports/?months=${months}`);
 
 export const testSmtpEmail = (to) =>
   api.post("/superadmin/settings/test-email/", { to });
