@@ -122,11 +122,13 @@ export default function SupportTickets() {
   return (
     <div>
       <div className="page-header">
-        <h2 className="page-title">Support Tickets</h2>
+        <div>
+          <h2 className="page-title">Support Tickets</h2>
+          <p className="page-subtitle">
+            View and manage support tickets from all companies. You can filter and update status or priority.
+          </p>
+        </div>
       </div>
-      <p className="page-subtitle">
-        View and manage support tickets from all companies. You can filter and update status or priority.
-      </p>
 
       {fetchError && (
         <p className="muted-text" style={{ color: "#b91c1c", marginTop: 8 }}>{fetchError}</p>

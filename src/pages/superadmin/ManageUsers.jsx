@@ -167,11 +167,13 @@ export default function ManageUsers() {
   return (
     <div className="manage-users-page">
       <div className="page-header">
-        <h2 className="page-title">User & Role Management</h2>
+        <div>
+          <h2 className="page-title">User & Role Management</h2>
+          <p className="page-subtitle">
+            View all users across the platform. Assign roles, reset passwords, and block or unblock access.
+          </p>
+        </div>
       </div>
-      <p className="page-subtitle">
-        View all users across the platform. Assign roles, reset passwords, and block or unblock access.
-      </p>
 
       <div className="filters-row" style={{ marginTop: 16, marginBottom: 16, display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 200px' }}>
