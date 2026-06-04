@@ -7,11 +7,9 @@ const CATEGORY_META = {
     desc: "Core platform configuration — name, timezone, support contact" },
   email:    { label: "Email / SMTP", icon: "📧", color: "#0891b2",
     desc: "Outgoing mail server (SMTP) — required for MFA codes, notifications & payslips" },
-  security: { label: "Security",   icon: "🔐", color: "#7c3aed",
-    desc: "Authentication, session management and password policies" },
 };
 
-const TABS = ["general", "email", "security"];
+const TABS = ["general", "email"];
 
 /* ─── Inline card style (avoids pages.css overflow:hidden on .card) ─── */
 const CARD = {
@@ -374,24 +372,6 @@ export default function SystemSettings() {
                 {/* Test email panel — only on email tab */}
                 {activeTab === "email" && (
                   <TestEmailPanel onTest={handleTestEmail} />
-                )}
-
-                {/* Security context hints */}
-                {activeTab === "security" && (
-                  <div style={{
-                    marginTop: 20, padding: "14px 18px", borderRadius: 10,
-                    background: "#faf5ff", border: "1.5px solid #d8b4fe",
-                  }}>
-                    <p style={{ margin: "0 0 8px", fontWeight: 700, fontSize: 13, color: "#7c3aed" }}>
-                      🛡️ Security Policy Notes
-                    </p>
-                    <ul style={{ margin: 0, paddingLeft: 18, fontSize: 12.5, color: "#6b21a8", lineHeight: 1.8 }}>
-                      <li><strong>Require MFA</strong> — Enforces email OTP on every login for Admins, HR, and Employees (Super Admins are exempt)</li>
-                      <li><strong>Session Timeout</strong> — Minimum 5 minutes recommended. JWT access tokens are issued with this lifetime</li>
-                      <li><strong>Password Expiry = 0</strong> — Disables forced password rotation</li>
-                      <li><strong>Max Login Attempts</strong> — Set to 0 to disable account locking</li>
-                    </ul>
-                  </div>
                 )}
               </div>
             </div>

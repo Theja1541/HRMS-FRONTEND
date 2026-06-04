@@ -10,10 +10,11 @@ export default function Login() {
   const navigate = useNavigate();
 
   // ── Step 1: Credentials ──────────────────────────────
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState(() => localStorage.getItem("rememberedEmail") || "");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [rememberMe, setRememberMe] = useState(() => !!localStorage.getItem("rememberedEmail"));
 
   // ── Step 2: MFA OTP ──────────────────────────────────
   const [mfaStep, setMfaStep] = useState(false);
@@ -62,6 +63,12 @@ export default function Login() {
       if (!result.success) {
         setError(result.message || "Invalid credentials");
         return;
+      }
+
+      if (rememberMe) {
+        localStorage.setItem("rememberedEmail", username.trim());
+      } else {
+        localStorage.removeItem("rememberedEmail");
       }
 
       // ── MFA required ──────────────────────────────────
@@ -325,69 +332,142 @@ export default function Login() {
      RENDER: Normal Login Screen
   ───────────────────────────────────────────────────── */
   return (
-    <div className="login-container">
-      <form className="login-card" onSubmit={handleSubmit}>
-        <h2>HRMS Login</h2>
-        <p className="login-subtitle">Sign in to access your dashboard</p>
-
-        {error && <div className="login-error">{error}</div>}
-
-        <input
-          type="text"
-          placeholder="Email address"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          autoFocus
-        />
-
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-
-        <button type="submit" className="login-btn" disabled={loading}>
-          {loading ? "Signing in..." : "Login"}
-        </button>
-
-        <button
-          type="button"
-          className="forgot-password-link"
-          onClick={() => setShowForgotPassword(true)}
-        >
-          Forgot Password?
-        </button>
-      </form>
-
-      {/* Forgot Password Modal */}
-      {showForgotPassword && (
-        <div className="modal-overlay" onClick={() => setShowForgotPassword(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>Forgot Password</h3>
-              <button className="modal-close" onClick={() => setShowForgotPassword(false)}>×</button>
+    <div className="login-page-wrapper">
+      <div className="login-sidebar">
+        <div className="sidebar-content">
+          <h1>Welcome to HRMS</h1>
+          <p>Empowering your workforce with intelligent management, seamless collaboration, and advanced analytics.</p>
+          <div className="sidebar-decoration">
+            <div className="glass-card card-1">
+              <div className="skeleton-line"></div>
+              <div className="skeleton-line short"></div>
             </div>
-            <form onSubmit={handleForgotPassword}>
-              <p className="modal-subtitle">
-                Enter your registered email to receive a temporary password
-              </p>
-              {forgotError && <div className="login-error">{forgotError}</div>}
-              {forgotSuccess && <div className="login-success">{forgotSuccess}</div>}
-              <input
-                type="email"
-                placeholder="Enter your email"
-                value={forgotEmail}
-                onChange={(e) => setForgotEmail(e.target.value)}
-                autoFocus
-              />
-              <button type="submit" className="login-btn" disabled={forgotLoading}>
-                {forgotLoading ? "Sending..." : "Send Temporary Password"}
-              </button>
-            </form>
+            <div className="glass-card card-2">
+              <div className="user-avatar"></div>
+              <div className="skeleton-line"></div>
+            </div>
+            <div className="circle circle-1"></div>
+            <div className="circle circle-2"></div>
           </div>
         </div>
-      )}
+      </div>
+      
+      <div className="login-container">
+        <form className="login-card" onSubmit={handleSubmit}>
+          <div className="brand-logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          </div>
+          <h2>Welcome Back</h2>
+          <p className="login-subtitle">Sign in to access your workspace</p>
+
+          {error && (
+            <div className="login-error">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+              <span>{error}</span>
+            </div>
+          )}
+
+          <div className="input-group">
+            <label>Email Address</label>
+            <div className="input-wrapper">
+              <svg className="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+              <input
+                type="text"
+                placeholder="name@company.com"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                autoFocus
+              />
+            </div>
+          </div>
+
+          <div className="input-group">
+            <label>Password</label>
+            <div className="input-wrapper">
+              <svg className="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              <input
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div className="form-actions">
+            <label className="remember-me">
+              <input 
+                type="checkbox" 
+                checked={rememberMe} 
+                onChange={(e) => setRememberMe(e.target.checked)} 
+              />
+              <span>Remember me</span>
+            </label>
+            <button
+              type="button"
+              className="forgot-password-link"
+              onClick={() => setShowForgotPassword(true)}
+            >
+              Forgot Password?
+            </button>
+          </div>
+
+          <button type="submit" className="login-btn" disabled={loading}>
+            {loading ? <span className="loader"></span> : "Sign In"}
+          </button>
+        </form>
+
+        {/* Forgot Password Modal */}
+        {showForgotPassword && (
+          <div className="modal-overlay" onClick={() => setShowForgotPassword(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <button className="modal-close-btn" onClick={() => setShowForgotPassword(false)}>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+              
+              <div className="modal-header-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path></svg>
+              </div>
+              <h3>Reset Password</h3>
+              <p className="modal-subtitle">
+                Enter your registered email to receive a temporary password.
+              </p>
+
+              <form onSubmit={handleForgotPassword} className="forgot-form">
+                {forgotError && (
+                  <div className="login-error">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    <span>{forgotError}</span>
+                  </div>
+                )}
+                {forgotSuccess && (
+                  <div className="login-success">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    <span>{forgotSuccess}</span>
+                  </div>
+                )}
+                
+                <div className="input-group">
+                  <div className="input-wrapper">
+                    <svg className="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                    <input
+                      type="email"
+                      placeholder="name@company.com"
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                      autoFocus
+                    />
+                  </div>
+                </div>
+                
+                <button type="submit" className="login-btn mt-4" disabled={forgotLoading}>
+                  {forgotLoading ? <span className="loader"></span> : "Send Reset Link"}
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

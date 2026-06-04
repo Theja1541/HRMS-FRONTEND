@@ -269,6 +269,22 @@
   cursor: not-allowed;
 }
 
+.btn-email-single {
+  background: linear-gradient(135deg, #f97316, #ea580c);
+  color: white;
+  padding: 8px 14px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: 0.25s ease;
+  font-weight: 500;
+}
+
+.btn-email-single:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(234, 88, 12, 0.35);
+}
+
 /* ===================================================
    LOADING STATE
 =================================================== */

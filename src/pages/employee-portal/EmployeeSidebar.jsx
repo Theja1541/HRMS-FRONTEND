@@ -101,12 +101,12 @@ export default function EmployeeSidebar({ isOpen, onClose, lockoutActive = false
 
         <NavLink to="/employee/dashboard" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
           <span>🏠</span>
-          {!collapsed && <span>Dashboard</span>}
+          <span>Dashboard</span>
         </NavLink>
 
         <NavLink to="/employee/attendance" className="sidebar-item" style={getBlockedStyle(features.attendance ? undefined : "none")} onClick={onClose}>
           <span>📅</span>
-          {!collapsed && <span>My Attendance</span>}
+          <span>My Attendance</span>
         </NavLink>
 
         {/* LEAVES */}
@@ -199,17 +199,27 @@ export default function EmployeeSidebar({ isOpen, onClose, lockoutActive = false
 
         <NavLink to="/employee/profile" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
           <span>👤</span>
-          {!collapsed && <span>My Profile</span>}
+          <span>My Profile</span>
         </NavLink>
 
         <NavLink to="/employee/asset-requests" className="sidebar-item" style={getBlockedStyle(features.assets ? undefined : "none")} onClick={onClose}>
           <span>📦</span>
-          {!collapsed && <span>Assets</span>}
+          <span>Assets</span>
+        </NavLink>
+
+        <NavLink to="/employee/holidays" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
+          <span>🏖️</span>
+          <span>Holidays</span>
+        </NavLink>
+
+        <NavLink to="/employee/resignation" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
+          <span>👋</span>
+          <span>Resignation</span>
         </NavLink>
 
         <NavLink to="/employee/settings" className="sidebar-item" onClick={onClose}>
           <span>⚙️</span>
-          {!collapsed && <span>Settings</span>}
+          <span>Settings</span>
         </NavLink>
 
       </div>
@@ -218,7 +228,7 @@ export default function EmployeeSidebar({ isOpen, onClose, lockoutActive = false
       <div className="sidebar-footer">
         <div className="sidebar-item logout" onClick={handleLogout}>
           <span>🚪</span>
-          {!collapsed && <span>Logout</span>}
+          <span>Logout</span>
         </div>
       </div>
 

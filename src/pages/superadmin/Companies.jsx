@@ -299,6 +299,10 @@ export default function Companies() {
     admin_last_name: "",
     admin_email: "",
     enabled_modules: getInitialModulesState(),
+    max_login_attempts: 5,
+    min_password_length: 8,
+    password_expiry_days: 90,
+    require_mfa: false,
   });
 
 
@@ -416,6 +420,10 @@ export default function Companies() {
       admin_last_name: "",
       admin_email: "",
       enabled_modules: getInitialModulesState(),
+      max_login_attempts: 5,
+      min_password_length: 8,
+      password_expiry_days: 90,
+      require_mfa: false,
     });
     setCurrentStep(1);
     setModalOpen(true);
@@ -446,6 +454,10 @@ export default function Companies() {
       admin_last_name: c.admin_last_name || "",
       admin_email: c.admin_email || "",
       enabled_modules: normalizeCompanyModules(c.enabled_modules),
+      max_login_attempts: c.max_login_attempts ?? 5,
+      min_password_length: c.min_password_length ?? 8,
+      password_expiry_days: c.password_expiry_days ?? 90,
+      require_mfa: c.require_mfa || false,
     });
     setCurrentStep(1);
     setModalOpen(true);
@@ -723,7 +735,7 @@ export default function Companies() {
                     {c.employee_count ?? 0}
                   </td>
                   <td style={{ padding: "16px", color: '#475569' }}>
-                    <span style={{ background: '#f1f5f9', padding: '6px 12px', borderRadius: '20px', fontSize: '13px', fontWeight: '500' }}>
+                    <span style={{ background: '#f1f5f9', padding: '6px 12px', borderRadius: '20px', fontSize: '13px', fontWeight: '500', whiteSpace: 'nowrap' }}>
                       {(() => {
                         const planName = c.pricing_plan_name;
                         const planPrice = c.pricing_plan_price || c.pricing_plan_price_monthly;
@@ -952,9 +964,10 @@ export default function Companies() {
             <div style={{display: 'flex', gap: '8px', marginBottom: '20px', paddingBottom: '10px', borderBottom: '1px solid #e2e8f0'}}>
               <div style={{flex: 1, padding: '8px', textAlign: 'center', background: currentStep === 1 ? '#eff6ff' : 'transparent', color: currentStep === 1 ? '#1d4ed8' : '#64748b', borderRadius: '8px', fontWeight: currentStep === 1 ? '600' : '400'}}>Step 1: Company Details</div>
               <div style={{flex: 1, padding: '8px', textAlign: 'center', background: currentStep === 2 ? '#eff6ff' : 'transparent', color: currentStep === 2 ? '#1d4ed8' : '#64748b', borderRadius: '8px', fontWeight: currentStep === 2 ? '600' : '400'}}>Step 2: Admin Details</div>
+              <div style={{flex: 1, padding: '8px', textAlign: 'center', background: currentStep === 3 ? '#eff6ff' : 'transparent', color: currentStep === 3 ? '#1d4ed8' : '#64748b', borderRadius: '8px', fontWeight: currentStep === 3 ? '600' : '400'}}>Step 3: Security Settings</div>
             </div>
             <form onSubmit={(e) => {
-              if (currentStep === 2) {
+              if (currentStep === 3) {
                 handleSubmit(e);
               } else {
                 e.preventDefault();
@@ -1255,25 +1268,75 @@ export default function Companies() {
                   />
                 </>
               )}
-              <div className="modal-actions" style={{marginTop: '24px', display: 'flex', justifyContent: 'space-between', width: '100%'}}>
-                <div>
-                  {currentStep > 1 && (
-                    <button type="button" className="btn" onClick={() => setCurrentStep(prev => prev - 1)}>
-                      ← Back
-                    </button>
-                  )}
-                </div>
-                <div style={{display: 'flex', gap: '12px'}}>
-                  <button type="button" className="btn-cancel" onClick={() => setModalOpen(false)}>Cancel</button>
-                  {currentStep === 2 ? (
+              
+              {currentStep === 3 && (
+                <>
+                  <h4 style={{ marginBottom: 8 }}>Security Settings</h4>
+                  <p className="muted-text" style={{ marginTop: 0 }}>
+                    Configure security policies for this company.
+                  </p>
+                  
+                  <label>Max Login Attempts</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={form.max_login_attempts}
+                    onChange={(e) => setForm({ ...form, max_login_attempts: parseInt(e.target.value) })}
+                    placeholder="5 (0 to disable)"
+                  />
+                  <p className="muted-text" style={{ marginTop: "-8px", marginBottom: "16px", fontSize: "12px" }}>Account locks after this many failed logins. 0 to disable.</p>
+
+                  <label>Minimum Password Length</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={form.min_password_length}
+                    onChange={(e) => setForm({ ...form, min_password_length: parseInt(e.target.value) })}
+                    placeholder="8"
+                  />
+
+                  <label>Password Expiry (Days)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={form.password_expiry_days}
+                    onChange={(e) => setForm({ ...form, password_expiry_days: parseInt(e.target.value) })}
+                    placeholder="90 (0 = never)"
+                  />
+                  
+                  <label style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: "16px" }}>
+                    <input
+                      type="checkbox"
+                      checked={form.require_mfa}
+                      onChange={(e) => setForm({ ...form, require_mfa: e.target.checked })}
+                    />
+                    Require Multi-Factor Authentication (MFA)
+                  </label>
+
+                  <div style={{display: 'flex', gap: '12px', marginTop: '24px'}}>
+                    <button type="button" className="btn-cancel" onClick={() => setModalOpen(false)}>Cancel</button>
                     <button type="button" className="btn primary" onClick={handleSubmit}>Save</button>
-                  ) : (
+                  </div>
+                </>
+              )}
+
+              {currentStep < 3 && (
+                <div className="modal-actions" style={{marginTop: '24px', display: 'flex', justifyContent: 'space-between', width: '100%'}}>
+                  <div>
+                    {currentStep > 1 && (
+                      <button type="button" className="btn" onClick={() => setCurrentStep(prev => prev - 1)}>
+                        ← Back
+                      </button>
+                    )}
+                  </div>
+                  <div style={{display: 'flex', gap: '12px'}}>
+                    <button type="button" className="btn-cancel" onClick={() => setModalOpen(false)}>Cancel</button>
                     <button type="submit" className="btn primary">
                       Next →
                     </button>
-                  )}
+                  </div>
                 </div>
-              </div>
+              )}
             </form>
 
           </div>

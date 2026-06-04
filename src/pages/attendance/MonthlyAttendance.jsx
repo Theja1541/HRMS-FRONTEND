@@ -604,8 +604,6 @@ export default function MonthlyAttendance() {
                 <option value="HALF_DAY">Half Day</option>
                 <option value="PAID_LEAVE">Paid Leave</option>
                 <option value="UNPAID_LEAVE">Unpaid Leave</option>
-                <option value="HOLIDAY">Holiday</option>
-                <option value="WEEK_OFF">Week Off</option>
               </select>
             </div>
             {!bulkEdit && (

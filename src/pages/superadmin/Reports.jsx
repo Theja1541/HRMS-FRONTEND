@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { getReportsOverview } from "../../api/superadmin";
+import { ResponsiveContainer, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend } from "recharts";
 import "../../styles/pages.css";
 
 const currency = (value) =>
@@ -31,23 +32,27 @@ function KpiCard({ label, value, sub, trend, tone = "#2563eb" }) {
     <div
       style={{
         background: "#fff",
-        borderRadius: 8,
-        padding: 18,
-        boxShadow: "0 4px 16px rgba(15,23,42,0.08)",
-        border: "1px solid #eef2f7",
+        borderRadius: 12,
+        padding: 20,
+        boxShadow: "0 4px 16px rgba(15,23,42,0.06)",
+        border: "1px solid #e2e8f0",
         minHeight: 132,
+        transition: "all 0.25s ease",
+        cursor: "default",
       }}
+      onMouseEnter={(e) => { e.currentTarget.style.transform = "translateY(-4px)"; e.currentTarget.style.boxShadow = "0 12px 24px rgba(15,23,42,0.12)"; }}
+      onMouseLeave={(e) => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(15,23,42,0.06)"; }}
     >
-      <div style={{ color: "#64748b", fontSize: 12, fontWeight: 800, textTransform: "uppercase" }}>
+      <div style={{ color: "#64748b", fontSize: 12, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.5px" }}>
         {label}
       </div>
-      <div style={{ marginTop: 10, fontSize: 28, fontWeight: 850, color: tone }}>
+      <div style={{ marginTop: 12, fontSize: 32, fontWeight: 800, color: tone }}>
         {value}
       </div>
-      {sub && <div style={{ marginTop: 8, color: "#475569", fontSize: 13 }}>{sub}</div>}
+      {sub && <div style={{ marginTop: 6, color: "#64748b", fontSize: 13, fontWeight: 500 }}>{sub}</div>}
       {trend != null && (
-        <div style={{ marginTop: 10, color: trend >= 0 ? "#15803d" : "#b91c1c", fontSize: 12, fontWeight: 800 }}>
-          {trend >= 0 ? "Up" : "Down"} {number(Math.abs(trend))} last 30 days
+        <div style={{ marginTop: 12, display: "flex", alignItems: "center", gap: 4, color: trend >= 0 ? "#059669" : "#dc2626", fontSize: 13, fontWeight: 700 }}>
+          {trend >= 0 ? "↑" : "↓"} {number(Math.abs(trend))} last 30 days
         </div>
       )}
     </div>
@@ -59,114 +64,66 @@ function SectionCard({ title, subtitle, children }) {
     <section
       style={{
         background: "#fff",
-        borderRadius: 8,
-        boxShadow: "0 4px 16px rgba(15,23,42,0.08)",
-        border: "1px solid #eef2f7",
+        borderRadius: 12,
+        boxShadow: "0 4px 16px rgba(15,23,42,0.06)",
+        border: "1px solid #e2e8f0",
         overflow: "hidden",
+        display: "flex",
+        flexDirection: "column"
       }}
     >
       <div
         style={{
-          padding: "18px 22px",
-          background: "#f8fafc",
+          padding: "20px 24px",
           borderBottom: "1px solid #e2e8f0",
+          background: "#f8fafc"
         }}
       >
-        <h3 style={{ margin: 0, color: "#0f172a", fontSize: 17, fontWeight: 800 }}>{title}</h3>
-        {subtitle && <p style={{ margin: "4px 0 0", color: "#64748b", fontSize: 13 }}>{subtitle}</p>}
+        <h3 style={{ margin: 0, color: "#0f172a", fontSize: 18, fontWeight: 700 }}>{title}</h3>
+        {subtitle && <p style={{ margin: "4px 0 0", color: "#64748b", fontSize: 13, fontWeight: 500 }}>{subtitle}</p>}
       </div>
-      <div style={{ padding: 22 }}>{children}</div>
+      <div style={{ padding: 24, flex: 1, display: "flex", flexDirection: "column" }}>{children}</div>
     </section>
   );
 }
 
-function BarChart({ data, valueKey, color, formatter = number }) {
-  const values = data.map((item) => Number(item[valueKey] || 0));
-  const max = Math.max(...values, 1);
-  const hasData = values.some((value) => value > 0);
-
-  return (
-    <div>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: `repeat(${data.length}, minmax(28px, 1fr))`,
-          alignItems: "end",
-          gap: 10,
-          minHeight: 210,
-          padding: "8px 2px 0",
-          borderBottom: "1px solid #cbd5e1",
-        }}
-      >
-        {data.map((item) => {
-          const rawValue = Number(item[valueKey] || 0);
-          const height = hasData ? Math.max(rawValue === 0 ? 2 : 18, (rawValue / max) * 160) : 2;
-          return (
-            <div key={item.month} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
-              <div style={{ height: 22, color: "#334155", fontSize: 11, fontWeight: 800 }}>
-                {rawValue > 0 ? formatter(rawValue) : ""}
-              </div>
-              <div
-                title={`${item.month}: ${formatter(rawValue)}`}
-                style={{
-                  width: "100%",
-                  maxWidth: 48,
-                  height,
-                  background: rawValue > 0 ? color : "#e2e8f0",
-                  borderRadius: "6px 6px 0 0",
-                  transition: "height 0.25s ease",
-                }}
-              />
-            </div>
-          );
-        })}
+const CustomTooltip = ({ active, payload, label, formatter }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div style={{ background: "#fff", padding: "12px 16px", border: "1px solid #e2e8f0", borderRadius: 8, boxShadow: "0 10px 25px rgba(0,0,0,0.1)" }}>
+        <p style={{ margin: "0 0 8px", color: "#64748b", fontSize: 12, fontWeight: 700, textTransform: "uppercase" }}>{monthLabel(label)}</p>
+        <p style={{ margin: 0, color: payload[0].fill || payload[0].color || "#0f172a", fontSize: 16, fontWeight: 800 }}>
+          {formatter ? formatter(payload[0].value) : number(payload[0].value)}
+        </p>
       </div>
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: `repeat(${data.length}, minmax(28px, 1fr))`,
-          gap: 10,
-          paddingTop: 10,
-        }}
-      >
-        {data.map((item) => (
-          <div key={item.month} style={{ textAlign: "center", color: "#64748b", fontSize: 11, fontWeight: 700 }}>
-            {monthLabel(item.month)}
-          </div>
-        ))}
+    );
+  }
+  return null;
+};
+
+const PieCustomTooltip = ({ active, payload }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div style={{ background: "#fff", padding: "12px 16px", border: "1px solid #e2e8f0", borderRadius: 8, boxShadow: "0 10px 25px rgba(0,0,0,0.1)" }}>
+        <p style={{ margin: "0 0 4px", color: "#64748b", fontSize: 12, fontWeight: 700 }}>{payload[0].name}</p>
+        <p style={{ margin: 0, color: payload[0].payload.fill, fontSize: 16, fontWeight: 800 }}>
+          {number(payload[0].value)} units
+        </p>
       </div>
-    </div>
+    );
+  }
+  return null;
+};
+
+function ReportsTable({ columns, rows, empty, itemsPerPage = 5 }) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.ceil(rows.length / itemsPerPage);
+  
+  const currentRows = rows.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
   );
-}
 
-function DistributionList({ rows, labelKey, totalKey = "count", colorFor }) {
-  const total = rows.reduce((sum, row) => sum + Number(row[totalKey] || 0), 0) || 1;
-  if (!rows.length) return <p style={{ color: "#64748b", margin: 0 }}>No data yet.</p>;
-
-  return (
-    <div style={{ display: "grid", gap: 14 }}>
-      {rows.map((row, index) => {
-        const label = labelKey(row);
-        const value = Number(row[totalKey] || 0);
-        const percent = Math.round((value / total) * 100);
-        const color = colorFor?.(row, index) || "#2563eb";
-        return (
-          <div key={`${label}-${index}`}>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: 12, marginBottom: 7 }}>
-              <span style={{ color: "#0f172a", fontWeight: 800 }}>{label}</span>
-              <span style={{ color: "#475569", fontWeight: 700 }}>{number(value)} ({percent}%)</span>
-            </div>
-            <div style={{ height: 10, background: "#eaf0f7", borderRadius: 999, overflow: "hidden" }}>
-              <div style={{ width: `${percent}%`, height: "100%", background: color, borderRadius: 999 }} />
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function ReportsTable({ columns, rows, empty }) {
   return (
     <div className="table-wrapper">
       <table className="table">
@@ -178,18 +135,18 @@ function ReportsTable({ columns, rows, empty }) {
           </tr>
         </thead>
         <tbody>
-          {rows.length === 0 ? (
+          {currentRows.length === 0 ? (
             <tr>
               <td colSpan={columns.length} style={{ textAlign: "center", color: "#64748b", padding: 24 }}>
                 {empty}
               </td>
             </tr>
           ) : (
-            rows.map((row, rowIndex) => (
+            currentRows.map((row, rowIndex) => (
               <tr key={row.id || rowIndex}>
                 {columns.map((column) => (
                   <td key={column.key} style={column.cellStyle}>
-                    {column.render(row, rowIndex)}
+                    {column.render(row, (currentPage - 1) * itemsPerPage + rowIndex)}
                   </td>
                 ))}
               </tr>
@@ -197,6 +154,27 @@ function ReportsTable({ columns, rows, empty }) {
           )}
         </tbody>
       </table>
+      {totalPages > 1 && (
+        <div style={{ display: "flex", justifyContent: "flex-end", gap: 8, padding: "12px 16px", borderTop: "1px solid #e2e8f0" }}>
+          <button 
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(prev => prev - 1)}
+            style={{ padding: "4px 10px", borderRadius: 4, border: "1px solid #cbd5e1", background: currentPage === 1 ? "#f8fafc" : "#fff", color: currentPage === 1 ? "#94a3b8" : "#334155", cursor: currentPage === 1 ? "not-allowed" : "pointer" }}
+          >
+            Prev
+          </button>
+          <span style={{ display: "flex", alignItems: "center", fontSize: 13, color: "#64748b" }}>
+            Page {currentPage} of {totalPages}
+          </span>
+          <button 
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(prev => prev + 1)}
+            style={{ padding: "4px 10px", borderRadius: 4, border: "1px solid #cbd5e1", background: currentPage === totalPages ? "#f8fafc" : "#fff", color: currentPage === totalPages ? "#94a3b8" : "#334155", cursor: currentPage === totalPages ? "not-allowed" : "pointer" }}
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -205,11 +183,17 @@ export default function Reports() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
 
   const loadReports = () => {
     setLoading(true);
     setError("");
-    getReportsOverview()
+    const params = {};
+    if (fromDate) params.from_date = fromDate;
+    if (toDate) params.to_date = toDate;
+
+    getReportsOverview(params)
       .then((response) => setData(response.data))
       .catch(() => setError("Failed to load reports. Please try again."))
       .finally(() => setLoading(false));
@@ -271,13 +255,28 @@ export default function Reports() {
             Platform-wide analytics from live tenant, user, payroll, invoice, and payment records
           </p>
         </div>
-        <button
-          className="btn"
-          onClick={loadReports}
-          style={{ background: "rgba(255,255,255,0.16)", color: "white", border: "1px solid rgba(255,255,255,0.35)" }}
-        >
-          Refresh
-        </button>
+        <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+          <input 
+            type="date" 
+            value={fromDate}
+            onChange={(e) => setFromDate(e.target.value)}
+            style={{ padding: "8px 12px", borderRadius: 6, border: "1px solid rgba(255,255,255,0.35)", background: "rgba(255,255,255,0.1)", color: "white", outline: "none", fontSize: 14 }}
+          />
+          <span style={{ color: "white" }}>to</span>
+          <input 
+            type="date" 
+            value={toDate}
+            onChange={(e) => setToDate(e.target.value)}
+            style={{ padding: "8px 12px", borderRadius: 6, border: "1px solid rgba(255,255,255,0.35)", background: "rgba(255,255,255,0.1)", color: "white", outline: "none", fontSize: 14 }}
+          />
+          <button
+            className="btn"
+            onClick={loadReports}
+            style={{ background: "rgba(255,255,255,0.16)", color: "white", border: "1px solid rgba(255,255,255,0.35)", cursor: "pointer" }}
+          >
+            Refresh
+          </button>
+        </div>
       </div>
 
       <div style={{ marginTop: 22, display: "grid", gap: 22 }}>
@@ -292,30 +291,125 @@ export default function Reports() {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: 20 }}>
           <SectionCard title="Company Growth" subtitle={`${number(chartSummary.companyTotal)} companies created in the last 12 months`}>
-            <BarChart data={monthlyCompanies} valueKey="count" color="#2563eb" />
+            <div style={{ width: "100%", height: 280 }}>
+              <ResponsiveContainer>
+                <AreaChart data={monthlyCompanies} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorComp" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#2563eb" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                  <XAxis dataKey="month" tickFormatter={monthLabel} tick={{fill: "#64748b", fontSize: 12}} axisLine={false} tickLine={false} dy={10} />
+                  <YAxis tick={{fill: "#64748b", fontSize: 12}} axisLine={false} tickLine={false} />
+                  <RechartsTooltip content={<CustomTooltip />} />
+                  <Area type="monotone" dataKey="count" stroke="#2563eb" strokeWidth={3} fillOpacity={1} fill="url(#colorComp)" activeDot={{r: 6, strokeWidth: 0}} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </SectionCard>
           <SectionCard title="User Growth" subtitle={`${number(chartSummary.userTotal)} users created in the last 12 months`}>
-            <BarChart data={monthlyUsers} valueKey="count" color="#7c3aed" />
+            <div style={{ width: "100%", height: 280 }}>
+              <ResponsiveContainer>
+                <BarChart data={monthlyUsers} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                  <XAxis dataKey="month" tickFormatter={monthLabel} tick={{fill: "#64748b", fontSize: 12}} axisLine={false} tickLine={false} dy={10} />
+                  <YAxis tick={{fill: "#64748b", fontSize: 12}} axisLine={false} tickLine={false} />
+                  <RechartsTooltip content={<CustomTooltip />} cursor={{fill: "#f1f5f9"}} />
+                  <Bar dataKey="count" fill="#7c3aed" radius={[4, 4, 0, 0]} maxBarSize={40} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </SectionCard>
           <SectionCard title="Monthly Revenue" subtitle={`${currency(chartSummary.revenueTotal)} completed payments in the last 12 months`}>
-            <BarChart data={monthlyRevenue} valueKey="total" color="#16a34a" formatter={currency} />
+            <div style={{ width: "100%", height: 280 }}>
+              <ResponsiveContainer>
+                <AreaChart data={monthlyRevenue} margin={{ top: 10, right: 10, left: 10, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorRev" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#16a34a" stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor="#16a34a" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
+                  <XAxis dataKey="month" tickFormatter={monthLabel} tick={{fill: "#64748b", fontSize: 12}} axisLine={false} tickLine={false} dy={10} />
+                  <YAxis tickFormatter={(val) => `₹${val/1000}k`} tick={{fill: "#64748b", fontSize: 12}} axisLine={false} tickLine={false} />
+                  <RechartsTooltip content={<CustomTooltip formatter={currency} />} />
+                  <Area type="monotone" dataKey="total" stroke="#16a34a" strokeWidth={3} fillOpacity={1} fill="url(#colorRev)" activeDot={{r: 6, strokeWidth: 0}} />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
           </SectionCard>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))", gap: 20 }}>
           <SectionCard title="Users by Role" subtitle="Role distribution across the platform">
-            <DistributionList
-              rows={usersByRole}
-              labelKey={(row) => String(row.role || "Unknown").replace("_", " ")}
-              colorFor={(row) => roleColors[row.role] || "#64748b"}
-            />
+            <div style={{ width: "100%", height: 260 }}>
+              {usersByRole.length === 0 ? (
+                <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b" }}>No data yet.</div>
+              ) : (
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie
+                      data={usersByRole}
+                      dataKey="count"
+                      nameKey="role"
+                      cx="50%"
+                      cy="45%"
+                      innerRadius={60}
+                      outerRadius={90}
+                      paddingAngle={2}
+                    >
+                      {usersByRole.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={roleColors[entry.role] || "#64748b"} />
+                      ))}
+                    </Pie>
+                    <RechartsTooltip content={<PieCustomTooltip />} />
+                    <Legend 
+                      verticalAlign="bottom" 
+                      height={36} 
+                      iconType="circle" 
+                      formatter={(value) => <span style={{ color: "#475569", fontWeight: 600, fontSize: 12 }}>{String(value).replace("_", " ")}</span>} 
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
+            </div>
           </SectionCard>
           <SectionCard title="Plan Distribution" subtitle="Companies per pricing plan">
-            <DistributionList
-              rows={planDistribution}
-              labelKey={(row) => row.pricing_plan__name || "No Plan"}
-              colorFor={(_row, index) => ["#2563eb", "#7c3aed", "#0891b2", "#16a34a"][index % 4]}
-            />
+            <div style={{ width: "100%", height: 260 }}>
+              {planDistribution.length === 0 ? (
+                <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748b" }}>No data yet.</div>
+              ) : (
+                <ResponsiveContainer>
+                  <PieChart>
+                    <Pie
+                      data={planDistribution}
+                      dataKey="count"
+                      nameKey="pricing_plan__name"
+                      cx="50%"
+                      cy="45%"
+                      innerRadius={60}
+                      outerRadius={90}
+                      paddingAngle={2}
+                    >
+                      {planDistribution.map((entry, index) => {
+                        const colors = ["#2563eb", "#7c3aed", "#0891b2", "#16a34a"];
+                        return <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />;
+                      })}
+                    </Pie>
+                    <RechartsTooltip content={<PieCustomTooltip />} />
+                    <Legend 
+                      verticalAlign="bottom" 
+                      height={36} 
+                      iconType="circle" 
+                      formatter={(value) => <span style={{ color: "#475569", fontWeight: 600, fontSize: 12 }}>{value || "No Plan"}</span>} 
+                    />
+                  </PieChart>
+                </ResponsiveContainer>
+              )}
+            </div>
           </SectionCard>
         </div>
 
@@ -336,7 +430,7 @@ export default function Reports() {
                 ),
               },
               { key: "employees", label: "Employees", render: (row) => number(row.employee_count), cellStyle: { fontWeight: 800, color: "#2563eb" } },
-              { key: "plan", label: "Plan", render: (row) => row.plan || "-" },
+              { key: "plan", label: "Plan", render: (row) => row.pricing_plan__name || row.plan || "-" },
               {
                 key: "end",
                 label: "Subscription End",

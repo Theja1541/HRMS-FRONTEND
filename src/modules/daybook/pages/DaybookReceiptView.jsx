@@ -94,11 +94,44 @@ export default function DaybookReceiptView() {
 
       <style>{`
         @media print {
+          /* Hide all unrelated elements completely from layout flow */
           body * { visibility: hidden; }
+          
+          /* Make our receipt and its children visible */
           #printable-receipt, #printable-receipt * { visibility: visible; }
-          #printable-receipt { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none !important; margin: 0 !important; padding: 0 !important; }
+          
+          /* Pull the receipt to the top-left and reset layout */
+          #printable-receipt { 
+            position: absolute; 
+            left: 0; 
+            top: 0; 
+            width: 100%; 
+            box-shadow: none !important; 
+            margin: 0 !important; 
+            padding: 20px !important; 
+            border: none !important;
+          }
+          
+          /* CRITICAL: Force parent containers to collapse so they don't create blank pages */
+          html, body, #root, .layout-root, .layout-main, .layout-content {
+            height: auto !important;
+            min-height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #fff !important;
+          }
+
+          /* Explicitly hide the wrapper's minHeight padding */
+          .print-wrapper {
+            min-height: 0 !important;
+            padding: 0 !important;
+            background: #fff !important;
+          }
+
           .no-print { display: none !important; }
-          @page { size: auto; margin: 15mm; }
+          
+          /* Remove browser headers and footers (URL, Title, Date) */
+          @page { margin: 0; }
         }
         .receipt-container {
           font-family: 'Outfit', 'Inter', sans-serif;
@@ -111,9 +144,21 @@ export default function DaybookReceiptView() {
           color: #1e293b;
           border: 1px solid #e2e8f0;
         }
+        /* Reduce spacing for print to fit on one page */
+        @media print {
+          .receipt-container {
+            padding: 25px !important;
+          }
+          .receipt-container h2 {
+            margin: 0 0 15px 0 !important;
+          }
+          .receipt-container > div {
+            margin-bottom: 15px !important;
+          }
+        }
       `}</style>
 
-      <div id="printable-receipt" className="receipt-container">
+      <div id="printable-receipt" className="receipt-container print-wrapper">
         {/* Tenant Logo */}
         <div style={{ textAlign: "center", marginBottom: "30px" }}>
           {company.logo_url ? (

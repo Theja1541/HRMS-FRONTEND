@@ -49,6 +49,7 @@ export default function ManageUsers() {
 
   const handleRoleChange = async (id, newRole) => {
     if (id === currentUser?.id) return;
+    if (!window.confirm(`Are you sure you want to change this user's role to ${ROLE_LABELS[newRole] ?? newRole}?`)) return;
     setActionLoading(id);
     try {
       await updateUserRole(id, newRole);
@@ -235,7 +236,7 @@ export default function ManageUsers() {
                 <td style={{ padding: "16px", color: '#475569' }}>{user.email}</td>
                 <td style={{ padding: "16px", color: '#475569', fontWeight: '500' }}>{user.company_name ?? "—"}</td>
                 <td style={{ padding: "16px", color: '#475569' }}>
-                  <span style={{ background: '#f1f5f9', padding: '6px 12px', borderRadius: '20px', fontSize: '13px', fontWeight: '500' }}>
+                  <span style={{ background: '#f1f5f9', padding: '6px 12px', borderRadius: '20px', fontSize: '13px', fontWeight: '500', whiteSpace: 'nowrap' }}>
                     {ROLE_LABELS[user.role] ?? user.role}
                   </span>
                 </td>

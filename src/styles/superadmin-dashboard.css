@@ -1,0 +1,950 @@
+/* =====================================================
+   HRMS · Super Admin Dashboard — Premium Redesign
+   File: src/styles/superadmin-dashboard.css
+   ===================================================== */
+
+/* ─── Loading State ─── */
+.sad-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  gap: 16px;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.sad-loading-spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #e2e8f0;
+  border-top-color: #1a56db;
+  border-radius: 50%;
+  animation: sad-spin 0.8s linear infinite;
+}
+
+@keyframes sad-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── Page Wrapper ─── */
+.sad-page {
+  width: 100%;
+  padding-bottom: 32px;
+}
+
+/* =====================================================
+   HERO
+   ===================================================== */
+.sad-hero {
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #1a56db 100%);
+  border-radius: 20px;
+  padding: 28px 32px;
+  margin-bottom: 22px;
+  position: relative;
+  overflow: hidden;
+}
+
+.sad-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 80% 50%, rgba(99, 179, 255, 0.14) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.sad-hero::after {
+  content: "";
+  position: absolute;
+  bottom: -50px;
+  right: -50px;
+  width: 180px;
+  height: 180px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.sad-hero-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.sad-hero-title {
+  font-size: 24px;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.5px;
+  margin: 0;
+}
+
+.sad-hero-sub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 4px;
+}
+
+.sad-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 0.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 5px 13px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.85);
+  margin-top: 10px;
+}
+
+.sad-hero-badge-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22d3a5;
+  box-shadow: 0 0 6px rgba(34, 211, 165, 0.6);
+}
+
+.sad-hero-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Clock */
+.sad-clock {
+  text-align: right;
+}
+
+.sad-clock-time {
+  font-size: 26px;
+  font-weight: 700;
+  color: #ffffff;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 1px;
+}
+
+.sad-clock-date {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+  margin-top: 3px;
+}
+
+/* Notifications */
+.sad-notif-wrap {
+  position: relative;
+}
+
+.sad-notif-btn {
+  position: relative;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.1);
+  border: 0.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: background 0.2s;
+  color: #fff;
+}
+
+.sad-notif-btn:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.sad-notif-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background: #ef4444;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #1e3a8a;
+}
+
+.sad-notif-dropdown {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  width: 280px;
+  background: #ffffff;
+  border-radius: 14px;
+  border: 0.5px solid #e2e8f0;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  overflow: hidden;
+  animation: sad-fadeDown 0.2s ease;
+}
+
+@keyframes sad-fadeDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.sad-notif-header {
+  font-size: 13px;
+  font-weight: 700;
+  color: #0f172a;
+  padding: 12px 16px;
+  border-bottom: 0.5px solid #e2e8f0;
+}
+
+.sad-notif-item {
+  padding: 10px 16px;
+  border-bottom: 0.5px solid #f1f5f9;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.sad-notif-item:hover {
+  background: #f8fafc;
+}
+
+.sad-notif-item:last-child {
+  border-bottom: none;
+}
+
+.sad-notif-item p {
+  font-size: 13px;
+  color: #0f172a;
+  line-height: 1.4;
+}
+
+.sad-notif-item span {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 2px;
+  display: block;
+}
+
+.sad-notif-item--info { border-left: 3px solid #1a56db; }
+.sad-notif-item--success { border-left: 3px solid #0f9d6a; }
+.sad-notif-item--warn { border-left: 3px solid #d97706; }
+
+/* =====================================================
+   KPI GRID
+   ===================================================== */
+.sad-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.sad-kpi {
+  border-radius: 16px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  user-select: none;
+  animation: sad-fadeUp 0.5s ease both;
+}
+
+.sad-kpi:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18);
+}
+
+.sad-kpi:nth-child(1) { animation-delay: 0.05s; }
+.sad-kpi:nth-child(2) { animation-delay: 0.10s; }
+.sad-kpi:nth-child(3) { animation-delay: 0.15s; }
+.sad-kpi:nth-child(4) { animation-delay: 0.20s; }
+.sad-kpi:nth-child(5) { animation-delay: 0.25s; }
+.sad-kpi:nth-child(6) { animation-delay: 0.30s; }
+
+@keyframes sad-fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.sad-kpi--blue   { background: linear-gradient(135deg, #1341b5, #1a56db); color: #fff; }
+.sad-kpi--green  { background: linear-gradient(135deg, #0a7a54, #0f9d6a); color: #fff; }
+.sad-kpi--amber  { background: linear-gradient(135deg, #b45309, #d97706); color: #fff; }
+.sad-kpi--red    { background: linear-gradient(135deg, #b91c1c, #dc2626); color: #fff; }
+.sad-kpi--teal   { background: linear-gradient(135deg, #0d5e6c, #0891b2); color: #fff; }
+.sad-kpi--purple { background: linear-gradient(135deg, #5b21b6, #7c3aed); color: #fff; }
+
+.sad-kpi-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  margin-bottom: 14px;
+}
+
+.sad-kpi-value {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+.sad-kpi-label {
+  font-size: 12px;
+  opacity: 0.85;
+  margin-top: 5px;
+  line-height: 1.3;
+}
+
+.sad-kpi-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 20px;
+  padding: 3px 9px;
+  font-size: 11px;
+  margin-top: 10px;
+}
+
+/* =====================================================
+   SHARED CARD
+   ===================================================== */
+.sad-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 20px 22px;
+  border: 0.5px solid #e8edf3;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.05);
+  animation: sad-fadeUp 0.5s ease both;
+}
+
+.sad-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sad-card-icon {
+  font-size: 16px;
+}
+
+.sad-card-footer {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 0.5px solid #e8edf3;
+}
+
+.sad-link {
+  font-size: 13px;
+  color: #1a56db;
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.sad-link:hover {
+  opacity: 0.75;
+}
+
+.sad-muted {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+/* =====================================================
+   CHART ROW
+   ===================================================== */
+.sad-chart-row {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.sad-chart-tabs {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.sad-tab-btn {
+  padding: 5px 13px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid #e2e8f0;
+  background: transparent;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sad-tab-btn:hover {
+  border-color: #1a56db;
+  color: #1a56db;
+}
+
+.sad-tab-btn--active {
+  background: #1a56db;
+  color: #fff;
+  border-color: #1a56db;
+}
+
+.sad-chart-container {
+  width: 100%;
+  height: 230px;
+}
+
+.sad-chart-container--sm {
+  height: 190px;
+}
+
+/* =====================================================
+   COMPANIES TABLE
+   ===================================================== */
+.sad-two-col {
+  display: grid;
+  grid-template-columns: 1.7fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.sad-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sad-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.sad-table th {
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  padding: 0 12px 10px 0;
+  border-bottom: 0.5px solid #e8edf3;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.sad-table td {
+  padding: 10px 12px 10px 0;
+  font-size: 13px;
+  color: #0f172a;
+  border-bottom: 0.5px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.sad-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.sad-table tbody tr:hover td {
+  background: #f9fafb;
+}
+
+.sad-co-name {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.sad-co-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.sad-code {
+  font-family: "SF Mono", "Fira Code", monospace;
+  font-size: 11px;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 2px 7px;
+  border-radius: 5px;
+}
+
+.sad-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.sad-badge--active {
+  background: rgba(15, 157, 106, 0.1);
+  color: #0f9d6a;
+}
+
+.sad-badge--suspended {
+  background: rgba(220, 38, 38, 0.09);
+  color: #dc2626;
+}
+
+/* =====================================================
+   ACTIVITY FEED
+   ===================================================== */
+.sad-activity-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sad-activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  padding: 10px 0;
+  border-bottom: 0.5px solid #f1f5f9;
+}
+
+.sad-activity-item:last-child {
+  border-bottom: none;
+}
+
+.sad-act-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.sad-act-icon--reg  { background: rgba(26, 86, 219, 0.1); }
+.sad-act-icon--pay  { background: rgba(15, 157, 106, 0.1); }
+.sad-act-icon--usr  { background: rgba(124, 58, 237, 0.1); }
+.sad-act-icon--warn { background: rgba(217, 119, 6, 0.1); }
+
+.sad-act-body p {
+  font-size: 13px;
+  color: #0f172a;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.sad-act-body span {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 2px;
+  display: block;
+}
+
+/* =====================================================
+   BOTTOM ROW
+   ===================================================== */
+.sad-bottom-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* ─── Health Bars ─── */
+.sad-health-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.sad-health-item {
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 12px;
+  border: 0.5px solid #e8edf3;
+}
+
+.sad-health-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.sad-health-label {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.sad-health-badge {
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 20px;
+  padding: 2px 8px;
+}
+
+.sad-health-badge--ok {
+  background: rgba(15, 157, 106, 0.12);
+  color: #0f9d6a;
+}
+
+.sad-health-badge--warn {
+  background: rgba(217, 119, 6, 0.12);
+  color: #d97706;
+}
+
+.sad-health-bar {
+  height: 5px;
+  border-radius: 3px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.sad-health-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1.2s ease;
+}
+
+.sad-health-fill--ok   { background: linear-gradient(90deg, #0a7a54, #0f9d6a); }
+.sad-health-fill--warn { background: linear-gradient(90deg, #b45309, #d97706); }
+
+.sad-health-val {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 5px;
+}
+
+/* ─── Recent Companies ─── */
+.sad-rc-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 0.5px solid #f1f5f9;
+}
+
+.sad-rc-item:last-child {
+  border-bottom: none;
+}
+
+.sad-rc-logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.sad-rc-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.sad-rc-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sad-rc-sub {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 1px;
+}
+
+.sad-rc-date {
+  font-size: 11px;
+  color: #94a3b8;
+  flex-shrink: 0;
+}
+
+/* ─── Quick Actions ─── */
+.sad-qa-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.sad-qa-btn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border-radius: 10px;
+  border: 0.5px solid #e2e8f0;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+  color: #334155;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.sad-qa-btn:hover {
+  background: rgba(26, 86, 219, 0.06);
+  border-color: #1a56db;
+  color: #1a56db;
+  transform: translateY(-1px);
+}
+
+.sad-qa-icon {
+  font-size: 18px;
+}
+
+/* ─── Mini Stats ─── */
+.sad-mini-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0;
+  background: #f1f5f9;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 0.5px solid #e2e8f0;
+}
+
+.sad-mini-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 8px;
+}
+
+.sad-mini-stat--divider {
+  border-left: 0.5px solid #e2e8f0;
+  border-right: 0.5px solid #e2e8f0;
+}
+
+.sad-mini-val {
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1;
+}
+
+.sad-mini-label {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* =====================================================
+   RESPONSIVE
+   ===================================================== */
+@media (max-width: 1280px) {
+  .sad-kpi-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 1024px) {
+  .sad-chart-row,
+  .sad-two-col,
+  .sad-bottom-row {
+    grid-template-columns: 1fr;
+  }
+
+  .sad-chart-container {
+    height: 260px;
+  }
+}
+
+@media (max-width: 768px) {
+  .sad-hero {
+    padding: 20px;
+    border-radius: 16px;
+  }
+
+  .sad-hero-title {
+    font-size: 20px;
+  }
+
+  .sad-clock-time {
+    font-size: 20px;
+  }
+
+  .sad-hero-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .sad-hero-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .sad-kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .sad-kpi-value {
+    font-size: 22px;
+  }
+
+  .sad-health-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sad-notif-dropdown {
+    right: auto;
+    left: 0;
+    width: 260px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sad-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sad-qa-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sad-kpi-value {
+    font-size: 26px;
+  }
+
+  .sad-hero-title {
+    font-size: 18px;
+  }
+}
+
+/* ─── Dark mode support ─── */
+@media (prefers-color-scheme: dark) {
+  .sad-card {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .sad-card-title,
+  .sad-table td,
+  .sad-rc-name,
+  .sad-act-body p,
+  .sad-co-name span {
+    color: #f1f5f9;
+  }
+
+  .sad-table th {
+    color: #94a3b8;
+    border-bottom-color: #334155;
+  }
+
+  .sad-table td {
+    border-bottom-color: #1e293b;
+  }
+
+  .sad-table tbody tr:hover td {
+    background: #263347;
+  }
+
+  .sad-health-item {
+    background: #0f172a;
+    border-color: #334155;
+  }
+
+  .sad-qa-btn {
+    background: #0f172a;
+    border-color: #334155;
+    color: #cbd5e1;
+  }
+
+  .sad-qa-btn:hover {
+    background: rgba(26, 86, 219, 0.15);
+    border-color: #1a56db;
+    color: #60a5fa;
+  }
+
+  .sad-mini-stats {
+    background: #0f172a;
+    border-color: #334155;
+  }
+
+  .sad-mini-val {
+    color: #f1f5f9;
+  }
+
+  .sad-mini-stat--divider {
+    border-color: #334155;
+  }
+
+  .sad-activity-item {
+    border-bottom-color: #1e293b;
+  }
+
+  .sad-rc-item {
+    border-bottom-color: #1e293b;
+  }
+
+  .sad-code {
+    background: #0f172a;
+    color: #94a3b8;
+  }
+
+  .sad-notif-dropdown {
+    background: #1e293b;
+    border-color: #334155;
+  }
+
+  .sad-notif-header {
+    color: #f1f5f9;
+    border-bottom-color: #334155;
+  }
+
+  .sad-notif-item {
+    border-bottom-color: #263347;
+  }
+
+  .sad-notif-item:hover {
+    background: #263347;
+  }
+
+  .sad-notif-item p {
+    color: #e2e8f0;
+  }
+
+  .sad-card-footer {
+    border-top-color: #334155;
+  }
+
+  .sad-health-bar {
+    background: #334155;
+  }
+}
