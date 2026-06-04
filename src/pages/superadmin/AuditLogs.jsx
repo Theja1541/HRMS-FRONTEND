@@ -77,11 +77,13 @@ export default function AuditLogs() {
   return (
     <div className="audit-logs-page">
       <div className="page-header">
-        <h2 className="page-title">Audit Logs & Activity Monitoring</h2>
+        <div>
+          <h2 className="page-title">Audit Logs & Activity Monitoring</h2>
+          <p className="page-subtitle">
+            Security feature: track every important action across the platform (admin created employee, payroll generated, user login, password reset, etc.).
+          </p>
+        </div>
       </div>
-      <p className="page-subtitle">
-        Security feature: track every important action across the platform (admin created employee, payroll generated, user login, password reset, etc.).
-      </p>
 
       <div className="filters-row" style={{ marginTop: 16, marginBottom: 16, display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: '1 1 200px' }}>
