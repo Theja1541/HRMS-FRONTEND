@@ -60,25 +60,7 @@ export default function EmployeeLayout() {
       {/* MAIN CONTENT */}
       <div className="employee-body">
 
-        {/* HEADER */}
-        <header className="employee-header">
 
-          <div className="employee-header-left">
-            <span className="employee-role">{user?.role}</span>
-          </div>
-
-          <div className="employee-header-right" style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            {/* 🔔 Notification Bell — same component used in Admin portal */}
-            <NotificationCenter />
-
-            <span className="employee-user">{user?.username}</span>
-
-            <button className="logout-btn" onClick={logout}>
-              Logout
-            </button>
-          </div>
-
-        </header>
 
         {/* PAGE CONTENT */}
         <main className="employee-main">

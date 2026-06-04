@@ -5,6 +5,7 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  animation: fadeIn 0.25s ease-in-out;
 }
 
 /* ================= HEADER ================= */
@@ -113,6 +114,10 @@
   }
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 /* ================= FILTER BAR ================= */
 
 .filter-bar {

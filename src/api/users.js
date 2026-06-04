@@ -50,4 +50,8 @@ export const unlockUser = (userId) => {
   return api.post(`/accounts/users/${userId}/unlock/`);
 };
 
+export const resetUserAttempts = (userId) => {
+  return api.post(`/accounts/users/${userId}/reset-attempts/`);
+};
+
 

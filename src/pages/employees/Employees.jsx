@@ -195,7 +195,7 @@ export default function Employees() {
                 fetchDepartments();
               }}
             >
-              ⚙️ Settings
+              ⚙️ Manage Roles & Depts
             </button>
           )}
           <button
@@ -445,27 +445,12 @@ export default function Employees() {
         <div className="modal-overlay" onClick={() => setShowSettings(false)}>
           <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px', width: '90%' }}>
             <div className="modal-header">
-              <h3>Employee Settings</h3>
+              <h3>Manage Roles & Departments</h3>
               <button 
                 onClick={() => setShowSettings(false)}
                 className="modal-close"
               >
                 ×
-              </button>
-            </div>
-
-            {/* Deactivated Employees Section */}
-            <div style={{ marginBottom: '30px', padding: '20px', background: '#f8fafc', borderRadius: '8px' }}>
-              <h4 style={{ marginBottom: '10px' }}>Deactivated Employees</h4>
-              <button
-                className="btn"
-                onClick={() => {
-                  setShowSettings(false);
-                  fetchDeactivatedEmployees();
-                }}
-                style={{ background: '#f59e0b', color: 'white' }}
-              >
-                View Deactivated Employees
               </button>
             </div>
 

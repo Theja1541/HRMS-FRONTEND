@@ -214,8 +214,8 @@ export default function Dashboard() {
         }
       `}</style>
       {/* ================= HERO ================= */}
-      <div className="dashboard-hero" style={{ overflow: 'visible' }}>
-        <div className="hero-content" style={{ overflow: 'visible', zIndex: 10 }}>
+      <div className="dashboard-hero" style={{ overflow: 'visible', position: 'relative', zIndex: 50 }}>
+        <div className="hero-content" style={{ overflow: 'visible', zIndex: 50 }}>
 
           <div>
             <h2>

@@ -319,6 +319,11 @@ export default function Sidebar({ variant = "admin", isOpen, onClose, lockoutAct
                 📊 {!collapsed && "Monthly"}
               </NavLink>
             )}
+            {hasPermission("employees") && (
+              <NavLink to="/separation" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
+                👋 {!collapsed && "Separation"}
+              </NavLink>
+            )}
             {features.holidays && hasPermission("holidays") && (
               <NavLink to="/holidays" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
                 🏖️ {!collapsed && "Holidays"}

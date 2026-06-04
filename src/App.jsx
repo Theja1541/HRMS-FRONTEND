@@ -48,6 +48,7 @@ import MyLeaveBalance from "./pages/employee-portal/MyLeaveBalance";
 import SalaryGrowthTimeline from "./pages/employee-portal/SalaryGrowthTimeline";
 import MySalary from "./pages/employee-portal/MySalary";
 import Settings from "./pages/auth/Settings";
+import EmployeeHolidays from "./pages/employee-portal/EmployeeHolidays";
 
 /* Super Admin (uses same Layout + Sidebar as Admin, variant="superadmin") */
 import SuperAdminDashboard from "./pages/superadmin/SuperAdminDashboard";
@@ -99,6 +100,10 @@ import DaybookCategories from "./modules/daybook/pages/Categories";
 import DaybookReports from "./modules/daybook/pages/DaybookReports";
 import DaybookInvoiceView from "./modules/daybook/pages/DaybookInvoiceView";
 import DaybookReceiptView from "./modules/daybook/pages/DaybookReceiptView";
+
+/* Separation */
+import ResignationForm from "./modules/separation/pages/ResignationForm";
+import SeparationDashboard from "./modules/separation/pages/SeparationDashboard";
 
 function ModuleRoute({ module, page = null, action = null, children }) {
   const [allowed, setAllowed] = useState(null);
@@ -435,6 +440,9 @@ export default function App() {
             <Route path="daybook/categories" element={<ModuleRoute module="daybook" page="categories"><DaybookCategories /></ModuleRoute>} />
             <Route path="daybook/reports" element={<ModuleRoute module="daybook" page="reports"><DaybookReports /></ModuleRoute>} />
 
+            {/* Separation */}
+            <Route path="separation" element={<ModuleRoute module="employees"><SeparationDashboard /></ModuleRoute>} />
+
             {/* Settings */}
             <Route path="settings" element={<Settings />} />
           </Route>
@@ -460,6 +468,8 @@ export default function App() {
             <Route path="profile" element={<MyProfile />} />
             <Route path="my-documents" element={<MyDocuments />} />
             <Route path="asset-requests" element={<ModuleRoute module="assets"><MyAssetReturns /></ModuleRoute>} />
+            <Route path="holidays" element={<EmployeeHolidays />} />
+            <Route path="resignation" element={<ResignationForm />} />
             <Route path="settings" element={<Settings />} />
           </Route>
 

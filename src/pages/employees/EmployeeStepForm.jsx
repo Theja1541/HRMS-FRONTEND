@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEmployees } from "../../context/EmployeesContext";
-import { checkEmployeeId, getEmployeeDepartments, getEmployeeRoles } from "../../api/employees";
+import { checkEmployeeId, getEmployeeDepartments, getEmployeeRoles, addEmployeeRole, addEmployeeDepartment } from "../../api/employees";
 import { formatINR } from "../../utils/currency";
 import {
   buildCalculatedSalaryPayload,
@@ -173,6 +173,35 @@ export default function EmployeeStepForm({ employee }) {
 
     return () => clearTimeout(delay);
   }, [form.employee_id, employee]);
+
+  const handleAddCustomRole = async () => {
+    const newRole = window.prompt("Enter new Role name:");
+    if (!newRole || !newRole.trim()) return;
+    try {
+      await addEmployeeRole(newRole.trim());
+      const res = await getEmployeeRoles();
+      setCustomRoles(res.data.roles || []);
+      update("role", newRole.trim());
+      update("designation", newRole.trim());
+    } catch (err) {
+      console.error('Failed to add role', err);
+      alert("Failed to add role. It might already exist.");
+    }
+  };
+
+  const handleAddCustomDepartment = async () => {
+    const newDept = window.prompt("Enter new Department name:");
+    if (!newDept || !newDept.trim()) return;
+    try {
+      await addEmployeeDepartment(newDept.trim());
+      const res = await getEmployeeDepartments();
+      setCustomDepartments(res.data.departments || []);
+      update("department", newDept.trim());
+    } catch (err) {
+      console.error('Failed to add department', err);
+      alert("Failed to add department. It might already exist.");
+    }
+  };
 
   const update = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -501,7 +530,15 @@ export default function EmployeeStepForm({ employee }) {
         {step === 1 && (
           <>
             <div className="form-field">
-              <label>Role *</label>
+              <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>Role *</span>
+                <span 
+                  style={{ color: '#4f46e5', fontSize: '12px', cursor: 'pointer', fontWeight: 600 }}
+                  onClick={handleAddCustomRole}
+                >
+                  + Add New Role
+                </span>
+              </label>
               <select
                 value={form.role || ""}
                 onChange={(e) => {
@@ -523,7 +560,15 @@ export default function EmployeeStepForm({ employee }) {
             </div>
 
             <div className="form-field">
-              <label>Department *</label>
+              <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>Department *</span>
+                <span 
+                  style={{ color: '#4f46e5', fontSize: '12px', cursor: 'pointer', fontWeight: 600 }}
+                  onClick={handleAddCustomDepartment}
+                >
+                  + Add New Dept
+                </span>
+              </label>
               <select
                 value={form.department || ""}
                 onChange={(e)=>update("department", e.target.value)}
