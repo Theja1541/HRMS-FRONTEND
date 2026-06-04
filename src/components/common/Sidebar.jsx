@@ -300,6 +300,11 @@ export default function Sidebar({ variant = "admin", isOpen, onClose, lockoutAct
               🏠 {!collapsed && "Dashboard"}
             </NavLink>
             {hasPermission("employees") && (
+              <NavLink to="/roles-departments" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
+                ⚙️ {!collapsed && "Roles & Depts"}
+              </NavLink>
+            )}
+            {hasPermission("employees") && (
               <NavLink to="/employees" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
                 👥 {!collapsed && "Employees"}
               </NavLink>

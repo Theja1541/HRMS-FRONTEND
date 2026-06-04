@@ -131,7 +131,7 @@ export default function EmployeeStepForm({ employee }) {
     const fetchRoles = async () => {
       try {
         const res = await getEmployeeRoles();
-        setCustomRoles(res.data.roles || []);
+        setCustomRoles(res.data.roles ? res.data.roles.map(r => typeof r === 'object' ? r.name : r) : []);
       } catch (err) {
         console.error('Failed to fetch roles', err);
       }
@@ -140,7 +140,7 @@ export default function EmployeeStepForm({ employee }) {
     const fetchDepartments = async () => {
       try {
         const res = await getEmployeeDepartments();
-        setCustomDepartments(res.data.departments || []);
+        setCustomDepartments(res.data.departments ? res.data.departments.map(d => typeof d === 'object' ? d.name : d) : []);
       } catch (err) {
         console.error('Failed to fetch departments', err);
       }
@@ -180,7 +180,7 @@ export default function EmployeeStepForm({ employee }) {
     try {
       await addEmployeeRole(newRole.trim());
       const res = await getEmployeeRoles();
-      setCustomRoles(res.data.roles || []);
+      setCustomRoles(res.data.roles ? res.data.roles.map(r => typeof r === 'object' ? r.name : r) : []);
       update("role", newRole.trim());
       update("designation", newRole.trim());
     } catch (err) {
@@ -195,7 +195,7 @@ export default function EmployeeStepForm({ employee }) {
     try {
       await addEmployeeDepartment(newDept.trim());
       const res = await getEmployeeDepartments();
-      setCustomDepartments(res.data.departments || []);
+      setCustomDepartments(res.data.departments ? res.data.departments.map(d => typeof d === 'object' ? d.name : d) : []);
       update("department", newDept.trim());
     } catch (err) {
       console.error('Failed to add department', err);
@@ -531,13 +531,7 @@ export default function EmployeeStepForm({ employee }) {
           <>
             <div className="form-field">
               <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span>Role *</span>
-                <span 
-                  style={{ color: '#4f46e5', fontSize: '12px', cursor: 'pointer', fontWeight: 600 }}
-                  onClick={handleAddCustomRole}
-                >
-                  + Add New Role
-                </span>
+                Role *
               </label>
               <select
                 value={form.role || ""}
@@ -561,13 +555,7 @@ export default function EmployeeStepForm({ employee }) {
 
             <div className="form-field">
               <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span>Department *</span>
-                <span 
-                  style={{ color: '#4f46e5', fontSize: '12px', cursor: 'pointer', fontWeight: 600 }}
-                  onClick={handleAddCustomDepartment}
-                >
-                  + Add New Dept
-                </span>
+                Department *
               </label>
               <select
                 value={form.department || ""}

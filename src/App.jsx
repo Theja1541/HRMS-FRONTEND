@@ -23,6 +23,7 @@ import Dashboard from "./pages/dashboard/Dashboard";
 import Employees from "./pages/employees/Employees";
 import AddEmployee from "./pages/employees/AddEmployee";
 import EmployeeProfile from "./pages/employees/EmployeeProfile";
+import RolesAndDepartments from "./pages/employees/RolesAndDepartments";
 import Attendance from "./pages/attendance/Attendance";
 import MonthlyAttendance from "./pages/attendance/MonthlyAttendance";
 import Leaves from "./pages/leaves/Leaves";
@@ -377,6 +378,7 @@ export default function App() {
 
             {/* Employees */}
             <Route path="employees" element={<ModuleRoute module="employees"><Employees /></ModuleRoute>} />
+            <Route path="roles-departments" element={<ModuleRoute module="employees"><RolesAndDepartments /></ModuleRoute>} />
             <Route path="employees/add" element={<ModuleRoute module="employees" action="create"><AddEmployee /></ModuleRoute>} />
             <Route path="employees/edit/:id" element={<ModuleRoute module="employees" action="edit"><AddEmployee /></ModuleRoute>} />
             <Route path="employees/:id" element={<ModuleRoute module="employees" action="view"><EmployeeProfile /></ModuleRoute>} />
