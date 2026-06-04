@@ -76,7 +76,7 @@ export default function Employees() {
   const fetchAvailableRoles = async () => {
     try {
       const res = await getEmployeeRoles();
-      setAvailableRoles(res.data.roles || []);
+      setAvailableRoles(res.data.roles ? res.data.roles.map(r => typeof r === 'object' ? r.name : r) : []);
     } catch (err) {
       console.error('Failed to fetch available roles', err);
     }
@@ -85,7 +85,7 @@ export default function Employees() {
   const fetchAvailableDepartments = async () => {
     try {
       const res = await getEmployeeDepartments();
-      setAvailableDepartments(res.data.departments || []);
+      setAvailableDepartments(res.data.departments ? res.data.departments.map(d => typeof d === 'object' ? d.name : d) : []);
     } catch (err) {
       console.error('Failed to fetch available departments', err);
     }
@@ -186,18 +186,7 @@ export default function Employees() {
           <p className="page-subtitle">Manage your workforce</p>
         </div>
         <div className="header-actions">
-          {canEdit && (
-            <button
-              className="settings-btn"
-              onClick={() => {
-                setShowSettings(true);
-                fetchRoles();
-                fetchDepartments();
-              }}
-            >
-              ⚙️ Manage Roles & Depts
-            </button>
-          )}
+
           <button
             className="deactivated-btn"
             onClick={() => {
@@ -440,114 +429,7 @@ export default function Employees() {
         </div>
       )}
 
-      {/* SETTINGS MODAL */}
-      {showSettings && (
-        <div className="modal-overlay" onClick={() => setShowSettings(false)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '600px', width: '90%' }}>
-            <div className="modal-header">
-              <h3>Manage Roles & Departments</h3>
-              <button 
-                onClick={() => setShowSettings(false)}
-                className="modal-close"
-              >
-                ×
-              </button>
-            </div>
 
-            {/* Roles Management Section */}
-            <div style={{ padding: '20px', background: '#f8fafc', borderRadius: '8px', marginBottom: '20px' }}>
-              <h4 style={{ marginBottom: '15px' }}>Manage Roles</h4>
-              
-              <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-                <input
-                  type="text"
-                  placeholder="Enter new role name"
-                  value={newRole}
-                  onChange={(e) => setNewRole(e.target.value)}
-                  style={{ flex: 1, padding: '8px 12px', borderRadius: '6px', border: '1px solid #e5e7eb' }}
-                />
-                <button
-                  className="btn primary"
-                  onClick={addRole}
-                  style={{ padding: '8px 16px' }}
-                >
-                  Add Role
-                </button>
-              </div>
-
-              <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                {roles.length === 0 ? (
-                  <p style={{ color: '#64748b', textAlign: 'center' }}>No custom roles added</p>
-                ) : (
-                  <ul style={{ listStyle: 'none', padding: 0 }}>
-                    {Array.isArray(roles) && roles.map((role, index) => (
-                      <li key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', background: 'white', marginBottom: '8px', borderRadius: '6px' }}>
-                        <span>{role}</span>
-                        <button
-                          onClick={() => {
-                            if (window.confirm(`Delete role "${role}"?`)) {
-                              deleteRole(role);
-                            }
-                          }}
-                          style={{ background: '#ef4444', color: 'white', border: 'none', padding: '4px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}
-                        >
-                          Delete
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
-
-            {/* Departments Management Section */}
-            <div style={{ padding: '20px', background: '#f8fafc', borderRadius: '8px' }}>
-              <h4 style={{ marginBottom: '15px' }}>Manage Departments</h4>
-              
-              <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-                <input
-                  type="text"
-                  placeholder="Enter new department name"
-                  value={newDepartment}
-                  onChange={(e) => setNewDepartment(e.target.value)}
-                  style={{ flex: 1, padding: '8px 12px', borderRadius: '6px', border: '1px solid #e5e7eb' }}
-                />
-                <button
-                  className="btn primary"
-                  onClick={addDepartment}
-                  style={{ padding: '8px 16px' }}
-                >
-                  Add Department
-                </button>
-              </div>
-
-              <div style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                {departments.length === 0 ? (
-                  <p style={{ color: '#64748b', textAlign: 'center' }}>No custom departments added</p>
-                ) : (
-                  <ul style={{ listStyle: 'none', padding: 0 }}>
-                    {Array.isArray(departments) && departments.map((dept, index) => (
-                      <li key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px', background: 'white', marginBottom: '8px', borderRadius: '6px' }}>
-                        <span>{dept}</span>
-                        <button
-                          onClick={() => {
-                            if (window.confirm(`Delete department "${dept}"?`)) {
-                              deleteDepartment(dept);
-                            }
-                          }}
-                          style={{ background: '#ef4444', color: 'white', border: 'none', padding: '4px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' }}
-                        >
-                          Delete
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

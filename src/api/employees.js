@@ -26,15 +26,21 @@ export const activateEmployeeById = (id) => api.post(`/employees/${id}/activate/
 
 export const getEmployeeRoles = (params = {}) => api.get("/employees/roles/", { params });
 
-export const addEmployeeRole = (role) => api.post("/employees/roles/", { role });
+export const addEmployeeRole = (payload) => api.post("/employees/roles/", payload);
 
-export const deleteEmployeeRole = (roleName) =>
-  api.delete(`/employees/roles/${encodeURIComponent(roleName)}/`);
+export const editEmployeeRole = (id, payload) =>
+  api.patch(`/employees/roles/${id}/`, payload);
+
+export const deleteEmployeeRole = (id) =>
+  api.delete(`/employees/roles/${id}/`);
 
 export const getEmployeeDepartments = (params = {}) => api.get("/employees/departments/", { params });
 
-export const addEmployeeDepartment = (department) =>
-  api.post("/employees/departments/", { department });
+export const addEmployeeDepartment = (payload) =>
+  api.post("/employees/departments/", payload);
 
-export const deleteEmployeeDepartment = (departmentName) =>
-  api.delete(`/employees/departments/${encodeURIComponent(departmentName)}/`);
+export const editEmployeeDepartment = (id, payload) =>
+  api.patch(`/employees/departments/${id}/`, payload);
+
+export const deleteEmployeeDepartment = (id) =>
+  api.delete(`/employees/departments/${id}/`);

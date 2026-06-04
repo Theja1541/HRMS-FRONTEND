@@ -27,11 +27,11 @@ export default function CompanyEmployees() {
       
     // Fetch unique roles and departments
     getEmployeeDepartments({ company_id: id })
-      .then((res) => setDepartments(res.data.departments || []))
+      .then((res) => setDepartments(res.data.departments ? res.data.departments.map(d => typeof d === 'object' ? d.name : d) : []))
       .catch(() => {});
       
     getEmployeeRoles({ company_id: id })
-      .then((res) => setRoles(res.data.roles || []))
+      .then((res) => setRoles(res.data.roles ? res.data.roles.map(r => typeof r === 'object' ? r.name : r) : []))
       .catch(() => {});
   }, [id]);
 

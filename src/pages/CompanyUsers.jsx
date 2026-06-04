@@ -359,9 +359,9 @@ export default function CompanyUsers() {
   const fetchRolesAndDepartments = async () => {
     try {
       const rRes = await getEmployeeRoles();
-      setCustomRoles(rRes.data.roles || []);
+      setCustomRoles(rRes.data.roles ? rRes.data.roles.map(r => typeof r === 'object' ? r.name : r) : []);
       const dRes = await getEmployeeDepartments();
-      setCustomDepartments(dRes.data.departments || []);
+      setCustomDepartments(dRes.data.departments ? dRes.data.departments.map(d => typeof d === 'object' ? d.name : d) : []);
     } catch (err) {
       console.error("Failed to load departments or roles", err);
     }
