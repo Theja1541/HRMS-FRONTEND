@@ -96,10 +96,10 @@ export default function DaybookDashboard() {
   return (
     <div className="daybook-dashboard" style={{ padding: '24px', background: '#f8fafc', minHeight: '100vh', fontFamily: "'Inter', sans-serif" }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
+      <div className="page-header" style={{ marginBottom: '32px' }}>
         <div>
-          <h1 style={{ fontSize: '28px', fontWeight: '800', color: '#0f172a', margin: '0 0 8px 0' }}>Daybook Overview</h1>
-          <p style={{ color: '#64748b', margin: 0, fontSize: '14px' }}>Monitor your company's financial health in real-time</p>
+          <h2 className="page-title">Daybook Overview</h2>
+          <p className="page-subtitle">Monitor your company's financial health in real-time</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: 'white', padding: '12px 20px', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.05)' }}>
           <div style={{ display: 'flex', flexDirection: 'column' }}>
