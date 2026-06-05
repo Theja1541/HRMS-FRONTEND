@@ -1,0 +1,49 @@
+.ff-filters-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 2rem;
+}
+.ff-filters-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 200px;
+}
+.filter-group label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #475569;
+}
+.filter-group input,
+.filter-group select {
+  padding: 0.5rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-family: inherit;
+  width: 100%;
+}
+.date-inputs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.date-inputs span {
+  font-size: 0.875rem;
+  color: #64748b;
+}
+.ff-filters-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}

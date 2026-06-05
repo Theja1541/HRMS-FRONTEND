@@ -35,6 +35,7 @@ export default function Sidebar({ variant = "admin", isOpen, onClose, lockoutAct
   const [openPayroll, setOpenPayroll] = useState(false);
   const [openAssets, setOpenAssets] = useState(false);
   const [openDaybook, setOpenDaybook] = useState(false);
+  const [openSeparation, setOpenSeparation] = useState(false);
 
   const getBlockedStyle = (display = undefined) => {
     const styleObj = {};
@@ -58,6 +59,7 @@ export default function Sidebar({ variant = "admin", isOpen, onClose, lockoutAct
     billing: true,
     holidays: true,
     daybook: true,
+    separation: true,
   });
   const [logoImageLoaded, setLogoImageLoaded] = useState(false);
   const [logoImageError, setLogoImageError] = useState(false);
@@ -114,6 +116,7 @@ export default function Sidebar({ variant = "admin", isOpen, onClose, lockoutAct
     }
 
     if (user.role !== "HR") return true;
+    if (moduleName === "separation") return true;
     if (!user.hr_permissions) return false;
     
     const hrModKey = moduleName === "leave" ? "leaves" : (moduleName === "leaves" ? "leaves" : moduleName);
@@ -183,6 +186,7 @@ export default function Sidebar({ variant = "admin", isOpen, onClose, lockoutAct
             billing: true,
             holidays: true,
             daybook: true,
+            separation: true,
           });
           setCompanyFeatures({});
         }
@@ -324,10 +328,33 @@ export default function Sidebar({ variant = "admin", isOpen, onClose, lockoutAct
                 📊 {!collapsed && "Monthly"}
               </NavLink>
             )}
-            {hasPermission("employees") && (
-              <NavLink to="/separation" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
-                👋 {!collapsed && "Separation"}
-              </NavLink>
+            {features.separation && hasPermission("separation") && (
+              <>
+                <div
+                  className="sidebar-item dropdown"
+                  style={getBlockedStyle()}
+                  onClick={() => !lockoutActive && setOpenSeparation(!openSeparation)}
+                >
+                  👋 {!collapsed && "Separation"}
+                  {!collapsed && (
+                    <span className="dropdown-arrow">{openSeparation ? "▲" : "▼"}</span>
+                  )}
+                </div>
+                {openSeparation && !collapsed && (
+                  <div className="sidebar-dropdown-menu">
+                    {hasPermission("separation", "dashboard") && (user?.role === "HR" || user?.role === "ADMIN" || isSuperAdmin) && (
+                      <NavLink to="/separation" end className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        📊 Dashboard
+                      </NavLink>
+                    )}
+                    {hasPermission("separation", "ff-history") && (user?.role === "HR" || user?.role === "ADMIN" || isSuperAdmin) && (
+                      <NavLink to="/separation/ff-history" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        📜 F&F History
+                      </NavLink>
+                    )}
+                  </div>
+                )}
+              </>
             )}
             {features.holidays && hasPermission("holidays") && (
               <NavLink to="/holidays" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>

@@ -197,10 +197,6 @@ export default function EmployeeSidebar({ isOpen, onClose, lockoutActive = false
           </NavLink>
         )}
 
-        <NavLink to="/employee/profile" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
-          <span>👤</span>
-          <span>My Profile</span>
-        </NavLink>
 
         <NavLink to="/employee/asset-requests" className="sidebar-item" style={getBlockedStyle(features.assets ? undefined : "none")} onClick={onClose}>
           <span>📦</span>
@@ -212,6 +208,13 @@ export default function EmployeeSidebar({ isOpen, onClose, lockoutActive = false
           <span>Holidays</span>
         </NavLink>
 
+
+        <NavLink to="/employee/profile" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
+          <span>👤</span>
+          <span>My Profile</span>
+        </NavLink>
+
+        
         <NavLink to="/employee/resignation" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
           <span>👋</span>
           <span>Resignation</span>

@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import api from "../../api/axios";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
@@ -371,7 +371,7 @@ export default function LeaveCalendar() {
             <select value={selectedDepartment} onChange={(e)=>setSelectedDepartment(e.target.value)}>
               <option value="">All Departments</option>
               {departmentOptions.map((dept, index) => (
-                <option key={index} value={dept}>{dept}</option>
+                <option key={dept.id || index} value={dept.name || dept}>{dept.name || dept}</option>
               ))}
             </select>
           </div>

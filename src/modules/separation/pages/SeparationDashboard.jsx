@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { getResignationRequests, approveResignation } from '../api/separationApi';
 import toast from 'react-hot-toast';
 import '../../../styles/separation.css';
+import AssetClearanceCard from '../components/AssetClearanceCard';
 
 export default function SeparationDashboard() {
   const [requests, setRequests] = useState([]);
@@ -197,6 +198,15 @@ export default function SeparationDashboard() {
                   onChange={(e) => setRemarks(e.target.value)}
                 />
               </div>
+
+              {selectedRequest.status === 'HR_APPROVED' && (
+                <div className="modal-section" style={{ marginTop: '2rem' }}>
+                  <AssetClearanceCard 
+                    resignationId={selectedRequest.id} 
+                    employeeId={selectedRequest.employee} 
+                  />
+                </div>
+              )}
             </div>
 
             <div className="modal-footer">

@@ -115,17 +115,45 @@ const PieCustomTooltip = ({ active, payload }) => {
   return null;
 };
 
-function ReportsTable({ columns, rows, empty, itemsPerPage = 5 }) {
+function ReportsTable({ columns, rows, empty, itemsPerPage = 5, searchable = false, searchPlaceholder = "Search..." }) {
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.ceil(rows.length / itemsPerPage);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredRows = useMemo(() => {
+    if (!searchTerm) return rows;
+    const lowerSearch = searchTerm.toLowerCase();
+    return rows.filter((row) => {
+      // Match against string/number values in the row object
+      return Object.values(row).some((val) =>
+        val != null && String(val).toLowerCase().includes(lowerSearch)
+      );
+    });
+  }, [rows, searchTerm]);
+
+  const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
   
-  const currentRows = rows.slice(
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  const currentRows = filteredRows.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
 
   return (
     <div className="table-wrapper">
+      {searchable && (
+        <div style={{ padding: "12px 16px", borderBottom: "1px solid #e2e8f0", display: "flex", justifyContent: "flex-end" }}>
+          <input
+            type="text"
+            placeholder={searchPlaceholder}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            style={{ padding: "8px 12px", borderRadius: 6, border: "1px solid #cbd5e1", fontSize: 14, minWidth: 250, outline: "none" }}
+          />
+        </div>
+      )}
       <table className="table">
         <thead>
           <tr>
@@ -415,6 +443,8 @@ export default function Reports() {
 
         <SectionCard title="Top Companies" subtitle="Ranked by employee headcount">
           <ReportsTable
+            searchable
+            searchPlaceholder="Search companies..."
             empty="No companies yet."
             rows={topCompanies}
             columns={[
@@ -464,6 +494,8 @@ export default function Reports() {
 
         <SectionCard title="Recent Payments" subtitle="Latest completed transactions">
           <ReportsTable
+            searchable
+            searchPlaceholder="Search payments..."
             empty="No payments yet."
             rows={recentPayments}
             columns={[

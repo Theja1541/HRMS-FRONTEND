@@ -118,6 +118,16 @@ const ORIGINAL_MODULES_SCHEMA = [
     pages: [
       { key: "view", label: "Billing & Plans", actions: ["view", "create", "export"] }
     ]
+  },
+  {
+    key: "separation",
+    label: "Separation",
+    icon: "👋",
+    description: "Manage employee resignations, asset clearance, and full & final settlements.",
+    pages: [
+      { key: "dashboard", label: "Dashboard", actions: ["view", "approve", "edit"] },
+      { key: "ff-history", label: "F&F History", actions: ["view", "export"] }
+    ]
   }
 ];
 

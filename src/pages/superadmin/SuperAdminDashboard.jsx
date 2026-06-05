@@ -137,8 +137,8 @@ export default function SuperAdminDashboard() {
             <h3>Monthly Growth Trend</h3>
             <span className="badge">Platform</span>
           </div>
-          <div className="responsive-chart-container" style={{ height: 350, width: "100%", minWidth: 0 }}>
-            <ResponsiveContainer width="99%" height="100%">
+          <div className="responsive-chart-container" style={{ height: 350, width: "100%", minWidth: 0, overflow: "hidden" }}>
+            <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={monthlyData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
@@ -192,8 +192,8 @@ export default function SuperAdminDashboard() {
 
           <div className="dashboard-card premium-card role-dist-card">
             <h3>Role Distribution</h3>
-            <div className="responsive-chart-container" style={{ height: 260, marginTop: '20px', width: "100%", minWidth: 0 }}>
-              <ResponsiveContainer width="99%" height="100%">
+            <div className="responsive-chart-container" style={{ height: 260, marginTop: '20px', width: "100%", minWidth: 0, overflow: "hidden" }}>
+              <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={data.role_distribution}

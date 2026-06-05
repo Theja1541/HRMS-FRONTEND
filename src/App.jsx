@@ -105,6 +105,8 @@ import DaybookReceiptView from "./modules/daybook/pages/DaybookReceiptView";
 /* Separation */
 import ResignationForm from "./modules/separation/pages/ResignationForm";
 import SeparationDashboard from "./modules/separation/pages/SeparationDashboard";
+import FFSettlementView from "./modules/separation/pages/FFSettlementView";
+import FFHistoryPage from "./modules/separation/pages/FFHistoryPage";
 
 function ModuleRoute({ module, page = null, action = null, children }) {
   const [allowed, setAllowed] = useState(null);
@@ -188,6 +190,8 @@ function ModuleRoute({ module, page = null, action = null, children }) {
 
   // 2. Enforce HR-level role permissions
   if (user && user.role === "HR") {
+    if (module === "separation") return children;
+    
     const hr_perms = user.hr_permissions || {};
     const hrModKey = module === "leave" ? "leaves" : (module === "leaves" ? "leaves" : module);
     const modObj = hr_perms[hrModKey] || hr_perms[module];
@@ -443,7 +447,9 @@ export default function App() {
             <Route path="daybook/reports" element={<ModuleRoute module="daybook" page="reports"><DaybookReports /></ModuleRoute>} />
 
             {/* Separation */}
-            <Route path="separation" element={<ModuleRoute module="employees"><SeparationDashboard /></ModuleRoute>} />
+            <Route path="separation" element={<ModuleRoute module="separation" page="dashboard"><SeparationDashboard /></ModuleRoute>} />
+            <Route path="separation/ff-history" element={<ModuleRoute module="separation" page="ff-history"><FFHistoryPage /></ModuleRoute>} />
+            <Route path="separation/ff-settlements/:id" element={<ModuleRoute module="separation" page="dashboard"><FFSettlementView /></ModuleRoute>} />
 
             {/* Settings */}
             <Route path="settings" element={<Settings />} />

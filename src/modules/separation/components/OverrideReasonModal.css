@@ -1,0 +1,51 @@
+.override-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.unreturned-list {
+  margin: 0;
+  padding-left: 1.5rem;
+  color: #ef4444;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+.override-error {
+  padding: 0.75rem;
+  background: #fee2e2;
+  color: #991b1b;
+  border-radius: 6px;
+  font-size: 0.875rem;
+}
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.form-group label {
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #334155;
+}
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-family: inherit;
+  resize: vertical;
+}
+.form-group textarea:disabled {
+  background: #f8fafc;
+  cursor: not-allowed;
+}
+.form-group small {
+  color: #64748b;
+  font-size: 0.75rem;
+}
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
