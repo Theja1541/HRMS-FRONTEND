@@ -12,8 +12,29 @@ export const sendSystemNotification = (data) =>
 
 export const getSystemSettings = () => api.get("/superadmin/settings/");
 
-export const getEffectiveSystemSettings = () =>
-  api.get("/superadmin/settings/effective/");
+let effectiveSettingsCache = null;
+let effectiveSettingsCacheTime = 0;
+const SETTINGS_CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+export const getEffectiveSystemSettings = () => {
+  const now = Date.now();
+  if (effectiveSettingsCache && (now - effectiveSettingsCacheTime < SETTINGS_CACHE_TTL)) {
+    return Promise.resolve(effectiveSettingsCache);
+  }
+  return api.get("/superadmin/settings/effective/").then(res => {
+    effectiveSettingsCache = res;
+    effectiveSettingsCacheTime = now;
+    return res;
+  });
+};
+
+export const getCachedEffectiveSettings = () => {
+  const now = Date.now();
+  if (effectiveSettingsCache && (now - effectiveSettingsCacheTime < SETTINGS_CACHE_TTL)) {
+    return effectiveSettingsCache;
+  }
+  return null;
+};
 
 export const updateSystemSettings = (data) =>
   api.patch("/superadmin/settings/update/", data);

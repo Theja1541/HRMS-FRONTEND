@@ -98,11 +98,16 @@
 .sidebar-logo-img {
   display: block;
   object-fit: contain;
-  object-position: left center;
+  object-position: center;
+  background: #ffffff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  transition: all 0.3s ease;
 }
 
 .sidebar-logo-img--loaded:not(.sidebar-logo-img--collapsed) {
-  max-height: 40px;
+  max-height: 48px;
   max-width: min(188px, 100%);
 }
 

@@ -9,6 +9,7 @@ import {
   sidebarBrandingCacheKey,
 } from "../../utils/sidebarBrandingCache";
 import "../../styles/sidebar.css";
+import defaultCompanyLogo from "../../assets/company-logo.png";
 
 /**
  * Logo URLs from the API may be relative (/media/...). The app runs on Vite (e.g. :5173);
@@ -201,7 +202,7 @@ export default function Sidebar({ variant = "admin", isOpen, onClose, lockoutAct
   const rawLogoUrl = hasBrandingPayload
     ? branding.logo_url || branding.logoUrl || null
     : user?.company?.logo_url || user?.company?.logoUrl || null;
-  const logoUrl = resolveBrandingLogoUrl(rawLogoUrl);
+  const logoUrl = resolveBrandingLogoUrl(rawLogoUrl) || defaultCompanyLogo;
   const showLogoGraphic = Boolean(logoUrl && !logoImageError);
   /** Never show company name while a logo URL exists — only skeleton until decode, or text if no logo / broken image. */
   const showTitleFallback = !showLogoGraphic;

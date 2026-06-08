@@ -266,6 +266,7 @@ export default function Billing() {
     yearly_price: "",
     gst_percentage: "18.00",
     employee_limit: "",
+    payment_mode: "online",
     features_json: getInitialModulesState(),
     is_active: true,
   });
@@ -274,6 +275,7 @@ export default function Billing() {
   const [assignForm, setAssignForm] = useState({
     pricing_plan_id: "",
     billing_cycle: "monthly",
+    payment_method: "manual",
     subscription_period_start: new Date().toISOString().slice(0, 10),
     subscription_period_end: ""
   });
@@ -320,6 +322,7 @@ export default function Billing() {
           yearly_price: String(plan.yearly_price),
           gst_percentage: String(plan.gst_percentage || "18.00"),
           employee_limit: plan.employee_limit != null ? String(plan.employee_limit) : "",
+          payment_mode: plan.payment_mode || "online",
           features_json: normalizeCompanyModules(plan.features_json),
           is_active: plan.is_active !== false,
         }
@@ -331,6 +334,7 @@ export default function Billing() {
           yearly_price: "",
           gst_percentage: "18.00",
           employee_limit: "",
+          payment_mode: "online",
           features_json: getInitialModulesState(),
           is_active: true,
         }
@@ -348,6 +352,7 @@ export default function Billing() {
       yearly_price: parseFloat(planForm.yearly_price) || 0,
       gst_percentage: parseFloat(planForm.gst_percentage) || 18.00,
       employee_limit: planForm.employee_limit ? parseInt(planForm.employee_limit, 10) : null,
+      payment_mode: planForm.payment_mode,
       features_json: planForm.features_json,
       is_active: planForm.is_active,
     };
@@ -376,6 +381,7 @@ export default function Billing() {
     setAssignForm({
       pricing_plan_id: "",
       billing_cycle: "monthly",
+      payment_method: "manual",
       subscription_period_start: new Date().toISOString().slice(0, 10),
       subscription_period_end: ""
     });
@@ -389,6 +395,7 @@ export default function Billing() {
       await assignPlanToCompany(assignCompanyId, {
         pricing_plan_id: parseInt(assignForm.pricing_plan_id, 10),
         billing_cycle: assignForm.billing_cycle,
+        payment_method: assignForm.payment_method,
         subscription_period_start: assignForm.subscription_period_start || null,
         subscription_period_end: assignForm.subscription_period_end || null,
       });
@@ -421,7 +428,7 @@ export default function Billing() {
     });
   };
 
-  if (loading && !plans.length) return <p>Loading billing...</p>;
+  // removed early return to prevent layout thrashing
 
   return (
     <div>
@@ -516,7 +523,16 @@ export default function Billing() {
                   </tr>
                 </thead>
                 <tbody>
-                  {paginatedPlans.map((p) => (
+                  {loading ? (
+                    <tr>
+                      <td colSpan="5" style={{ textAlign: "center", padding: "40px" }}>Loading billing plans...</td>
+                    </tr>
+                  ) : paginatedPlans.length === 0 ? (
+                    <tr>
+                      <td colSpan="5" style={{ textAlign: "center", padding: "20px" }}>No plans found.</td>
+                    </tr>
+                  ) : (
+                    paginatedPlans.map((p) => (
                     <tr key={p.id}>
                       <td>
                         <strong style={{ fontSize: "14px", color: "#0f172a" }}>{p.name}</strong>
@@ -560,7 +576,7 @@ export default function Billing() {
                         </button>
                       </td>
                     </tr>
-                  ))}
+                  )))}
                 </tbody>
               </table>
               
@@ -827,11 +843,15 @@ export default function Billing() {
       {/* Plan create/edit modal */}
       {planModal && (
         <div className="modal-overlay" onClick={() => setPlanModal(false)}>
-          <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 640 }}>
+          <div className="modal-card" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 1000, width: "90%" }}>
             <h3 style={{ borderBottom: "1px solid #e2e8f0", paddingBottom: "12px", marginBottom: "16px" }}>
               {editingPlan ? "📝 Edit Subscription Plan" : "➕ Create Subscription Plan"}
             </h3>
             <form onSubmit={savePlan}>
+              <div style={{ display: "flex", gap: "24px", alignItems: "flex-start" }}>
+                
+                {/* Left side: Basic Info */}
+                <div style={{ flex: "0 0 350px" }}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "12px" }}>
                 <div>
                   <label style={{ fontWeight: "700", display: "block", marginBottom: "4px" }}>Name *</label>
@@ -865,10 +885,17 @@ export default function Billing() {
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px", marginBottom: "16px" }}>
                 <div>
+                  <label style={{ fontWeight: "700", display: "block", marginBottom: "4px" }}>Payment Mode</label>
+                  <select value={planForm.payment_mode} onChange={(e) => setPlanForm({ ...planForm, payment_mode: e.target.value })} style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}>
+                    <option value="online">Online (Razorpay)</option>
+                    <option value="cash">Cash / Offline</option>
+                  </select>
+                </div>
+                <div>
                   <label style={{ fontWeight: "700", display: "block", marginBottom: "4px" }}>Max Staff Limit (Optional)</label>
                   <input type="number" min="0" value={planForm.employee_limit} onChange={(e) => setPlanForm({ ...planForm, employee_limit: e.target.value })} placeholder="Unlimited" style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }} />
                 </div>
-                <div style={{ display: "flex", alignItems: "center", paddingTop: "24px" }}>
+                <div style={{ display: "flex", alignItems: "center", paddingTop: "0" }}>
                   <label style={{ display: "flex", alignItems: "center", gap: "8px", fontWeight: "700", cursor: "pointer" }}>
                     <input type="checkbox" checked={planForm.is_active} onChange={(e) => setPlanForm({ ...planForm, is_active: e.target.checked })} style={{ width: "18px", height: "18px" }} />
                     Active Status
@@ -876,8 +903,10 @@ export default function Billing() {
                 </div>
               </div>
 
-              {/* Module Feature Flags Selection Grid */}
-              <div style={{ background: "#f8fafc", padding: "20px", borderRadius: "16px", border: "1px solid #e2e8f0", marginBottom: "20px" }}>
+                </div>
+
+                {/* Right side: Module Feature Flags Selection Grid */}
+                <div style={{ flex: 1, background: "#f8fafc", padding: "20px", borderRadius: "16px", border: "1px solid #e2e8f0", height: "100%", alignSelf: "stretch" }}>
                 <h4 style={{ margin: "0 0 16px 0", fontSize: "15px", fontWeight: "800", color: "#1e293b", borderBottom: "1px solid #cbd5e1", paddingBottom: "10px", display: "flex", alignItems: "center", gap: "6px" }}>
                   <span>🔐</span> Plan Modules &amp; Subpages Configuration
                 </h4>
@@ -957,12 +986,13 @@ export default function Billing() {
                       </div>
                     );
                   })}
+                  </div>
                 </div>
               </div>
 
-              <div className="modal-actions" style={{ borderTop: "1px solid #e2e8f0", paddingTop: "14px", marginTop: "10px" }}>
-                <button type="submit" className="btn primary" style={{ padding: "10px 24px", borderRadius: "8px", fontWeight: "750" }}>Save</button>
-                <button type="button" className="btn-cancel" onClick={() => setPlanModal(false)} style={{ padding: "10px 24px", borderRadius: "8px", background: "#f1f5f9", color: "#334155" }}>Cancel</button>
+              <div className="modal-actions" style={{ borderTop: "1px solid #e2e8f0", paddingTop: "14px", marginTop: "20px", display: "flex", justifyContent: "flex-end", gap: "12px" }}>
+                <button type="submit" className="btn primary" style={{ width: "auto", flex: "none", padding: "10px 24px", borderRadius: "8px", fontWeight: "750" }}>Save</button>
+                <button type="button" className="btn-cancel" onClick={() => setPlanModal(false)} style={{ width: "auto", flex: "none", padding: "10px 24px", borderRadius: "8px", background: "#f1f5f9", color: "#334155" }}>Cancel</button>
               </div>
             </form>
           </div>
@@ -987,6 +1017,12 @@ export default function Billing() {
               <select value={assignForm.billing_cycle} onChange={(e) => setAssignForm({ ...assignForm, billing_cycle: e.target.value })} required>
                 <option value="monthly">Monthly</option>
                 <option value="yearly">Yearly</option>
+              </select>
+
+              <label style={{ marginTop: "12px", display: "block" }}>Payment Method *</label>
+              <select value={assignForm.payment_method} onChange={(e) => setAssignForm({ ...assignForm, payment_method: e.target.value })} required>
+                <option value="manual">Bank / Online Transfer</option>
+                <option value="cash">Cash</option>
               </select>
 
               <label style={{ marginTop: "12px", display: "block" }}>Subscription period start</label>

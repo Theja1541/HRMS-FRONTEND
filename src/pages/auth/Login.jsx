@@ -4,6 +4,7 @@ import { useAuth } from "../../auth/AuthContext";
 import api from "../../api/axios";
 import { mfaSendOtp, mfaVerifyOtp } from "../../api/superadmin";
 import "../../styles/login.css";
+import companyLogo from "../../assets/company-logo.png";
 
 export default function Login() {
   const { login, completeMfaLogin } = useAuth();
@@ -354,8 +355,8 @@ export default function Login() {
       
       <div className="login-container">
         <form className="login-card" onSubmit={handleSubmit}>
-          <div className="brand-logo">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          <div className="brand-logo" style={{ background: "transparent", border: "none", display: "flex", justifyContent: "center", marginBottom: "16px" }}>
+            <img src={companyLogo} alt="HRMS Logo" style={{ height: "80px", objectFit: "contain" }} />
           </div>
           <h2>Welcome Back</h2>
           <p className="login-subtitle">Sign in to access your workspace</p>

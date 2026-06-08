@@ -162,7 +162,7 @@ export default function ManageUsers() {
     marginBottom: 4,
   };
 
-  if (loading) return <p>Loading users...</p>;
+  // removed early return to prevent layout thrashing
 
   return (
     <div className="manage-users-page">
@@ -220,7 +220,12 @@ export default function ManageUsers() {
               </tr>
             </thead>
             <tbody>
-              {paginatedUsers.map((user) => (
+              {loading ? (
+                <tr>
+                  <td colSpan="7" style={{ textAlign: "center", padding: "48px 24px", color: "#94a3b8" }}>Loading users...</td>
+                </tr>
+              ) : paginatedUsers.length > 0 ? (
+                paginatedUsers.map((user) => (
               <tr 
                 key={user.id} 
                 style={{ borderBottom: '1px solid #f1f5f9', transition: 'background-color 0.2s ease' }}
@@ -296,22 +301,22 @@ export default function ManageUsers() {
                     }}
                     onMouseEnter={(e) => { e.currentTarget.style.background = '#f1f5f9'; e.currentTarget.style.color = '#0f172a'; }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#64748b'; }}
-                  >
-                    ⋮
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {paginatedUsers.length === 0 && (
-              <tr>
-                <td colSpan="7" style={{ textAlign: "center", padding: "48px 24px" }}>
-                  <div style={{ color: '#94a3b8', fontSize: '16px', marginBottom: '8px' }}>No users match the filters.</div>
-                  <div style={{ color: '#cbd5e1', fontSize: '14px' }}>Try adjusting your search criteria</div>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+                      >
+                        ⋮
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7" style={{ textAlign: "center", padding: "48px 24px" }}>
+                    <div style={{ color: '#94a3b8', fontSize: '16px', marginBottom: '8px' }}>No users match the filters.</div>
+                    <div style={{ color: '#cbd5e1', fontSize: '14px' }}>Try adjusting your search criteria</div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
 
         {filteredUsers.length > 0 && (

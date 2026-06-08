@@ -25,15 +25,7 @@ export default function SuperAdminDashboard() {
   const [monthlyData, setMonthlyData] = useState([]);
   const [currentTime, setCurrentTime] = useState(new Date());
 
-  const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#8b5cf6"];
-  const GRADIENTS = [
-    "linear-gradient(135deg, #3b82f6, #2563eb)",
-    "linear-gradient(135deg, #10b981, #059669)",
-    "linear-gradient(135deg, #f59e0b, #d97706)",
-    "linear-gradient(135deg, #ef4444, #dc2626)",
-    "linear-gradient(135deg, #8b5cf6, #7c3aed)",
-    "linear-gradient(135deg, #06b6d4, #0891b2)",
-  ];
+  const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#06b6d4"];
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -72,25 +64,20 @@ export default function SuperAdminDashboard() {
     return Object.values(map).sort((a, b) => a.month.localeCompare(b.month));
   };
 
-  if (!data) return (
-    <div className="dashboard-loading">
-      <div className="spinner"></div>
-      <p>Loading your dashboard...</p>
-    </div>
-  );
 
-  const overviewCards = [
-    { label: "Total Companies", value: data.total_companies_registered ?? data.total_companies ?? 0, icon: <Building2 />, gradient: GRADIENTS[0] },
-    { label: "Total Employees", value: data.total_employees ?? 0, icon: <Users />, gradient: GRADIENTS[1] },
-    { label: "Active Companies", value: data.active_companies ?? 0, icon: <CheckCircle />, gradient: GRADIENTS[2] },
-    { label: "Suspended", value: data.inactive_companies ?? 0, icon: <XCircle />, gradient: GRADIENTS[3] },
-    { label: "Payroll Processed", value: data.total_payroll_processed || 0, isCurrency: true, icon: <IndianRupee />, gradient: GRADIENTS[4] },
-    { label: "HR / Admin Users", value: data.hr_admin_count ?? 0, icon: <UserCog />, gradient: GRADIENTS[5] },
-  ];
 
-  const companiesSummary = data.companies_summary || [];
-  const recentCompanies = data.recent_companies || [];
-  const systemHealth = data.system_health || "Healthy";
+  const overviewCards = data ? [
+    { label: "Total Companies", value: data.total_companies_registered ?? data.total_companies ?? 0, icon: <Building2 />, color: COLORS[0] },
+    { label: "Total Employees", value: data.total_employees ?? 0, icon: <Users />, color: COLORS[1] },
+    { label: "Active Companies", value: data.active_companies ?? 0, icon: <CheckCircle />, color: COLORS[2] },
+    { label: "Suspended", value: data.inactive_companies ?? 0, icon: <XCircle />, color: COLORS[3] },
+    { label: "Payroll Processed", value: data.total_payroll_processed || 0, isCurrency: true, icon: <IndianRupee />, color: COLORS[4] },
+    { label: "HR / Admin Users", value: data.hr_admin_count ?? 0, icon: <UserCog />, color: COLORS[5] },
+  ] : [];
+
+  const companiesSummary = data?.companies_summary || [];
+  const recentCompanies = data?.recent_companies || [];
+  const systemHealth = data?.system_health || "Healthy";
 
   const isHealthy = systemHealth.toLowerCase() === "healthy";
 
@@ -116,20 +103,29 @@ export default function SuperAdminDashboard() {
         </div>
       </div>
 
-      <div className="dashboard-kpis">
-        {overviewCards.map((item, index) => (
-          <div key={item.label} className="kpi-card premium-card" style={{ background: item.gradient, animationDelay: `${index * 0.1}s` }}>
-            <div className="kpi-icon-wrapper">{item.icon}</div>
-            <div className="kpi-info">
-              <h3>
-                {item.isCurrency ? "₹" : ""}
-                <CountUp end={item.value} separator="," duration={2.5} />
-              </h3>
-              <span>{item.label}</span>
+      {!data ? (
+        <div style={{ padding: "40px", textAlign: "center" }}>
+          <div className="spinner" style={{ margin: "0 auto" }}></div>
+          <p style={{ marginTop: "16px", color: "#64748b" }}>Loading your dashboard...</p>
+        </div>
+      ) : (
+        <div className="dashboard-kpis">
+          {overviewCards.map((item, index) => (
+            <div key={item.label} className="kpi-card premium-card" style={{ background: "#ffffff", boxShadow: "0 10px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1)", animationDelay: `${index * 0.1}s`, borderBottom: `4px solid ${item.color}`, padding: "24px", borderRadius: "16px", display: "flex", alignItems: "center", gap: "20px" }}>
+              <div className="kpi-icon-wrapper" style={{ background: item.color, color: "#ffffff", width: "64px", height: "64px", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: "28px", flexShrink: 0, boxShadow: `0 4px 12px ${item.color}66` }}>
+                {item.icon}
+              </div>
+              <div className="kpi-info" style={{ textAlign: "left", flex: 1 }}>
+                <h3 style={{ color: "#111827", fontSize: "1.85rem", fontWeight: "800", margin: "0 0 4px 0", letterSpacing: "-0.025em" }}>
+                  {item.isCurrency ? "₹" : ""}
+                  <CountUp end={item.value} separator="," duration={2.5} />
+                </h3>
+                <span style={{ color: "#475569", fontSize: "1rem", fontWeight: "600", textTransform: "uppercase", letterSpacing: "0.05em" }}>{item.label}</span>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       <div className="dashboard-grid">
         <div className="dashboard-card premium-card chart-card">
@@ -196,7 +192,7 @@ export default function SuperAdminDashboard() {
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
-                    data={data.role_distribution}
+                    data={data?.role_distribution || []}
                     dataKey="count"
                     nameKey="role"
                     cx="50%"
@@ -205,7 +201,7 @@ export default function SuperAdminDashboard() {
                     outerRadius={80}
                     paddingAngle={5}
                   >
-                    {data.role_distribution?.map((entry, index) => (
+                    {data?.role_distribution?.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
