@@ -599,8 +599,6 @@ export default function Companies() {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedCompanies = companies.slice(startIndex, startIndex + itemsPerPage);
 
-  if (loading) return <p>Loading companies...</p>;
-
   return (
     <div className="companies-page">
       <style>{`
@@ -713,7 +711,19 @@ export default function Companies() {
               </tr>
             </thead>
             <tbody>
-              {paginatedCompanies.map((c, index) => (
+              {loading ? (
+                <tr>
+                  <td colSpan="5" style={{ textAlign: "center", padding: "40px", color: "#94a3b8" }}>Loading companies...</td>
+                </tr>
+              ) : paginatedCompanies.length === 0 ? (
+                <tr>
+                  <td colSpan="5" style={{ textAlign: "center", padding: "48px 24px" }}>
+                    <div style={{ color: '#94a3b8', fontSize: '16px', marginBottom: '8px' }}>No companies found.</div>
+                    <div style={{ color: '#cbd5e1', fontSize: '14px' }}>Click "Create Company" to add one.</div>
+                  </td>
+                </tr>
+              ) : (
+                paginatedCompanies.map((c, index) => (
                 <tr 
                   key={`${c.id}-${index}`}
                   style={{ borderBottom: '1px solid #f1f5f9', transition: 'background-color 0.2s ease' }}
@@ -777,19 +787,12 @@ export default function Companies() {
                       style={{ padding: "8px", fontSize: 18, lineHeight: 1, borderRadius: '8px', background: 'transparent', border: 'none', cursor: 'pointer', color: '#64748b', transition: 'all 0.2s' }}
                       onMouseEnter={(e) => { e.currentTarget.style.background = '#f1f5f9'; e.currentTarget.style.color = '#0f172a'; }}
                       onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = '#64748b'; }}
-                    >
-                      ⋮
-                    </button>
-                  </td>
-                </tr>
-              ))}
-              {paginatedCompanies.length === 0 && (
-                <tr>
-                  <td colSpan="5" style={{ textAlign: "center", padding: "48px 24px" }}>
-                    <div style={{ color: '#94a3b8', fontSize: '16px', marginBottom: '8px' }}>No companies found.</div>
-                    <div style={{ color: '#cbd5e1', fontSize: '14px' }}>Click "Create Company" to add one.</div>
-                  </td>
-                </tr>
+                      >
+                        ⋮
+                      </button>
+                    </td>
+                  </tr>
+                ))
               )}
             </tbody>
           </table>

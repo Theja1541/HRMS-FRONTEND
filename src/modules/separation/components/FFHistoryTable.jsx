@@ -47,7 +47,7 @@ export default function FFHistoryTable({ data, loading, error, onRetry }) {
     },
     {
       title: 'Gross',
-      dataIndex: 'gross_amount',
+      dataIndex: 'total_earnings',
       render: (val) => <span style={{ fontFamily: 'monospace' }}>{formatCurrency(val)}</span>,
     },
     {

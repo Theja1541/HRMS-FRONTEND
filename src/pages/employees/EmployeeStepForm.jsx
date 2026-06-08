@@ -131,7 +131,7 @@ export default function EmployeeStepForm({ employee }) {
     const fetchRoles = async () => {
       try {
         const res = await getEmployeeRoles();
-        setCustomRoles(res.data.roles ? res.data.roles.map(r => typeof r === 'object' ? r.name : r) : []);
+        setCustomRoles(res.data.roles ? res.data.roles.filter(r => typeof r === 'object' ? r.is_active !== false : true).map(r => typeof r === 'object' ? r.name : r) : []);
       } catch (err) {
         console.error('Failed to fetch roles', err);
       }
@@ -140,7 +140,7 @@ export default function EmployeeStepForm({ employee }) {
     const fetchDepartments = async () => {
       try {
         const res = await getEmployeeDepartments();
-        setCustomDepartments(res.data.departments ? res.data.departments.map(d => typeof d === 'object' ? d.name : d) : []);
+        setCustomDepartments(res.data.departments ? res.data.departments.filter(d => typeof d === 'object' ? d.is_active !== false : true).map(d => typeof d === 'object' ? d.name : d) : []);
       } catch (err) {
         console.error('Failed to fetch departments', err);
       }
@@ -180,7 +180,7 @@ export default function EmployeeStepForm({ employee }) {
     try {
       await addEmployeeRole(newRole.trim());
       const res = await getEmployeeRoles();
-      setCustomRoles(res.data.roles ? res.data.roles.map(r => typeof r === 'object' ? r.name : r) : []);
+      setCustomRoles(res.data.roles ? res.data.roles.filter(r => typeof r === 'object' ? r.is_active !== false : true).map(r => typeof r === 'object' ? r.name : r) : []);
       update("role", newRole.trim());
       update("designation", newRole.trim());
     } catch (err) {
@@ -195,7 +195,7 @@ export default function EmployeeStepForm({ employee }) {
     try {
       await addEmployeeDepartment(newDept.trim());
       const res = await getEmployeeDepartments();
-      setCustomDepartments(res.data.departments ? res.data.departments.map(d => typeof d === 'object' ? d.name : d) : []);
+      setCustomDepartments(res.data.departments ? res.data.departments.filter(d => typeof d === 'object' ? d.is_active !== false : true).map(d => typeof d === 'object' ? d.name : d) : []);
       update("department", newDept.trim());
     } catch (err) {
       console.error('Failed to add department', err);

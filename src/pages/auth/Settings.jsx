@@ -5,6 +5,7 @@ import { useAuth } from "../../auth/AuthContext";
 import { deleteCompanyLogo, getCompanyBranding, uploadCompanyLogo } from "../../api/companies";
 import { useToast } from "../../context/ToastContext";
 import BillingDashboard from "../../components/billing/BillingDashboard";
+import CompanySmtpSettings from "./CompanySmtpSettings";
 import "../../styles/settings.css";
 
 export default function Settings() {
@@ -17,6 +18,7 @@ export default function Settings() {
   const [activeTab, setActiveTab] = useState(tabParam || "change-password");
   const canManageBranding = ["ADMIN", "HR", "SUPER_ADMIN"].includes(user?.role || "");
   const canViewSubscription = ["ADMIN", "HR"].includes(user?.role || "");
+  const canManageSmtp = ["ADMIN"].includes(user?.role || "");
 
   // Change Password State
   const [oldPassword, setOldPassword] = useState("");
@@ -255,6 +257,14 @@ export default function Settings() {
             Company Branding
           </button>
         )}
+        {canManageSmtp && (
+          <button
+            className={`tab ${activeTab === "company-smtp" ? "active" : ""}`}
+            onClick={() => setActiveTab("company-smtp")}
+          >
+            Email / SMTP
+          </button>
+        )}
         {canViewSubscription && (
           <button
             className={`tab ${activeTab === "subscription-plan" ? "active" : ""}`}
@@ -415,6 +425,10 @@ export default function Settings() {
               </>
             )}
           </div>
+        )}
+        
+        {activeTab === "company-smtp" && canManageSmtp && (
+          <CompanySmtpSettings />
         )}
 
         {activeTab === "subscription-plan" && canViewSubscription && (

@@ -69,7 +69,7 @@ import SupportTickets from "./pages/superadmin/SupportTickets";
 import ErrorBoundary from "./components/common/ErrorBoundary";
 
 import { ToastProvider } from "./context/ToastContext";
-import { getEffectiveSystemSettings } from "./api/superadmin";
+import { getEffectiveSystemSettings, getCachedEffectiveSettings } from "./api/superadmin";
 
 import PayrollSummary from "./pages/payroll/PayrollSummary";
 import AddSalaryRevision from "./pages/payroll/AddSalaryRevision";
@@ -109,11 +109,23 @@ import FFSettlementView from "./modules/separation/pages/FFSettlementView";
 import FFHistoryPage from "./modules/separation/pages/FFHistoryPage";
 
 function ModuleRoute({ module, page = null, action = null, children }) {
-  const [allowed, setAllowed] = useState(null);
-  const [companyFeatures, setCompanyFeatures] = useState({});
+  const cachedSettings = getCachedEffectiveSettings();
+  
+  const [allowed, setAllowed] = useState(() => {
+    if (cachedSettings) return cachedSettings.data?.features?.[module] !== false;
+    return null;
+  });
+  
+  const [companyFeatures, setCompanyFeatures] = useState(() => {
+    if (cachedSettings) return cachedSettings.data?.company_enabled_modules || {};
+    return {};
+  });
+
   const { user } = useAuth();
 
   useEffect(() => {
+    if (cachedSettings) return; // Sync state already set
+    
     let cancelled = false;
     getEffectiveSystemSettings()
       .then((res) => {
