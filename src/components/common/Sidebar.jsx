@@ -9,7 +9,6 @@ import {
   sidebarBrandingCacheKey,
 } from "../../utils/sidebarBrandingCache";
 import "../../styles/sidebar.css";
-import defaultCompanyLogo from "../../assets/company-logo.png";
 
 /**
  * Logo URLs from the API may be relative (/media/...). The app runs on Vite (e.g. :5173);
@@ -37,6 +36,8 @@ export default function Sidebar({ variant = "admin", isOpen, onClose, lockoutAct
   const [openAssets, setOpenAssets] = useState(false);
   const [openDaybook, setOpenDaybook] = useState(false);
   const [openSeparation, setOpenSeparation] = useState(false);
+  const [openProjects, setOpenProjects] = useState(false);
+  const [openAttendance, setOpenAttendance] = useState(false);
 
   const getBlockedStyle = (display = undefined) => {
     const styleObj = {};
@@ -61,6 +62,7 @@ export default function Sidebar({ variant = "admin", isOpen, onClose, lockoutAct
     holidays: true,
     daybook: true,
     separation: true,
+    projects: true,
   });
   const [logoImageLoaded, setLogoImageLoaded] = useState(false);
   const [logoImageError, setLogoImageError] = useState(false);
@@ -188,6 +190,7 @@ export default function Sidebar({ variant = "admin", isOpen, onClose, lockoutAct
             holidays: true,
             daybook: true,
             separation: true,
+            projects: true,
           });
           setCompanyFeatures({});
         }
@@ -202,7 +205,7 @@ export default function Sidebar({ variant = "admin", isOpen, onClose, lockoutAct
   const rawLogoUrl = hasBrandingPayload
     ? branding.logo_url || branding.logoUrl || null
     : user?.company?.logo_url || user?.company?.logoUrl || null;
-  const logoUrl = resolveBrandingLogoUrl(rawLogoUrl) || defaultCompanyLogo;
+  const logoUrl = resolveBrandingLogoUrl(rawLogoUrl);
   const showLogoGraphic = Boolean(logoUrl && !logoImageError);
   /** Never show company name while a logo URL exists — only skeleton until decode, or text if no logo / broken image. */
   const showTitleFallback = !showLogoGraphic;
@@ -319,48 +322,33 @@ export default function Sidebar({ variant = "admin", isOpen, onClose, lockoutAct
                 🧑 {!collapsed && "Company Users"}
               </NavLink>
             )}
-            {features.attendance && hasPermission("attendance", "attendance") && (
-              <NavLink to="/attendance" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
-                📅 {!collapsed && "Attendance"}
-              </NavLink>
-            )}
-            {features.attendance && hasPermission("attendance", "monthly") && (
-              <NavLink to="/monthly" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
-                📊 {!collapsed && "Monthly"}
-              </NavLink>
-            )}
-            {features.separation && hasPermission("separation") && (
+            {features.attendance && hasPermission("attendance") && (
               <>
                 <div
                   className="sidebar-item dropdown"
                   style={getBlockedStyle()}
-                  onClick={() => !lockoutActive && setOpenSeparation(!openSeparation)}
+                  onClick={() => !lockoutActive && setOpenAttendance(!openAttendance)}
                 >
-                  👋 {!collapsed && "Separation"}
+                  📅 {!collapsed && "Attendance"}
                   {!collapsed && (
-                    <span className="dropdown-arrow">{openSeparation ? "▲" : "▼"}</span>
+                    <span className="dropdown-arrow">{openAttendance ? "▲" : "▼"}</span>
                   )}
                 </div>
-                {openSeparation && !collapsed && (
+                {openAttendance && !collapsed && (
                   <div className="sidebar-dropdown-menu">
-                    {hasPermission("separation", "dashboard") && (user?.role === "HR" || user?.role === "ADMIN" || isSuperAdmin) && (
-                      <NavLink to="/separation" end className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
-                        📊 Dashboard
+                    {hasPermission("attendance", "attendance") && (
+                      <NavLink to="/attendance" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        📅 Daily Attendance
                       </NavLink>
                     )}
-                    {hasPermission("separation", "ff-history") && (user?.role === "HR" || user?.role === "ADMIN" || isSuperAdmin) && (
-                      <NavLink to="/separation/ff-history" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
-                        📜 F&F History
+                    {hasPermission("attendance", "monthly") && (
+                      <NavLink to="/monthly" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        📊 Monthly Attendance
                       </NavLink>
                     )}
                   </div>
                 )}
               </>
-            )}
-            {features.holidays && hasPermission("holidays") && (
-              <NavLink to="/holidays" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
-                🏖️ {!collapsed && "Holidays"}
-              </NavLink>
             )}
             {features.leave && hasPermission("leaves") && (
               <>
@@ -443,6 +431,92 @@ export default function Sidebar({ variant = "admin", isOpen, onClose, lockoutAct
                 )}
               </>
             )}
+            {features.projects && (user?.role === "ADMIN" || user?.role === "HR") && hasPermission("projects") && (
+              <>
+                <div
+                  className="sidebar-item dropdown"
+                  style={getBlockedStyle()}
+                  onClick={() => !lockoutActive && setOpenProjects(!openProjects)}
+                >
+                  🚀 {!collapsed && "Projects"}
+                  {!collapsed && (
+                    <span className="dropdown-arrow">{openProjects ? "▲" : "▼"}</span>
+                  )}
+                </div>
+                {openProjects && !collapsed && (
+                  <div className="sidebar-dropdown-menu">
+                    {hasPermission("projects", "dashboard") && (
+                      <NavLink to="/projects/dashboard" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        📊 Dashboard
+                      </NavLink>
+                    )}
+                    {hasPermission("projects", "projects") && (
+                      <NavLink to="/projects" end className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        📋 All Projects
+                      </NavLink>
+                    )}
+                    {hasPermission("projects", "projects") && (
+                      <NavLink to="/projects/create" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        ➕ Create Project
+                      </NavLink>
+                    )}
+                    {hasPermission("projects", "projects") && (
+                      <NavLink to="/projects/assign" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        👥 Assign Team
+                      </NavLink>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+            {features.daybook && hasPermission("daybook") && (
+              <>
+                <div
+                  className="sidebar-item dropdown"
+                  style={getBlockedStyle()}
+                  onClick={() => !lockoutActive && setOpenDaybook(!openDaybook)}
+                >
+                  📘 {!collapsed && "Day Book"}
+                  {!collapsed && (
+                    <span className="dropdown-arrow">{openDaybook ? "▲" : "▼"}</span>
+                  )}
+                </div>
+                {openDaybook && !collapsed && (
+                  <div className="sidebar-dropdown-menu">
+                    {hasPermission("daybook", "dashboard") && (
+                      <NavLink to="/daybook/dashboard" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        📊 Dashboard
+                      </NavLink>
+                    )}
+                    {hasPermission("daybook", "transactions") && (
+                      <NavLink to="/daybook/transactions" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        💸 Transactions
+                      </NavLink>
+                    )}
+                    {hasPermission("daybook", "vendors") && (
+                      <NavLink to="/daybook/vendors" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        🏢 Vendors
+                      </NavLink>
+                    )}
+                    {hasPermission("daybook", "categories") && (
+                      <NavLink to="/daybook/categories" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        📂 Categories
+                      </NavLink>
+                    )}
+                    {hasPermission("daybook", "reports") && (
+                      <NavLink to="/daybook/reports" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        📈 Reports
+                      </NavLink>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+            {features.holidays && hasPermission("holidays") && (
+              <NavLink to="/holidays" className="sidebar-item" style={getBlockedStyle()} onClick={onClose}>
+                🏖️ {!collapsed && "Holidays"}
+              </NavLink>
+            )}
             {features.assets && hasPermission("assets") && (
               <>
                 <div
@@ -496,44 +570,28 @@ export default function Sidebar({ variant = "admin", isOpen, onClose, lockoutAct
                 )}
               </>
             )}
-            
-            {features.daybook && hasPermission("daybook") && (
+            {features.separation && hasPermission("separation") && (
               <>
                 <div
                   className="sidebar-item dropdown"
                   style={getBlockedStyle()}
-                  onClick={() => !lockoutActive && setOpenDaybook(!openDaybook)}
+                  onClick={() => !lockoutActive && setOpenSeparation(!openSeparation)}
                 >
-                  📘 {!collapsed && "Day Book"}
+                  👋 {!collapsed && "Separation"}
                   {!collapsed && (
-                    <span className="dropdown-arrow">{openDaybook ? "▲" : "▼"}</span>
+                    <span className="dropdown-arrow">{openSeparation ? "▲" : "▼"}</span>
                   )}
                 </div>
-                {openDaybook && !collapsed && (
+                {openSeparation && !collapsed && (
                   <div className="sidebar-dropdown-menu">
-                    {hasPermission("daybook", "dashboard") && (
-                      <NavLink to="/daybook/dashboard" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                    {hasPermission("separation", "dashboard") && (user?.role === "HR" || user?.role === "ADMIN" || isSuperAdmin) && (
+                      <NavLink to="/separation" end className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
                         📊 Dashboard
                       </NavLink>
                     )}
-                    {hasPermission("daybook", "transactions") && (
-                      <NavLink to="/daybook/transactions" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
-                        💸 Transactions
-                      </NavLink>
-                    )}
-                    {hasPermission("daybook", "vendors") && (
-                      <NavLink to="/daybook/vendors" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
-                        🏢 Vendors
-                      </NavLink>
-                    )}
-                    {hasPermission("daybook", "categories") && (
-                      <NavLink to="/daybook/categories" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
-                        📂 Categories
-                      </NavLink>
-                    )}
-                    {hasPermission("daybook", "reports") && (
-                      <NavLink to="/daybook/reports" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
-                        📈 Reports
+                    {hasPermission("separation", "ff-history") && (user?.role === "HR" || user?.role === "ADMIN" || isSuperAdmin) && (
+                      <NavLink to="/separation/ff-history" className="sidebar-subitem" style={getBlockedStyle()} onClick={onClose}>
+                        📜 F&F History
                       </NavLink>
                     )}
                   </div>

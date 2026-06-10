@@ -10,8 +10,8 @@ import Button from '../../../components/ui/Button';
 import Spinner from '../../../components/ui/Spinner';
 import toast from 'react-hot-toast';
 import './FFSettlementView.css';
+import NoticeShortfallBanner from '../components/NoticeShortfallBanner';
 import { format } from 'date-fns';
-
 export default function FFSettlementView() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -24,13 +24,21 @@ export default function FFSettlementView() {
   const [isPatching, setIsPatching] = useState(false);
   const [disputeRemarks, setDisputeRemarks] = useState('');
 
+  const [generateLoading, setGenerateLoading] = useState(false);
+  const [generateError, setGenerateError] = useState(null);
+
   const fetchSettlement = async () => {
     try {
       setLoading(true);
       const res = await api.get(`/separation/settlements/${id}/`);
       setSettlement(res.data);
     } catch (err) {
-      setError('Failed to load settlement details.');
+      if (err.response?.status === 404) {
+        // Settlement not found, we can generate it
+        setError('');
+      } else {
+        setError('Failed to load settlement details.');
+      }
     } finally {
       setLoading(false);
     }
@@ -59,7 +67,6 @@ export default function FFSettlementView() {
       setIsPatching(true);
       await api.patch(`/separation/settlements/${id}/`, {
         status: 'PENDING_APPROVAL',
-        // Assuming there might be a field for resolution notes in backend, ignoring for now if not schema-supported
       });
       toast.success("Dispute marked as resolved.");
       fetchSettlement();
@@ -67,6 +74,21 @@ export default function FFSettlementView() {
       toast.error("Failed to resolve dispute.");
     } finally {
       setIsPatching(false);
+    }
+  };
+
+  const handleGenerate = async () => {
+    try {
+      setGenerateLoading(true);
+      setGenerateError(null);
+      const { generateFFSettlement } = await import('../api/separationService');
+      const data = await generateFFSettlement(id);
+      setSettlement(data);
+      setError('');
+    } catch (err) {
+      setGenerateError(err.message || 'Failed to generate settlement.');
+    } finally {
+      setGenerateLoading(false);
     }
   };
 
@@ -78,7 +100,7 @@ export default function FFSettlementView() {
     );
   }
 
-  if (error || !settlement) {
+  if (error) {
     return (
       <div className="ff-view-error">
         <p>{error}</p>
@@ -98,10 +120,25 @@ export default function FFSettlementView() {
     <div className="ff-view-page">
       <div className="ff-header">
         <div className="ff-header-top">
-          <h2>Full & Final Settlement #{settlement.id}</h2>
+          <h2>Full & Final Settlement {settlement ? `#${settlement.id}` : 'Generation'}</h2>
           <Button variant="secondary" onClick={() => navigate(-1)}>Back</Button>
         </div>
         
+        {generateError && (
+          <div style={{ backgroundColor: '#fee2e2', color: '#b91c1c', padding: '12px', borderRadius: '4px', marginBottom: '16px', border: '1px solid #f87171' }}>
+            {generateError}
+          </div>
+        )}
+
+        {!settlement && (
+          <div style={{ marginBottom: '20px' }}>
+            <Button onClick={handleGenerate} disabled={generateLoading}>
+              {generateLoading ? 'Generating...' : 'Generate F&F Settlement'}
+            </Button>
+          </div>
+        )}
+        
+        {settlement && (
         <div className="ff-status-bar">
           <SettlementStatusBadge status={settlement.status} />
           {settlement.locked && settlement.approved_by && (
@@ -110,7 +147,12 @@ export default function FFSettlementView() {
             </span>
           )}
         </div>
+        )}
       </div>
+
+      {settlement && (
+        <>
+          <NoticeShortfallBanner snapshot={settlement.notice_shortfall_snapshot} />
 
       <div className="ff-employee-bar">
         <div className="emp-stat">
@@ -150,38 +192,41 @@ export default function FFSettlementView() {
           <h3>Earnings</h3>
           <div className="fin-row">
             <span>Gross Salary (Prorated)</span>
-            <span>{formatCurrency(settlement.gross_amount)}</span>
+            <span>{formatCurrency(settlement.total_earnings || 0)}</span>
           </div>
-          {/* If there are other earnings, list them here */}
         </div>
 
         <div className="ff-deductions-card">
           <h3>Deductions</h3>
-          <DeductionTable 
-            deductions={settlement.deductions} 
-            isLocked={settlement.locked} 
-            onAddDeduction={handleAddDeduction}
-            isSubmitting={isPatching}
-          />
+          {settlement.deductions && settlement.deductions.length > 0 ? (
+            settlement.deductions.map((deduction, idx) => (
+              <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #eee' }}>
+                <span>{deduction.deduction_type}</span>
+                <span>{formatCurrency(deduction.amount)}</span>
+              </div>
+            ))
+          ) : (
+            <p>No deductions applied.</p>
+          )}
         </div>
       </div>
 
-      <div className="ff-summary-bar">
+      <div className="ff-summary-bar" style={{ display: 'flex', gap: '24px', marginTop: '16px', padding: '16px', backgroundColor: '#f9fafb', borderRadius: '8px' }}>
         <div className="summary-item">
           <span>Gross Payable:</span>
-          <strong>{formatCurrency(settlement.gross_amount)}</strong>
+          <strong style={{ marginLeft: '8px' }}>{formatCurrency(settlement.total_earnings || 0)}</strong>
         </div>
         <div className="summary-item">
           <span>Total Deductions:</span>
-          <strong>{formatCurrency(totalDeductions)}</strong>
+          <strong style={{ marginLeft: '8px' }}>{formatCurrency(settlement.total_deductions || 0)}</strong>
         </div>
-        <div className="summary-item net-payable">
+        <div className="summary-item net-payable" style={{ marginLeft: 'auto', fontSize: '1.2rem', color: '#059669' }}>
           <span>Net Payable:</span>
-          <strong>{formatCurrency(settlement.net_amount)}</strong>
+          <strong style={{ marginLeft: '8px' }}>{formatCurrency(settlement.net_amount || 0)}</strong>
         </div>
       </div>
 
-      <div className="ff-actions">
+      <div className="ff-actions" style={{ marginTop: '24px' }}>
         {canApprove && (
           <ApproveSettlementButton 
             settlementId={settlement.id} 
@@ -189,6 +234,8 @@ export default function FFSettlementView() {
           />
         )}
       </div>
+      </>
+      )}
     </div>
   );
 }

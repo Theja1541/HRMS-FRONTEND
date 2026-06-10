@@ -35,17 +35,17 @@ export default function EditedAttendanceModal({
 
   const getStatusBadge = (status, type) => {
     const colors = {
-      PRESENT: { bg: type === "prev" ? "#fee2e2" : "#d1fae5", text: type === "prev" ? "#991b1b" : "#065f46" },
-      ABSENT: { bg: type === "prev" ? "#fee2e2" : "#fee2e2", text: type === "prev" ? "#991b1b" : "#991b1b" },
-      PAID_LEAVE: { bg: "#fed7aa", text: "#9a3412" },
-      UNPAID_LEAVE: { bg: "#fed7aa", text: "#9a3412" },
-      HALF_DAY: { bg: "#fef3c7", text: "#92400e" },
-      HOLIDAY: { bg: "#e0e7ff", text: "#3730a3" },
-      WEEK_OFF: { bg: "#f3f4f6", text: "#374151" }
+      PRESENT: { bg: type === "prev" ? "rgba(239, 68, 68, 0.15)" : "rgba(16, 185, 129, 0.15)", text: type === "prev" ? "#fca5a5" : "#6ee7b7", border: type === "prev" ? "rgba(239,68,68,0.3)" : "rgba(16,185,129,0.3)" },
+      ABSENT: { bg: "rgba(239, 68, 68, 0.15)", text: "#fca5a5", border: "rgba(239,68,68,0.3)" },
+      PAID_LEAVE: { bg: "rgba(245, 158, 11, 0.15)", text: "#fcd34d", border: "rgba(245,158,11,0.3)" },
+      UNPAID_LEAVE: { bg: "rgba(245, 158, 11, 0.15)", text: "#fcd34d", border: "rgba(245,158,11,0.3)" },
+      HALF_DAY: { bg: "rgba(234, 179, 8, 0.15)", text: "#fde047", border: "rgba(234,179,8,0.3)" },
+      HOLIDAY: { bg: "rgba(99, 102, 241, 0.15)", text: "#a5b4fc", border: "rgba(99,102,241,0.3)" },
+      WEEK_OFF: { bg: "rgba(148, 163, 184, 0.15)", text: "#cbd5e1", border: "rgba(148,163,184,0.3)" }
     };
-    const color = colors[status] || { bg: "#f3f4f6", text: "#374151" };
+    const color = colors[status] || { bg: "rgba(148, 163, 184, 0.15)", text: "#cbd5e1", border: "rgba(148,163,184,0.3)" };
     return (
-      <span className="status-badge" style={{ background: color.bg, color: color.text }}>
+      <span className="status-badge" style={{ background: color.bg, color: color.text, border: `1px solid ${color.border}` }}>
         {status?.replace("_", " ")}
       </span>
     );

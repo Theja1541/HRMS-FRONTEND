@@ -159,8 +159,8 @@ export default function ApplyLeave() {
       {/* HEADER */}
 
       <div className="page-header">
-        <h2>Apply Leave</h2>
-        <p>Submit your leave request</p>
+        <h2 style={{ color: "white" }}>Apply Leave</h2>
+        <p style={{ color: "white" }}>Submit your leave request</p>
       </div>
 
       <div className="apply-leave-layout">
@@ -187,7 +187,7 @@ export default function ApplyLeave() {
 
                 {leaveTypes.map(type => (
                   <option key={type.id} value={type.id}>
-                    {type.name} ({type.annual_quota} days/year)
+                    {type.name} ({type.annual_quota} days {type.accrual_type === 'MONTHLY' ? '(Monthly)' : type.accrual_type === 'QUARTERLY' ? '(Quarterly)' : '(Annual)'})
                   </option>
                 ))}
 

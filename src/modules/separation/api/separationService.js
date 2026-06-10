@@ -5,9 +5,18 @@ export const getAssetClearanceStatus = async (resignationId) => {
   return response.data;
 };
 
-export const generateFFSettlement = async (resignationId, payload = {}) => {
-  const response = await api.post(`/separation/requests/${resignationId}/generate_ff_settlement/`, payload);
-  return response.data;
+export const generateFFSettlement = async (resignationRequestId) => {
+  try {
+    const response = await api.post(`/separation/settlements/generate/`, {
+      resignation_request_id: resignationRequestId,
+    });
+    return response.data;
+  } catch (error) {
+    if (error.response && error.response.data && error.response.data.detail) {
+      throw new Error(error.response.data.detail);
+    }
+    throw error;
+  }
 };
 
 export const approveFFSettlement = async (settlementId) => {

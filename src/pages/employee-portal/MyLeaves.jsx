@@ -125,8 +125,8 @@ export default function MyLeaves() {
     <div className="my-leaves-page">
       <div className="page-header">
         <div>
-          <h2>My Leaves</h2>
-          <p>Track your leave requests</p>
+          <h2 style={{ color: "white" }}>My Leaves</h2>
+          <p style={{ color: "white" }}>Track your leave requests</p>
         </div>
       </div>
 
