@@ -146,6 +146,16 @@ const ORIGINAL_MODULES_SCHEMA = [
       { key: "dashboard", label: "Dashboard", actions: ["view", "approve", "edit"] },
       { key: "ff-history", label: "F&F History", actions: ["view", "export"] }
     ]
+  },
+  {
+    key: "projects",
+    label: "Projects",
+    icon: "🚀",
+    description: "Manage projects, clients, and assign teams.",
+    pages: [
+      { key: "dashboard", label: "Dashboard", actions: ["view"] },
+      { key: "projects", label: "All Projects", actions: ["view", "create", "edit", "delete"] }
+    ]
   }
 ];
 

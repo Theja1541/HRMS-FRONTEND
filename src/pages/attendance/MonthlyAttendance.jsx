@@ -346,6 +346,7 @@ export default function MonthlyAttendance() {
   let absent = 0;
   let holiday = 0;
   let weekOff = 0;
+  let lop = 0;
 
   Object.keys(attendance).forEach((date) => {
     if (!date.startsWith(month)) return;
@@ -370,11 +371,12 @@ export default function MonthlyAttendance() {
         if (rec.status === "ABSENT") absent++;
         if (rec.status === "HOLIDAY") holiday++;
         if (rec.status === "WEEK_OFF") weekOff++;
+        if (rec.status === "ABSENT" || rec.status === "UNPAID_LEAVE") lop++;
       }
     );
   });
 
-  return { present, leave, absent, holiday, weekOff };
+  return { present, leave, absent, holiday, weekOff, lop };
 }, [attendance, month, selectedEmployee]);
 
   const chartData = [
@@ -454,6 +456,10 @@ export default function MonthlyAttendance() {
         <div className="summary-card absent">
           <h3>{summary.absent}</h3>
           <span>Total Absent</span>
+        </div>
+        <div className="summary-card" style={{ backgroundColor: "#fee2e2", borderLeft: "4px solid #ef4444", padding: "16px", borderRadius: "8px", display: "flex", flexDirection: "column", gap: "8px" }}>
+          <h3 style={{ margin: 0, fontSize: "24px", color: "#b91c1c" }}>{summary.lop}</h3>
+          <span style={{ fontSize: "14px", color: "#991b1b", fontWeight: "600" }}>Total LOP Days</span>
         </div>
       </div>
 

@@ -8,6 +8,21 @@ import BillingDashboard from "../../components/billing/BillingDashboard";
 import CompanySmtpSettings from "./CompanySmtpSettings";
 import "../../styles/settings.css";
 
+function resolveBrandingLogoUrl(raw) {
+  if (raw == null) return null;
+  const s = String(raw).trim();
+  if (!s) return null;
+  if (/^(https?:|data:)/i.test(s)) return s;
+  if (s.startsWith("//") && typeof window !== "undefined") {
+    return `${window.location.protocol}${s}`;
+  }
+  const base = (api.defaults?.baseURL || "").replace(/\/+$/, "");
+  const origin = base.replace(/\/api\/?$/i, "") || (typeof window !== "undefined" ? window.location.origin : "");
+  if (!origin) return s;
+  if (s.startsWith("/")) return `${origin}${s}`;
+  return `${origin}/${s}`;
+}
+
 export default function Settings() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -83,7 +98,8 @@ export default function Settings() {
     }
   }, [tabParam]);
 
-  const brandingLogoUrl = branding?.logo_url || branding?.logoUrl || null;
+  const rawLogoUrl = branding?.logo_url || branding?.logoUrl || null;
+  const brandingLogoUrl = resolveBrandingLogoUrl(rawLogoUrl);
 
   useEffect(() => {
     if (!canManageBranding) return;

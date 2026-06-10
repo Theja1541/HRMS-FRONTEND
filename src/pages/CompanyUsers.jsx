@@ -136,6 +136,7 @@ export default function CompanyUsers() {
 
   // Onboarding Form State (Unified structure)
   const [form, setForm] = useState({
+    role: "HR",
     first_name: "",
     last_name: "",
     email: "",
@@ -646,7 +647,7 @@ export default function CompanyUsers() {
 
     try {
       const formData = new FormData();
-      formData.append("role", "HR");
+      formData.append("role", form.role);
       formData.append("email", form.email.trim());
       formData.append("username", form.email.trim().toLowerCase());
       formData.append("first_name", form.first_name.trim());
@@ -698,7 +699,7 @@ export default function CompanyUsers() {
       });
 
       await createCompanyUser(formData);
-      alert("HR user onboarded successfully. A temporary password has been emailed.");
+      alert(`${ROLE_LABELS[form.role] || form.role} onboarded successfully. A temporary password has been emailed.`);
       
       // Reset State
       setForm({
@@ -1370,7 +1371,7 @@ export default function CompanyUsers() {
       {showOnboardWizard ? (
         <div className="cu-card">
           <div className="cu-card-header">
-            <h3 className="cu-card-title">✨ Onboard New HR User</h3>
+            <h3 className="cu-card-title">✨ Onboard New Company User</h3>
             <button
               type="button"
               className="btn secondary"
@@ -1393,13 +1394,19 @@ export default function CompanyUsers() {
               </div>
             ))}
           </div>
-
           <form onSubmit={(e) => e.preventDefault()}>
             <div className={`step-animate ${direction}`}>
               
               {/* STEP 1: Personal Info */}
               {wizardStep === 0 && (
                 <div className="cu-form-grid">
+                  <div className="cu-form-field">
+                    <label>User Role *</label>
+                    <select name="role" value={form.role} onChange={handleChange} required>
+                      <option value="HR">Company HR</option>
+                      <option value="ADMIN">Company Admin</option>
+                    </select>
+                  </div>
                   <div className="cu-form-field">
                     <label>Employee ID *</label>
                     <input
@@ -1908,14 +1915,8 @@ export default function CompanyUsers() {
                             <div className={`custom-checkbox ${allChecked ? "checked" : ""}`} onClick={() => toggleModule(mod.key)} />
                           </div>
                           <div className="module-desc">{mod.description}</div>
-                          <div className="subpages-list">
-                            {mod.pages.map(p => (
-                              <div key={p.key} className="subpage-item" onClick={() => togglePage(mod.key, p.key)}>
-                                <div className={`custom-checkbox ${modObj[p.key] === true ? "checked" : ""}`} />
-                                <span>{p.label}</span>
-                              </div>
-                            ))}
-                          </div>
+
+
                         </div>
                       );
                     })}
@@ -2638,14 +2639,8 @@ export default function CompanyUsers() {
                             <div className={`custom-checkbox ${allChecked ? "checked" : ""}`} onClick={() => toggleModule(mod.key)} />
                           </div>
                           <div className="module-desc">{mod.description}</div>
-                          <div className="subpages-list">
-                            {mod.pages.map(p => (
-                              <div key={p.key} className="subpage-item" onClick={() => togglePage(mod.key, p.key)}>
-                                <div className={`custom-checkbox ${modObj[p.key] === true ? "checked" : ""}`} />
-                                <span>{p.label}</span>
-                              </div>
-                            ))}
-                          </div>
+
+
                         </div>
                       );
                     })}

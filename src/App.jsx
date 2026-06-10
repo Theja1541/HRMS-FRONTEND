@@ -108,6 +108,14 @@ import SeparationDashboard from "./modules/separation/pages/SeparationDashboard"
 import FFSettlementView from "./modules/separation/pages/FFSettlementView";
 import FFHistoryPage from "./modules/separation/pages/FFHistoryPage";
 
+/* Projects */
+import ProjectDashboard from "./pages/Projects/ProjectDashboard";
+import ProjectList from "./pages/Projects/ProjectList";
+import CreateProject from "./pages/Projects/CreateProject";
+import ProjectDetails from "./pages/Projects/ProjectDetails";
+import AssignEmployees from "./pages/Projects/AssignEmployees";
+import EditProject from "./pages/Projects/EditProject";
+
 function ModuleRoute({ module, page = null, action = null, children }) {
   const cachedSettings = getCachedEffectiveSettings();
   
@@ -463,6 +471,15 @@ export default function App() {
             <Route path="separation/ff-history" element={<ModuleRoute module="separation" page="ff-history"><FFHistoryPage /></ModuleRoute>} />
             <Route path="separation/ff-settlements/:id" element={<ModuleRoute module="separation" page="dashboard"><FFSettlementView /></ModuleRoute>} />
 
+            {/* Projects */}
+            <Route path="projects/dashboard" element={<ProtectedRoute allowedRoles={["ADMIN","HR","FINANCE_ADMIN"]}><ProjectDashboard /></ProtectedRoute>} />
+            <Route path="projects" element={<ProtectedRoute allowedRoles={["ADMIN","HR","FINANCE_ADMIN"]}><ProjectList /></ProtectedRoute>} />
+            <Route path="projects/create" element={<ProtectedRoute allowedRoles={["ADMIN","HR"]}><CreateProject /></ProtectedRoute>} />
+            <Route path="projects/:id" element={<ProtectedRoute allowedRoles={["ADMIN","HR","FINANCE_ADMIN"]}><ProjectDetails /></ProtectedRoute>} />
+            <Route path="projects/edit/:id" element={<ProtectedRoute allowedRoles={["ADMIN","HR"]}><EditProject /></ProtectedRoute>} />
+            <Route path="projects/assign" element={<ProtectedRoute allowedRoles={["ADMIN","HR"]}><AssignEmployees /></ProtectedRoute>} />
+            <Route path="projects/:id/assign" element={<ProtectedRoute allowedRoles={["ADMIN","HR"]}><AssignEmployees /></ProtectedRoute>} />
+
             {/* Settings */}
             <Route path="settings" element={<Settings />} />
           </Route>
@@ -490,6 +507,8 @@ export default function App() {
             <Route path="asset-requests" element={<ModuleRoute module="assets"><MyAssetReturns /></ModuleRoute>} />
             <Route path="holidays" element={<EmployeeHolidays />} />
             <Route path="resignation" element={<ResignationForm />} />
+            <Route path="projects" element={<ProjectList />} />
+            <Route path="projects/:id" element={<ProjectDetails />} />
             <Route path="settings" element={<Settings />} />
           </Route>
 

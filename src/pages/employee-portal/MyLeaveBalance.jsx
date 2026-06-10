@@ -29,8 +29,8 @@ export default function MyLeaveBalance() {
     <div className="leave-balance-page">
       <div className="page-header">
         <div>
-          <h2>My Leave Balance</h2>
-          <p>Track your yearly leave usage</p>
+          <h2 style={{ color: "white" }}>My Leave Balance</h2>
+          <p style={{ color: "white" }}>Track your yearly leave usage</p>
         </div>
       </div>
 

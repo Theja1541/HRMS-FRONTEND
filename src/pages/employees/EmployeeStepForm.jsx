@@ -590,6 +590,36 @@ export default function EmployeeStepForm({ employee }) {
               value={form.work_location}
               onChange={(e)=>update("work_location", e.target.value)}
             />
+
+            <div className="form-field">
+              <label>Employment Type</label>
+              <select
+                value={form.employment_type || "Full-time"}
+                onChange={(e)=>update("employment_type", e.target.value)}
+              >
+                <option value="Full-time">Full-time</option>
+                <option value="Part-time">Part-time</option>
+                <option value="Contract">Contract</option>
+                <option value="Intern">Intern</option>
+              </select>
+            </div>
+
+            <Input label="Reporting Manager"
+              value={form.reporting_manager || ""}
+              onChange={(e)=>update("reporting_manager", e.target.value)}
+              placeholder="e.g. John Doe"
+            />
+
+            <div className="form-field">
+              <label>Work From Home</label>
+              <select
+                value={form.is_work_from_home ? "Yes" : "No"}
+                onChange={(e)=>update("is_work_from_home", e.target.value === "Yes")}
+              >
+                <option value="No">No</option>
+                <option value="Yes">Yes</option>
+              </select>
+            </div>
           </>
         )}
 
